@@ -33,7 +33,7 @@ class Toaster
 				@modules = [].concat( eval( stdout ) )
 				for module in @modules
 					module.src = pn "#{@basepath}/#{module.src}"
-					module.release = pn "#{@basepath}/#{module.relese}"
+					module.release = pn "#{@basepath}/#{module.release}"
 					@compile module 
 		else
 			new Machine().toast @basepath

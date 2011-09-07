@@ -23,8 +23,7 @@
     "node": "0.4.9"
   },
   "dependencies": {
-	"coffee-script": "1.x",
-	 "inotify": "0.1.6"
+	"coffee-script": "1.x"
   },
   "devDependencies": {
   }
