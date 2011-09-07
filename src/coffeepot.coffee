@@ -1,82 +1,60 @@
-# toaster init $name $src $release
+# toaster new /path/fo/folder
 # toaster
 
 fs = require "fs"
-sys = require "sys"
 path = require "path"
+pn = path.normalize
 coffee = require "coffee-script"
-
-spawn = require('child_process').spawn
-child = spawn('bad_command')
-
 exec = (require "child_process").exec
 
 exports.run =->
-	coffeepot = new CoffeePot
+	toaster = new Toaster
 
-class CoffeePot
+
+class Toaster
+	
 	
 	constructor:->
 		@basepath = path.resolve(".")
 		
-		a = process.argv
-		if a.length > 2
-			console.log "sera???"
-			switch a[2]
-				when "new"
-					exec "mkdir #{a[3]}", (err, stdout, stderr)=>
-						@init()
-				else
-					child.stderr.setEncoding( "utf-8" )
-					child.stderr.on "data", (data) =>
-						console.log ">>>> #{data}"
-				
-			# console.log "You need to inform a folder! (coffee new myapp)"
-			
-		else if a.length > 2
-			if a[2].substr( 0, 1) == "/"
-				@basepath = a[2]
-			else
-				@basepath += "/#{a[2]}"
+		argv = process.argv[2..]
+		if argv.length && argv[0] == "new"
+			@base
+			new Machine().make @basepath, argv
+		else
+			@basepath += "/#{argv[0]}" if argv.length
+			@basepath = @basepath.replace /\/[^\/]+\/\.{2}/, ""
 			@init()
 	
 	init:->
-		
-		console.log @basepath
-		
-		toaster = "#{@basepath}/toaster.coffee"
-		if path.existsSync toaster
-			exec "coffee -p --bare #{toaster}", (error, stdout, stderr)=>
+		filepath = pn "#{@basepath}/toaster.coffee"
+		if path.existsSync filepath
+			exec "coffee -p --bare #{filepath}", (error, stdout, stderr)=>
 				@modules = [].concat( eval( stdout ) )
 				for module in @modules
-					module.basepath = @basepath
-					@compile module
+					module.src = pn "#{@basepath}/#{module.src}"
+					module.release = pn "#{@basepath}/#{module.relese}"
+					@compile module 
 		else
-			console.log "You haven't toasted this project yet, lets do it:"
-			console.log "\t1: What's you source folder, relative to this path?"
-			console.log "\t\t #{@basepath}"
+			new Machine().toast @basepath
 	
 	compile:(module)->
+		contents = @clean( @reorder( @collect( module.src ) ) )
+		fs.writeFileSync module.release, contents
 		
-		filepath = path.normalize "#{@basepath}/#{module.release}"
-		folderpath = filepath.split( "/" ).slice( 0, -1 ).join( "/" )
-		
-		fs.writeFileSync filepath, @clean( @reorder( @collect( module ) ) )
-		exec "coffee -c #{filepath}", (err, stdout, stderr)=>
-			console.time( "Compiled with cheese!\r\n\t#{filepath}"
+		exec "coffee -c #{module.release}", (error, stdout, stderr)=>
+			console.log "Toasted with love:\r\n\t#{module.release}"
 			if !module.watcher
-				module.watcher = new CoffeeWatcher( this, module )
+				module.watcher = new Watcher( this, module )
+		
+		true
 	
 	collect:(path, buffer = [])->
-		
-		path = path.src || path
-		for file in fs.readdirSync( path )
-			
-			filepath = "#{path}/#{file}"
+		for file in fs.readdirSync path
+			filepath = pn "#{path}/#{file}"
 			if fs.statSync( filepath ).isDirectory()
-				@collect( filepath, buffer )
-			
-			else if filepath.substr( -6 ) == "coffee"
+				@collect filepath, buffer
+			else if filepath.substr -6 == "coffee"
 				raw = fs.readFileSync( filepath, "utf-8" )
 				name = /(class\s)([\S]+)/g.exec( raw )[ 2 ]
 				
@@ -89,7 +67,6 @@ class CoffeePot
 	
 	reorder:(classes)->
 		initd = {}
-		
 		for klass, i in classes
 			initd["#{klass.name}"] = 1
 			if klass.ext
@@ -109,24 +86,92 @@ class CoffeePot
 
 
 
-class CoffeeWatcher
+class Watcher
 	
 	constructor:(@toaster, @module)->
-		console.log "Listening to..."
-		src = path.normalize "#{@module.basepath}/#{@module.src}"
-		
-		exec "find #{src} -name '*.coffee'", (error, stdout, stderr)=>
+		console.log "Watching:"
+		exec "find #{@module.src} -name '*.coffee'", (error, stdout, stderr)=>
 			for file in files = stdout.trim().split("\n")
-				filepath = path.normalize file
-				console.log "... #{filepath}"
+				filepath = pn file
+				console.log "... \t#{filepath}"
 				fs.watchFile filepath, {interval : 250}, (curr,prev)=>
 					mtime = curr.mtime.valueOf() != prev.mtime.valueOf()
 					ctime = curr.ctime.valueOf() != prev.ctime.valueOf()
 					@toaster.compile @module if mtime || ctime
 			console.log "--------------------------------------------------"
-			
-			
 
-# TODO: create class
-class CoffeeInit
-	# interactive create toaster.coffee
+
+
+class Machine
+	
+	tpl: "modules = \r\n\tname: '%name'\r\n\tsrc: '%src'\r\n\trelease: '%release'"
+	
+	make:(@basepath, argv)->
+		
+		[action, target] = [argv[0] if argv[0], argv[1] if argv[1]]
+		if target == undefined
+			console.log "You need to inform a target path!"
+			return console.log "toaster new myawesomeapp"
+		
+		if target.substr( 0, 1 ) != "/"
+			target = path.normalize( "#{@basepath}/#{target}" )
+		
+		console.log ". Wonderful! Let's toast this sly little project! :)"
+		console.log ". First, consider this as your basepath: #{target}"
+		console.log ". Now tell me:"
+		@ask "\tWhat's your app name? (none)", /.+/, (name)=>
+			@ask "\tWhere's its src folder? (src)", /.*/, (src)=>
+				@ask "\tWhere do you want your release file? (release/app.js)", /.*/, (release)=>
+					
+					srcdir = src || "src"
+					releasefile = release || "release/app.js"
+					releasedir = releasefile.split("/").slice( 0, 1).join "/"
+					
+					# config file
+					toaster = "#{target}/toaster.coffee"
+					contents = @tpl.replace "%name", name
+					contents = contents.replace "%src", srcdir
+					contents = contents.replace "%release", releasefile
+					
+					fs.mkdirSync target, 0755
+					fs.mkdirSync "#{target}/#{srcdir}", 0755
+					fs.mkdirSync "#{target}/#{releasedir}", 0755
+					fs.writeFileSync toaster, contents
+					
+					process.exit()
+	
+	toast:(@basepath)->
+		console.log "It seems this project hasn't been toasted yet."
+		
+		@ask "Do you wanna toast it? (Y/n)", /.*/, (data)=>
+			if data != "" && data.toLowerCase != "y"
+				return process.exit()
+			else
+				console.log ". Wonderful! Let's toast this sly little project! :)"
+				console.log ". First, consider this as your basepath: #{@basepath}"
+				console.log ". Now tell me:"
+
+				@ask "\tWhat's your app name? (none)", /.+/, (name)=>
+					@ask "\tWhere's its src folder? (i.e. src)", /.*/, (src)=>
+						@ask "\tWhere do you want your release file? (i.e. release/app.js)", /.*/, (release)=>
+							path = pn "#{@basepath}/toaster.coffee"
+							toaster = @tpl.replace "%name", name
+							toaster = toaster.replace "%src", src
+							toaster = toaster.replace "%release", release
+							fs.writeFileSync path, toaster
+							process.exit()
+	
+	ask:(question, format, fn)->
+		stdin = process.stdin
+		stdout = process.stdout
+
+		stdin.resume()
+		stdout.write "#{question} "
+
+		stdin.once 'data', (data)=>
+			data = data.toString().trim()
+			if format.test data
+				fn data
+			else
+				stdout.write "It should match: #{format}\n"
+				@ask question, format, fn
