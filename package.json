@@ -1,0 +1,31 @@
+{
+  "author": "Anderson Arboleya <me@nybras.com> (TODO: add url)",
+  "name": "coffee-pot",
+  "description": "Minimalist build system for coffee-script projects.",
+  "version": "0.0.1",
+  "homepage": "TODO: add homepage",
+  "repository": {
+    "type": "git",
+    "url": "TODO: add repository"
+  },
+  "main": "main.js",
+  "directories" : {
+    "lib" : "./lib/"
+  },
+  "main" : "./lib/coffeepot",
+  "bin":          {
+    "coffeepot":     "./bin/coffeepot"
+  },
+  "scripts": {
+    "test": "test.js"
+  },
+  "engines": {
+    "node": "0.4.9"
+  },
+  "dependencies": {
+	"coffee-script": "1.x",
+	 "inotify": "0.1.6"
+  },
+  "devDependencies": {
+  }
+}
