@@ -1,20 +1,19 @@
 {
-  "author": "Anderson Arboleya <me@nybras.com> (TODO: add url)",
-  "name": "coffee-pot",
-  "description": "Minimalist build system for coffee-script projects.",
+  "author": "Anderson Arboleya <me@nybras.com>",
+  "name": "coffee-toaster",
+  "description": "Minimalist inheritance-aware build system for coffee-script projects.",
   "version": "0.0.1",
   "homepage": "TODO: add homepage",
   "repository": {
     "type": "git",
     "url": "TODO: add repository"
   },
-  "main": "main.js",
-  "directories" : {
-    "lib" : "./lib/"
+  "main": "./lib/toaster",
+  "directories": {
+    "lib": "./lib/"
   },
-  "main" : "./lib/coffeepot",
-  "bin":          {
-    "coffeepot":     "./bin/coffeepot"
+  "bin": {
+    "toaster": "./bin/toaster"
   },
   "scripts": {
     "test": "test.js"

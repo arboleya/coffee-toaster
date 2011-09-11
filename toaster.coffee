@@ -1,4 +1,4 @@
 modules = 
 	name: 'Coffee Toaster'
 	src: 'src'
-	release: 'lib/coffepot.js'
+	release: 'lib/toaster.js'
