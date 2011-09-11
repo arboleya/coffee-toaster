@@ -17,6 +17,8 @@ You can have one or many classes per file, it doesn't matter, CoffeeToaster will
 
 ## Creating a new App
 
+CoffeeToaster suggests a very simple structure for initial projects, you can customize it as you like.
+
 	toaster new mynewapp
 
 You will be asked for some things:
@@ -32,7 +34,7 @@ Your scructure will be create with a 'toaster.coffee' file inside it.
 
 ## Toasting an existing project
 
-Your can toast an existent project like thisL
+Your can toast an existent project like this:
 
 	cd existing-project
 	toaster
@@ -95,22 +97,27 @@ Dependencies required in this method will be placed **after** the 'extended' one
 
 For example, let's assume you have three files:
 
-	# a.coffee
+**a.coffee**
+
 	#<< C
 	class A extends B
 		constructor:->
 			console.log "C created"
 			console.log new C
-	
-	# b.coffee
+
+**b.coffee**
+
 	class B
 		constructor:-> console.log "B created"
-	
-	# c.coffee
+
+**c.coffee**
+
 	class C
 		constructor:-> console.log "C created"
 
 This way, everything will be merged in an order like this:
+
+**buffer**
 
 	class B
 		constructor:-> console.log "B created"
@@ -173,4 +180,4 @@ You can also specify multiple modules lilke:
 			name: "My Sub Awesome App"
 			src: "vendors/mysubapp"
 			release: "release/subapp.js"
-		}	
+		}
