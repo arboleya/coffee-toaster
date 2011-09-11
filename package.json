@@ -2,7 +2,7 @@
   "author": "Anderson Arboleya <me@nybras.com>",
   "name": "coffee-toaster",
   "description": "Minimalist inheritance-aware build system for coffee-script projects.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "homepage": "TODO: add homepage",
   "repository": {
     "type": "git",
