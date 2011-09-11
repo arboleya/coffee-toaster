@@ -1,13 +1,15 @@
 fs = require "fs"
 path = require "path"
+
 pn = path.normalize
-coffee = require "coffee-script"
 exec = (require "child_process").exec
+
+coffee = require "coffee-script"
+colors = require 'colors'
 
 exports.run =->
 	toaster = new Toaster
 
-#<< Machine, Watcher
 
 class Toaster
 	
@@ -35,10 +37,10 @@ class Toaster
 	
 	compile:(module)->
 		@collect module, (files)=>
-			contents = @clean( @reorder( files, true ) )
+			contents = @clean( @reorder( files ) )
 			fs.writeFileSync module.release, contents
 			exec "coffee -c #{module.release}", (error, stdout, stderr)=>
-				console.log "Toasted with love: #{module.release}"
+				console.log "#{'Toasted with love:'.magenta} #{module.release}"
 				module.watcher = new Watcher( this, module ) if !module.watcher
 	
 	collect:(module, fn)->
@@ -70,18 +72,25 @@ class Toaster
 				buffer.push {name:name, dependencies:dependencies, raw:raw}
 			fn buffer
 	
-	reorder:(classes, debug = false)->
+	missing: {},
+	reorder:(classes, cycling = false)->
+		@missing = {} if !cycling
 		initd = {}
 		for klass, i in classes
 			initd["#{klass.name}"] = 1
-			
 			if klass.dependencies.length
 				for dependency, index in klass.dependencies
 					if !initd[dependency]
 						result = @find classes, dependency
-						classes.splice( index, 0, result.item )
-						classes.splice( result.index + 1, 1 )
-						classes = @reorder( classes )
+						if result?
+							classes.splice( index, 0, result.item )
+							classes.splice( result.index + 1, 1 )
+							classes = @reorder classes, true
+						else if !@missing[dependency]
+							@missing[dependency] = 1
+							klass.dependencies.push dependency
+							klass.dependencies.splice index, 1
+							console.log "WARNING ".bold.red, "Dependence #{dependency.bold.cyan} not found for class #{klass.name.bold.cyan}"
 		classes
 	
 	findall:(path, search_folders, fn)->
@@ -102,54 +111,56 @@ class Toaster
 
 
 class Machine
-
-	tpl: "modules = \r\n\tname: '%name'\r\n\tsrc: '%src'\r\n\trelease: '%release'"
-
+	tpl: "modules = \r\n\tname: '%name'\r\n\tsrc: '%src'\r\n\trelease: '%release'\r\n"
+	
 	make:(@basepath, argv)->
-
 		[action, target] = [argv[0] if argv[0], argv[1] if argv[1]]
 		if target == undefined
-			console.log "You need to inform a target path!"
-			return console.log "toaster new myawesomeapp"
-
+			console.log "You need to inform a target path!".red
+			return console.log "toaster new myawesomeapp".green
+		
 		if target.substr( 0, 1 ) != "/"
 			target = path.normalize( "#{@basepath}/#{target}" )
-
-		console.log ". Wonderful! Let's toast this sly little project! :)"
-		console.log ". First, consider this as your basepath: #{target}"
+		
+		console.log ". #{'Wonderful!'.rainbow} #{'Let\'s toast something fresh! :)'.grey.bold}"
+		console.log ". First, consider this as your basepath: #{target.cyan}"
 		console.log ". Now tell me:"
 		@ask "\tWhat's your app name? (none)", /.+/, (name)=>
 			@ask "\tWhere's its src folder? (src)", /.*/, (src)=>
 				@ask "\tWhere do you want your release file? (release/app.js)", /.*/, (release)=>
-
+					
 					srcdir = src || "src"
 					releasefile = release || "release/app.js"
 					releasedir = releasefile.split("/").slice( 0, 1).join "/"
-
+					
 					# config file
 					toaster = "#{target}/toaster.coffee"
 					contents = @tpl.replace "%name", name
 					contents = contents.replace "%src", srcdir
 					contents = contents.replace "%release", releasefile
-
+					
 					fs.mkdirSync target, 0755
+					console.log "#{'Created'.green.bold} #{target}"
 					fs.mkdirSync "#{target}/#{srcdir}", 0755
+					console.log "#{'Created'.green.bold} #{target}/#{srcdir}"
 					fs.mkdirSync "#{target}/#{releasedir}", 0755
+					console.log "#{'Created'.green.bold} #{target}/#{releasedir}"
 					fs.writeFileSync toaster, contents
-
+					console.log "#{'Created'.green.bold} #{toaster}"
+					
 					process.exit()
-
+	
 	toast:(@basepath)->
 		console.log "It seems this project hasn't been toasted yet."
-
+		
 		@ask "Do you wanna toast it? (Y/n)", /.*/, (data)=>
 			if data != "" && data.toLowerCase != "y"
 				return process.exit()
 			else
-				console.log ". Wonderful! Let's toast this sly little project! :)"
-				console.log ". First, consider this as your basepath: #{@basepath}"
+				console.log ". #{'Wonderful!'.rainbow} #{'Let\'s toast this sly little project! :)'.grey.bold}"
+				console.log ". First, consider this as your basepath: #{@basepath.cyan}"
 				console.log ". Now tell me:"
-
+				
 				@ask "\tWhat's your app name? (none)", /.+/, (name)=>
 					@ask "\tWhere's its src folder? (i.e. src)", /.+/, (src)=>
 						@ask "\tWhere do you want your release file? (i.e. release/app.js)", /.+/, (release)=>
@@ -157,13 +168,16 @@ class Machine
 							toaster = @tpl.replace "%name", name
 							toaster = toaster.replace "%src", src
 							toaster = toaster.replace "%release", release
+							
 							fs.writeFileSync path, toaster
+							console.log "#{'Created'.green.bold} #{path}"
+							
 							process.exit()
-
+	
 	ask:(question, format, fn)->
 		stdin = process.stdin
 		stdout = process.stdout
-
+		
 		stdin.resume()
 		stdout.write "#{question} "
 		
@@ -172,70 +186,84 @@ class Machine
 			if format.test data
 				fn data
 			else
-				stdout.write "It should match: #{format}\n"
+				stdout.write "\t#{'Invalid option! It should match:'.red} #{format.toString().cyan}\n"
 				@ask question, format, fn
+
 
 class Watcher
 	snapshots: {}
 	
 	constructor:(@toaster, @module)->
-		@toaster.findall @module.src, false, (files)=>
-			@watch_file file for file in files
-		@toaster.findall @module.src, true, (folders)=>
-			@watch_folder folder for folder in folders
-
+		@watch_folder module.src
+	
 	watch_file:(path)->
 		path = pn path
-		console.log "Watching file: #{path}"
+		console.log "#{'Watching file:'.cyan} #{path}"
 		fs.watchFile path, {interval : 250}, (curr,prev)=>
 			mtime = curr.mtime.valueOf() != prev.mtime.valueOf()
 			ctime = curr.ctime.valueOf() != prev.ctime.valueOf()
-			@toaster.compile @module if mtime || ctime
-
+			if mtime || ctime
+				console.log "#{'File Changed:'.yellow} #{path}"
+				@toaster.compile @module
+	
 	watch_folder:(path)->
 		path = pn path
-		console.log "Watching folder: #{path}"
+		console.log "#{'Watching folder:'.cyan} #{path}"
 		
 		exec "ls #{path}", (error, stdout, stderr)=>
-			@snapshots[path] = @clean_ls stdout
+			@snapshots[path] = @format_ls path, stdout
+			for item in @snapshots[path]
+				if item.type == "folder"
+					@watch_folder item.path
+				else
+					@watch_file item.path
 		
 		fs.watchFile path, {interval : 250}, (curr,prev)=>
 			exec "ls #{path}", (error, stdout, stderr)=>
-				diff = @diff @snapshots[path], @clean_ls stdout
+				diff = @diff( @snapshots[path], @format_ls( path, stdout ) )
+				if diff.length
+					@toaster.compile @module
 				for item in diff
 					switch item.action
 						when "created"
-							console.log "New file created, start watching: #{path}/#{item.path}"
-							@watch_file "#{path}/#{item.path}"
+							console.log "#{'New file created:'.green} #{item.path}"
+							@watch_file item.path
 						when "deleted"
-							console.log "File deleted, stop watching: #{path}/#{item.path}"
-							fs.unwatchFile "#{path}/#{item.path}"
+							console.log "#{'File deleted, stop watching:'.red} #{item.path}"
+							fs.unwatchFile item.path
 				
-				@snapshots[path] = @clean_ls stdout
+				@snapshots[path] = @format_ls path, stdout
+	
+	format_ls:(path, stdout)->
+		list = stdout.toString().trim().split "\n"
+		for item, index in list
+			if item == "\n"
+				list.splice index, 1
+			else
+				stats = fs.lstatSync "#{path}/#{item}"
+				list[index] = {
+					type: if stats.isDirectory() then "folder" else "file"
+					path: "#{path}/#{item}"
+				}
+	
+		list
 	
 	diff:(a,b)->
 		diff = []
 		
 		for item in a
 			if !@has item, b
-				diff.push {action:"deleted", path: item}
+				console.log 
+				diff.push {type:item.type, path: item.path, action:"deleted"}
 		
 		for item in b
 			if !@has item, a
-				diff.push {action:"created", path: item}
+				diff.push {type:item.type, path: item.path, action:"created"}
 		
 		diff
 	
 	has:(search, source)->
 		for item in source
-			if item == search
+			if item.path == search.path
 				return true
 		false
-	
-	clean_ls:(stdout)->
-		list = stdout.trim().split "\n"
-		for item, index in list
-			if item == "\n"
-				list.splice index, 1
-		
-		list
