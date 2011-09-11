@@ -70,6 +70,7 @@ class Toaster
 						dependencies = dependencies.concat item
 				
 				buffer.push {name:name, dependencies:dependencies, raw:raw}
+			
 			fn buffer
 	
 	missing: {},
@@ -98,7 +99,7 @@ class Toaster
 		exec "find #{path} #{query}", (error, stdout, stderr)=>
 			buffer = []
 			for item in items = stdout.trim().split "\n"
-				buffer.push item if item != "." && item != ".."
+				buffer.push item if item != "." && item != ".." && item != ""
 			fn buffer
 	
 	find:(classes, name)->
@@ -226,10 +227,18 @@ class Watcher
 				for item in diff
 					switch item.action
 						when "created"
-							console.log "#{'New file created:'.green} #{item.path}"
-							@watch_file item.path
+							switch item.type
+								when "file"
+									console.log "#{'New file created:'.green} #{item.path}"
+									@watch_file item.path
+								when "folder"
+									console.log "#{'New folder created:'.green} #{item.path}"
+									@watch_folder item.path
 						when "deleted"
-							console.log "#{'File deleted, stop watching:'.red} #{item.path}"
+							prefix = item.type.substr( 0, 1).toUpperCase()
+							prefix += item.type.substr( 1 )
+							msg = "#{prefix} deleted, stop watching:"
+							console.log "#{msg.red} #{item.path}"
 							fs.unwatchFile item.path
 				
 				@snapshots[path] = @format_ls path, stdout
@@ -237,7 +246,7 @@ class Watcher
 	format_ls:(path, stdout)->
 		list = stdout.toString().trim().split "\n"
 		for item, index in list
-			if item == "\n"
+			if item == "\n" || item == ""
 				list.splice index, 1
 			else
 				stats = fs.lstatSync "#{path}/#{item}"
@@ -245,7 +254,6 @@ class Watcher
 					type: if stats.isDirectory() then "folder" else "file"
 					path: "#{path}/#{item}"
 				}
-	
 		list
 	
 	diff:(a,b)->
