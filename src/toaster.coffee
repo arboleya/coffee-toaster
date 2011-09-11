@@ -38,7 +38,7 @@ class Toaster
 			contents = @clean( @reorder( files, true ) )
 			fs.writeFileSync module.release, contents
 			exec "coffee -c #{module.release}", (error, stdout, stderr)=>
-				console.log "Toasted with love:\r\n\t#{module.release}"
+				console.log "Toasted with love: #{module.release}"
 				module.watcher = new Watcher( this, module ) if !module.watcher
 	
 	collect:(module, fn)->
@@ -166,7 +166,7 @@ class Machine
 
 		stdin.resume()
 		stdout.write "#{question} "
-
+		
 		stdin.once 'data', (data)=>
 			data = data.toString().trim()
 			if format.test data
@@ -176,9 +176,9 @@ class Machine
 				@ask question, format, fn
 
 class Watcher
-
+	snapshots: {}
+	
 	constructor:(@toaster, @module)->
-		console.log "Watching:"
 		@toaster.findall @module.src, false, (files)=>
 			@watch_file file for file in files
 		@toaster.findall @module.src, true, (folders)=>
@@ -186,7 +186,7 @@ class Watcher
 
 	watch_file:(path)->
 		path = pn path
-		console.log "...file: \t#{path}"
+		console.log "Watching file: #{path}"
 		fs.watchFile path, {interval : 250}, (curr,prev)=>
 			mtime = curr.mtime.valueOf() != prev.mtime.valueOf()
 			ctime = curr.ctime.valueOf() != prev.ctime.valueOf()
@@ -194,6 +194,48 @@ class Watcher
 
 	watch_folder:(path)->
 		path = pn path
-		console.log "...folder: \t#{path}"
+		console.log "Watching folder: #{path}"
+		
+		exec "ls #{path}", (error, stdout, stderr)=>
+			@snapshots[path] = @clean_ls stdout
+		
 		fs.watchFile path, {interval : 250}, (curr,prev)=>
-			console.log curr, prev
+			exec "ls #{path}", (error, stdout, stderr)=>
+				diff = @diff @snapshots[path], @clean_ls stdout
+				for item in diff
+					switch item.action
+						when "created"
+							console.log "New file created, start watching: #{path}/#{item.path}"
+							@watch_file "#{path}/#{item.path}"
+						when "deleted"
+							console.log "File deleted, stop watching: #{path}/#{item.path}"
+							fs.unwatchFile "#{path}/#{item.path}"
+				
+				@snapshots[path] = @clean_ls stdout
+	
+	diff:(a,b)->
+		diff = []
+		
+		for item in a
+			if !@has item, b
+				diff.push {action:"deleted", path: item}
+		
+		for item in b
+			if !@has item, a
+				diff.push {action:"created", path: item}
+		
+		diff
+	
+	has:(search, source)->
+		for item in source
+			if item == search
+				return true
+		false
+	
+	clean_ls:(stdout)->
+		list = stdout.trim().split "\n"
+		for item, index in list
+			if item == "\n"
+				list.splice index, 1
+		
+		list
