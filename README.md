@@ -1,4 +1,3 @@
-
 # Coffee Toaster
 
 Essential build tool for working with complex inheritance architecture using CoffeeScript.
@@ -181,3 +180,6 @@ You can also specify multiple modules lilke:
 			src: "vendors/mysubapp"
 			release: "release/subapp.js"
 		}
+
+# Mailing List
+https://groups.google.com/group/coffee-toaster?hl=pt-BR
