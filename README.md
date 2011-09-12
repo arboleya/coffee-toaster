@@ -182,4 +182,6 @@ You can also specify multiple modules lilke:
 		}
 
 # Mailing List
-https://groups.google.com/group/coffee-toaster?hl=pt-BR
+
+A place to talk about it.
+https://groups.google.com/group/coffee-toaster
