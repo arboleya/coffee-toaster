@@ -82,7 +82,7 @@ Wait! How the hell it know when classes are needed?
 
 ## Extends directive
 
-Every time you use 'calss A extends B', CoffeeToaster reads the dependency -- "B" in this case -- and put it B before A, automagically.
+Every time you use 'class A extends B', CoffeeToaster reads the dependency -- "B" in this case -- and put it B before A, automagically.
 
 Of course, there must to be some file with the 'class B' declared inside of it, in your src folder.
 
