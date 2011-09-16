@@ -40,7 +40,12 @@ class Toaster
 			contents = @clean( @reorder( files ) )
 			fs.writeFileSync module.release, contents
 			exec "coffee -c #{module.release}", (error, stdout, stderr)=>
-				console.log "#{'Toasted with love:'.magenta} #{module.release}"
+				if error
+					console.log "#{'Compile Error:'.red}"
+					console.log stderr
+				else
+					console.log "#{'Toasted with love:'.magenta} #{module.release}"
+				
 				module.watcher = new Watcher( this, module ) if !module.watcher
 	
 	collect:(module, fn)->
