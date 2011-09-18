@@ -1,12 +1,21 @@
-# Coffee Toaster
+# Coffee Toaster (current version - 0.2.0)
 
-Essential build tool for working with complex inheritance architecture using CoffeeScript.
+Minimalist dependency management system for CoffeeScript.
 
-CoffeeToaster adds support for inheritance between multiple CoffeeScript source files, it lets you split everything into modules and automagically resolves all your 'extends' or declared dependencies, compiling every module into a single Javascript file.
+# Features
 
-Every CoffeeScript file is merged with the proper order **before** being compiled to Java Script.
-
-You can have one or many classes per file, it doesn't matter, CoffeeToaster will gently handle everything for you.
+ * Inheritance support across multiples files for the lazy
+  * Just use your extends as you do, dependencies will be resolved automagically.
+  * Or add explicit requirements with the simplest possible syntax:
+   * #<< ClassName
+   * #<< ClassNameA, ClassNameB
+ * Scaffolding routines
+  * Interactive creation of a very simple skeleton for new projects
+  * Interactive creation of new config file for existent projects
+ * Circular-dependency validation
+  * Helps you prevent some mistakes
+ * Live syntax-check
+  * Precise live check for compile problems (syntax-only), with file path and line number informations.
 
 # Installation
 
@@ -69,6 +78,7 @@ This file contains informations about the modules you have in your app, i.e:
 		name: "My Awesome App"
 		src: "src"
 		release: "release/app.js"
+
 
 So you when you call 'toaster' inside this directory, every file and folder start being watched.
 
@@ -162,7 +172,6 @@ The output JavaScript compiled after reordering classes will be something like t
 	    return A;
 	  })();
 	}).call(this);
-
 
 As you can see, things are ordered properly, then you can have your application's tree all tied up with a single start point.
 
