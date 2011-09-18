@@ -1,6 +1,6 @@
 # CoffeeToaster Changelog
 
-## 0.1.2 - 09/18/2011
+## 0.2.0 - 09/18/2011
  * Tag 0.1.2 is now used as submodule in order to self-toast (aka manage dependencies) of new versions of CoffeeToaster itself, starting from now
  * Refactoring everything, classes are now one per file, using dependency directives from CoffeeToaster itself. From now on, things should evolve a little easier.
  * Individualizing CoffeeScript handling
