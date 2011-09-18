@@ -4,12 +4,11 @@ path = require "path"
 pn = path.normalize
 exec = (require "child_process").exec
 
-coffee = require "coffee-script"
+cs = require "coffee-script"
 colors = require 'colors'
 
 exports.run =->
 	toaster = new Toaster
-
 
 class Toaster
 	
@@ -26,27 +25,49 @@ class Toaster
 	init:->
 		filepath = pn "#{@basepath}/toaster.coffee"
 		if path.existsSync filepath
-			exec "coffee -p --bare #{filepath}", (error, stdout, stderr)=>
-				@modules = [].concat( eval( stdout ) )
-				for module in @modules
-					module.src = pn "#{@basepath}/#{module.src}"
-					module.release = pn "#{@basepath}/#{module.release}"
-					@compile module 
+
+			contents = cs.compile fs.readFileSync( filepath, "utf-8" ), {bare:1}
+			@modules = [].concat( eval contents )
+			
+			for module in @modules
+				module.src = pn "#{@basepath}/#{module.src}"
+				module.release = pn "#{@basepath}/#{module.release}"
+				@compile module 
 		else
 			new Machine().toast @basepath
 	
 	compile:(module)->
 		@collect module, (files)=>
-			contents = @clean( @reorder( files ) )
-			fs.writeFileSync module.release, contents
-			exec "coffee -c #{module.release}", (error, stdout, stderr)=>
-				if error
-					console.log "#{'Compile Error:'.red}"
-					console.log stderr
-				else
-					console.log "#{'Toasted with love:'.magenta} #{module.release}"
+			
+			ordered = @reorder files
+			
+			linenum = 1
+			for file, i in ordered
+				file.start = linenum
+				file.length = file.raw.split("\n").length
+				file.end = file.start + ( file.length - 1 )
+				linenum = file.end + 1
+			
+			contents = @merge ordered
+			
+			try
+				contents = cs.compile( contents )
+				fs.writeFileSync module.release, contents
+				console.log "#{'Toasted with love:'.magenta} #{module.release}"
+			
+			catch err
+				msg = err.message
+				line = msg.match( /(line\s)([0-9]+)/ )[2]
 				
-				module.watcher = new Watcher( this, module ) if !module.watcher
+				for file in ordered
+					if line >= file.start && line <= file.end
+						line = (line - file.start) + 1
+						msg = msg.replace /line\s[0-9]+/, "line #{line}"
+						msg = msg.substr( 0, 1 ).toUpperCase() + msg.substr( 1 ).toLowerCase()
+						console.log "ERROR!".bold.red, msg,
+							"\n\t#{file.path.red}"
+			
+			module.watcher = new Watcher( this, module ) if !module.watcher
 	
 	collect:(module, fn)->
 		@findall module.src, false, (files)=>
@@ -59,7 +80,7 @@ class Toaster
 				if /(class\s)([\S]+)/g.test raw
 					name = /(class\s)([\S]+)/g.exec( raw )[ 2 ]
 				
-				if @find buffer, name
+				if @find buffer, name, "name"
 					continue
 				
 				# class dependencies
@@ -74,7 +95,12 @@ class Toaster
 						item = [].concat item.split ","
 						dependencies = dependencies.concat item
 				
-				buffer.push {name:name, dependencies:dependencies, raw:raw}
+				buffer.push {
+					path:file
+					name:name
+					dependencies:dependencies
+					raw:raw
+				}
 			
 			fn buffer
 	
@@ -85,18 +111,38 @@ class Toaster
 		for klass, i in classes
 			initd["#{klass.name}"] = 1
 			if klass.dependencies.length
-				for dependency, index in klass.dependencies
-					if !initd[dependency]
-						result = @find classes, dependency
-						if result?
+				
+				index = 0
+				while index < klass.dependencies.length
+					dependency = klass.dependencies[index]
+					
+					if initd[dependency]
+						index++
+						continue
+						
+					result = @find classes, dependency, "name"
+					if result?
+						
+						src = result.item.dependencies
+						if @find( src, klass.name )?
+							klass.dependencies.splice( index, 1 )
+							console.log "WARNING! ".bold.yellow,
+								"You have a circular loop between classes",
+								"#{dependency.yellow.bold} and",
+								"#{klass.name.yellow.bold}."
+							continue
+						else
 							classes.splice( index, 0, result.item )
 							classes.splice( result.index + 1, 1 )
 							classes = @reorder classes, true
-						else if !@missing[dependency]
-							@missing[dependency] = 1
-							klass.dependencies.push dependency
-							klass.dependencies.splice index, 1
-							console.log "WARNING ".bold.red, "Dependence #{dependency.bold.cyan} not found for class #{klass.name.bold.cyan}"
+					
+					else if !@missing[dependency]
+						@missing[dependency] = 1
+						klass.dependencies.push dependency
+						klass.dependencies.splice index, 1
+						console.log "WARNING ".bold.red, "Dependence #{dependency.bold.cyan} not found for class #{klass.name.bold.cyan}"
+					
+					index++
 		classes
 	
 	findall:(path, search_folders, fn)->
@@ -107,13 +153,14 @@ class Toaster
 				buffer.push item if item != "." && item != ".." && item != ""
 			fn buffer
 	
-	find:(classes, name)->
-		for j, i in classes
-			return {item: j, index: i} if j.name == name
+	find:(source, search, by_property)->
+		for j, i in source
+			if j == search || j[by_property] == search
+				return {item: j, index: i}
+		return
 	
-	clean:(input)->
-		(input[ i ] = klass.raw for klass, i in input).join "\r\n"
-
+	merge:(input)->
+		(klass.raw for klass in input).join "\n"
 
 
 class Machine
