@@ -1,12 +1,12 @@
 {
   "author": "Anderson Arboleya <me@nybras.com>",
   "name": "coffee-toaster",
-  "description": "Minimalist inheritance-aware build system for coffee-script projects.",
-  "version": "0.1.0",
+  "description": "Minimalist dependency management system for coffee-script.",
+  "version": "0.1.2",
   "homepage": "TODO: add homepage",
   "repository": {
     "type": "git",
-    "url": "TODO: add repository"
+    "url": "http://github.com/serpentem/coffee-toaster"
   },
   "main": "./lib/toaster",
   "directories": {
