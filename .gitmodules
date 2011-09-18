@@ -1,0 +1,3 @@
+[submodule "build/coffee-toaster-0.1.0"]
+	path = build/coffee-toaster-0.1.0
+	url = git://github.com/serpentem/coffee-toaster.git

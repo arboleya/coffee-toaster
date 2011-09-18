@@ -1,0 +1,2 @@
+class Css
+	constructor:->
