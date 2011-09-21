@@ -22,14 +22,15 @@ class Toaster
      	\n#{'Minimalist dependency management system for coffee-script.'.grey}
      	\n#{'Usage:'.grey.bold} $0")
     	.alias('n', 'new')
+    	.alias('h', 'help')
     	.describe('n', 'Creating a new App')
 
 		@basepath = path.resolve(".")    	
 
-		if ( argv.argv.n || argv.argv.new )
+		if ( argv.argv.n )
 			new Project( @basepath ).create argv.argv
 
-		else if ( argv.argv.h || argv.argv.help )
+		else if ( argv.argv.h )
 			console.log argv.help()
 
 		else
