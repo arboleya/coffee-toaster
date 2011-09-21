@@ -6,7 +6,7 @@ class Project extends Question
 	
 	create:(argv)->
 		
-		[action, target] = [argv[0] if argv[0], argv[1] if argv[1]]
+		target = if argv.n then argv.n else argv.new
 		
 		if target == undefined
 			console.log "You need to inform a target path!".red

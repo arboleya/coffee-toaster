@@ -12,8 +12,9 @@ class Config extends Question
 	create:()->
 		
 		console.log "It seems this project hasn't been toasted yet."
+		lol = "Y"
 		@ask "Do you wanna toast it? (Y/n)", /.*/, (data)=>
-			if data != "" && data.toLowerCase != "y"
+			if data != "" && data.toLowerCase() != "y"
 				return process.exit()
 			else
 				console.log ". #{'Wonderful!'.rainbow}",

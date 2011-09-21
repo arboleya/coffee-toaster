@@ -22,8 +22,9 @@
     "node": ">= 0.4.9"
   },
   "dependencies": {
-	"coffee-script": "1.x",
-	"colors": "0.5.0"
+    "coffee-script": "1.x",
+    "colors": "0.5.0",
+    "optimist":"0.2.6"
   },
   "devDependencies": {
   }
