@@ -4,7 +4,6 @@ path = require "path"
 pn = path.normalize
 exec = (require "child_process").exec
 
-coffee = require "coffee-script"
 colors = require 'colors'
 
 
