@@ -1,6 +1,6 @@
 # CoffeeToaster Changelog
 
-## 0.2.0 - 09/21/2011
+## 0.2.1
  * Implementing OptionParser (using Optimist)
 
 ## 0.2.0 - 09/18/2011
