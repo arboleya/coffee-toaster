@@ -1,3 +1,4 @@
+fs = require "coffee-script"
 cs = require "coffee-script"
 
 #<< FsUtil, ArrayUtil, StringUtil
@@ -7,8 +8,7 @@ class Script
 	constructor:(@config)->
 		@src = @config.src
 		@release = @config.release
-		@watch()
-		@compile()
+		@compile( @watch )
 	
 	watch:=>
 		FsUtil.watch_folder @src, (info)=>
@@ -34,7 +34,7 @@ class Script
 					msg = "#{('Watching ' + info.type).cyan}"
 					console.log "#{msg} #{info.path}"
 	
-	compile:()->
+	compile:(fn)->
 		@collect (files)=>
 			ordered = @reorder( files )
 			
@@ -48,9 +48,39 @@ class Script
 			contents = @merge( ordered )
 			
 			try
+				# compile production file
 				contents = cs.compile( contents )
 				fs.writeFileSync @release, contents
-				console.log "#{'Toasted with love:'.magenta} #{@release}"
+				console.log "#{'Toasted with love:'.bold} #{@release}"
+				
+				# compiling test files
+				toaster = "#{@release.split("/").slice(0,-1).join '/'}/toaster"
+				classes = "#{toaster}/classes"
+				
+				FsUtil.rmdir_rf toaster if path.existsSync toaster
+				FsUtil.mkdir_p classes
+				
+				tmpl = "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
+				buffer = ""
+				
+				for file, index in ordered
+					relative = file.path.replace @src, ""
+					relative = relative.replace ".coffee", ".js"
+					
+					filepath = classes + relative
+					folderpath = filepath.split('/').slice(0,-1).join("/")
+					
+					if !path.existsSync folderpath
+						FsUtil.mkdir_p folderpath
+					
+					relative = "./toaster/classes#{relative}"
+					fs.writeFileSync filepath, cs.compile file.raw, {bare:1}
+					buffer += tmpl.replace( "%SRC%", relative ) + "\n"
+					
+				# write toaster loader
+				toaster = "#{toaster}/toaster.js"
+				fs.writeFileSync toaster, cs.compile buffer, {bare:1}
+			
 			catch err
 				msg = err.message
 				line = msg.match( /(line\s)([0-9]+)/ )[2]
@@ -61,6 +91,8 @@ class Script
 						msg = StringUtil.ucasef msg
 						console.log "ERROR!".bold.red, msg,
 							"\n\t#{file.path.red}"
+			
+			fn?()
 	
 	collect:(fn)->
 		FsUtil.find @src, "*.coffee", (files)=>
