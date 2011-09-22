@@ -2,7 +2,7 @@
   "author": "Anderson Arboleya <me@nybras.com>",
   "name": "coffee-toaster",
   "description": "Minimalist dependency management system for coffee-script.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "TODO: add homepage",
   "repository": {
     "type": "git",
@@ -22,8 +22,9 @@
     "node": ">= 0.4.9"
   },
   "dependencies": {
-	"coffee-script": "1.x",
-	"colors": "0.5.0"
+    "coffee-script": "1.x",
+    "colors": "0.5.0",
+    "optimist":"0.2.6"
   },
   "devDependencies": {
   }

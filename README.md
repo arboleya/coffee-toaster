@@ -27,7 +27,7 @@ Minimalist dependency management system for CoffeeScript.
 
 CoffeeToaster suggests a very simple structure for initial projects, you can customize it as you like.
 
-	toaster new mynewapp
+	toaster -n mynewapp
 
 You will be asked for some things:
 

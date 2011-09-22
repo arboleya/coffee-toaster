@@ -13,7 +13,7 @@ class Config extends Question
 		
 		console.log "It seems this project hasn't been toasted yet."
 		@ask "Do you wanna toast it? (Y/n)", /.*/, (data)=>
-			if data != "" && data.toLowerCase != "y"
+			if data != "" && data.toLowerCase() != "y"
 				return process.exit()
 			else
 				console.log ". #{'Wonderful!'.rainbow}",

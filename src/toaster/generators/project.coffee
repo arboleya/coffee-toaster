@@ -6,9 +6,9 @@ class Project extends Question
 	
 	create:(argv)->
 		
-		[action, target] = [argv[0] if argv[0], argv[1] if argv[1]]
+		target = argv.n
 		
-		if target == undefined
+		if target == true
 			console.log "You need to inform a target path!".red
 			return console.log "\ttoaster new myawesomeapp".green
 		
