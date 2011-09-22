@@ -68,7 +68,7 @@ class Script
 					relative = relative.replace ".coffee", ".js"
 					
 					filepath = classes + relative
-					folderpath = filepath.split('/').slice(0,-1).join("/")
+					folderpath = filepath.split('/').slice(0,-1).join "/"
 					
 					if !path.existsSync folderpath
 						FsUtil.mkdir_p folderpath
@@ -136,8 +136,7 @@ class Script
 		
 		for klass, i in classes
 			initd["#{klass.name}"] = 1
-			if !klass.dependencies.length
-				continue
+			continue if !klass.dependencies.length
 			
 			index = 0
 			while index < klass.dependencies.length
@@ -149,9 +148,7 @@ class Script
 				
 				found = ArrayUtil.find classes, dependency, "name"
 				if found?
-					
 					if ArrayUtil.has found.item.dependencies, klass.name, "name"
-						
 						klass.dependencies.splice( index, 1 )
 						console.log "WARNING! ".bold.yellow,
 							"You have a circular loop between classes",
@@ -173,12 +170,6 @@ class Script
 				index++
 				
 		classes
-	
-	check_syntax:(files)->
-		for file in files
-			try cs.compile file catch err
-				return {path:file, err:err}
-		return false
 	
 	merge:(input)->
 		(klass.raw for klass in input).join "\n"
