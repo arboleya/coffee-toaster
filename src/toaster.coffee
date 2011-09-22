@@ -6,6 +6,7 @@ exec = (require "child_process").exec
 
 coffee = require "coffee-script"
 colors = require 'colors'
+optimist = require 'optimist'
 
 
 exports.run =->
@@ -17,15 +18,25 @@ exports.run =->
 class Toaster
 	
 	constructor:->
-		@basepath = path.resolve(".")
-		argv = process.argv[2..]
-		
-		if argv.length && argv[0] == "new"
-			new Project( @basepath ).create argv
+		argv = optimist.usage("#{'Coffee Toaster'.cyan.bold}
+     	\n#{'Minimalist dependency management system for coffee-script.'.grey}
+     	\n#{'Usage:'.grey.bold} $0")
+    	.alias('n', 'new')
+    	.alias('h', 'help')
+    	.describe('n', 'Creating a new App')
+
+		@basepath = path.resolve(".")    	
+
+		if ( argv.argv.n )
+			new Project( @basepath ).create argv.argv
+
+		else if ( argv.argv.h )
+			console.log argv.help()
+
 		else
-			@basepath += "/#{argv[0]}" if argv.length
+			@basepath += "/#{argv.argv._[0]}" if argv.argv.length
 			@basepath = @basepath.replace /\/[^\/]+\/\.{2}/, ""
-			@init()
+			@init()	
 	
 	init:->
 		filepath = pn "#{@basepath}/toaster.coffee"
