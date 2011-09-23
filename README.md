@@ -5,7 +5,7 @@ Minimalist dependency management system for CoffeeScript.
 # Features
 
  * Inheritance support across multiples files for the lazy
-  * Just use your extends as you do, dependencies will be resolved automagically.
+  * Just use your extends as you do, dependencies will be resolved automagically
   * Or add explicit requirements with the simplest possible syntax:
    * #<< ClassName
    * #<< ClassNameA, ClassNameB
@@ -15,7 +15,7 @@ Minimalist dependency management system for CoffeeScript.
  * Circular-dependency validation
   * Helps you prevent some mistakes
  * Live syntax-check
-  * Precise live check for compile problems (syntax-only), with file path and line number informations.
+  * Precise live check for compile problems (syntax-only), with file path and line number informations
 
 # Installation
 
@@ -27,7 +27,7 @@ Minimalist dependency management system for CoffeeScript.
 
 CoffeeToaster suggests a very simple structure for initial projects, you can customize it as you like.
 
-	toaster -n mynewapp
+	toaster -ns mynewapp
 
 You will be asked for some things:
 
@@ -45,11 +45,11 @@ Your scructure will be create with a 'toaster.coffee' file inside it.
 Your can toast an existent project like this:
 
 	cd existing-project
-	toaster
+	toaster -is
 
 Or:
 
-	toaster existing-project
+	toaster -is existing-project
 
 The same questions (name, src, release) will be made, answer everything according your project structure.
 
@@ -189,6 +189,7 @@ You can also specify multiple modules lilke:
 			src: "vendors/mysubapp"
 			release: "release/subapp.js"
 		}
+	]
 
 # Mailing List
 

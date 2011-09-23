@@ -121,13 +121,18 @@ class Help
 		usage = "#{'CoffeeToaster'.bold}\n"
 		usage += "  Minimalist dependency management for CoffeeScript\n\n".grey
 		
-		usage += "#{'Usage'.bold}\n"
-		usage += "  toaster #{'[options]'.bold} #{'[path]'.bold}\n\n"
+		usage += "#{'Usage:'}\n"
+		usage += "  toaster [#{'options'.green}] [#{'path'.green}]\n\n"
 		
-		usage += "#{'Examples'.bold}\n"
-		usage += "  toaster -ns myawsomeapp   (required)\n"
-		usage += "  toaster -cs [myawsomeapp] (optional)\n"
-		usage += "  toaster -ws [myawsomeapp] (optional)\n"
+		usage += "#{'Examples:'}\n"
+		usage += "  toaster -ns myawsomeapp   (#{'required'.red})\n"
+		usage += "  toaster -is [myawsomeapp] (#{'optional'.green})\n"
+		usage += "  toaster -ws [myawsomeapp] (#{'optional'.green})\n\n"
+		
+		usage += "  For more examples, try:\n"
+		usage += "    toaster -e\n"
+		usage += "    toaster --exammples"
+		
 		# usage += "  toaster -nk myawsomeapp\n"
 		# usage += "  toaster -nc myawsomeapp\n"
 		# usage += "  toaster -nskc myawsomeapp"
@@ -167,6 +172,11 @@ class Help
 			# .boolean( 'c' )
 			# .default('c', false)
 			# .describe('c', 'Enable CoffeeCss handling')
+			
+			.alias('e', 'examples')
+			.boolean( 'e' )
+			.default( 'e', false )
+			.describe('e', 'Print a list of usage examples, with description')
 			
 			.alias('v', 'version')
 			# .boolean( 'v' )
