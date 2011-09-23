@@ -27,7 +27,7 @@ exports.run =->
 
 
 # ------------------------------------------------------------------------------
-# Includes
+# Imports
 # ------------------------------------------------------------------------------
 #<< Project, Config
 #<< Script, Kup, Css
@@ -55,6 +55,8 @@ class Toaster
 			new Config( @basepath ).create()
 		else if argv.w
 			@watch()
+		else
+			console.log opts.help()
 	
 	watch:->
 		filepath = pn "#{@basepath}/toaster.coffee"
