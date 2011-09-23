@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------
+# Requires
+# ------------------------------------------------------------------------------
+
 fs = require "fs"
 path = require "path"
 
@@ -8,36 +12,51 @@ colors = require 'colors'
 optimist = require 'optimist'
 
 
+# ------------------------------------------------------------------------------
+# Global Vars
+# ------------------------------------------------------------------------------
+opts = null
+argv = null
+
+
+# ------------------------------------------------------------------------------
+# Exports
+# ------------------------------------------------------------------------------
 exports.run =->
 	toaster = new Toaster
 
-#<< Script, Kup, Css
+
+# ------------------------------------------------------------------------------
+# Includes
+# ------------------------------------------------------------------------------
 #<< Project, Config
+#<< Script, Kup, Css
+
 
 class Toaster
 	
 	constructor:->
-		argv = optimist.usage("#{'Coffee Toaster'.cyan.bold}
-     	\n#{'Minimalist dependency management system for coffee-script.'.grey}
-     	\n#{'Usage:'.grey.bold} $0")
-    	.alias('n', 'new')
-    	.alias('h', 'help')
-    	.describe('n', 'Creating a new App')
-
-		@basepath = path.resolve(".")    	
-
-		if ( argv.argv.n )
-			new Project( @basepath ).create argv.argv
-
-		else if ( argv.argv.h )
-			console.log argv.help()
-
-		else
-			@basepath += "/#{argv.argv._[0]}" if argv.argv.length
-			@basepath = @basepath.replace /\/[^\/]+\/\.{2}/, ""
-			@init()	
+		@help = new Help
+		
+		[opts, argv] = [@help.opts, @help.argv]
+		
+		if( argv.h )
+			console.log opts.help()
+			return
+		
+		@basepath = path.resolve "."
+		
+		if argv.v
+			path = pn __dirname + "/../build/VERSION"
+			console.log fs.readFileSync path, "utf-8"
+		if argv.n
+			new Project( @basepath ).create()
+		else if argv.i
+			new Config( @basepath ).create()
+		else if argv.w
+			@watch()
 	
-	init:->
+	watch:->
 		filepath = pn "#{@basepath}/toaster.coffee"
 		
 		if path.existsSync filepath
@@ -90,4 +109,68 @@ class Toaster
 				# if module.grains.css?
 				#	TODO: implement coffeeku support
 		else
-			new Config( @basepath ).create()
+			console.log "ERROR! ".bold.red
+			console.log "\tFile not found: #{filepath.red}"
+			console.log "\tTry running: "+ "toaster -i".green +
+				" or type #{'toaster -h'.green} for more info"
+
+class Help
+	constructor:->
+		usage = "#{'CoffeeToaster'.bold}\n"
+		usage += "  Minimalist dependency management for CoffeeScript\n\n".grey
+		
+		usage += "#{'Usage'.bold}\n"
+		usage += "  toaster #{'[options]'.bold} #{'[path]'.bold}\n\n"
+		
+		usage += "#{'Examples'.bold}\n"
+		usage += "  toaster -ns myawsomeapp   (required)\n"
+		usage += "  toaster -cs [myawsomeapp] (optional)\n"
+		usage += "  toaster -ws [myawsomeapp] (optional)\n"
+		# usage += "  toaster -nk myawsomeapp\n"
+		# usage += "  toaster -nc myawsomeapp\n"
+		# usage += "  toaster -nskc myawsomeapp"
+		
+		adendo = "use w/ [-s]"
+		# adendo = "use w/ [-s, -k, -c]"
+		
+		@argv = (@opts = optimist.usage( usage )
+    		.alias('n', 'new')
+			# .boolean( 'n' )
+			.describe('n', "Scaffold a very basic new App, #{adendo}")
+			
+			.alias('i', 'init')
+			# .boolean( 'i' )
+			.describe('i', "Create a config (toaster.coffee) file, #{adendo}")
+			
+			.alias('w', 'watch')
+			# .boolean( 'w' )
+			.describe('w', "Start watching/compiling your project, #{adendo}")
+			
+			.alias('d', 'debug')
+			.boolean( 'd' )
+			.default('d', false)
+			.describe('d', 'Debug mode (compile js files individually)')
+			
+			.alias('s', 'script')
+			.boolean( 's' )
+			.default('s', false)
+			.describe('s', 'Enable CoffeeScript handling')
+			
+			# .alias('k', 'kup')
+			# .boolean( 'k' )	
+			# .default('k', false)
+			# .describe('k', 'Enable CoffeeKup handling')
+			# 
+			# .alias('c', 'css')
+			# .boolean( 'c' )
+			# .default('c', false)
+			# .describe('c', 'Enable CoffeeCss handling')
+			
+			.alias('v', 'version')
+			# .boolean( 'v' )
+			.describe('v', '')
+			
+			.alias('h', 'help')
+			# .boolean( 'h' )
+			.describe('h', '')
+		).argv

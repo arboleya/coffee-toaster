@@ -4,20 +4,19 @@ class Project extends Question
 	
 	constructor:(@basepath)->
 	
-	create:(argv)->
-		
-		target = argv.n
-		
-		if target == true
+	create:()->
+		if !(arg_path = argv._[0])
 			console.log "You need to inform a target path!".red
 			return console.log "\ttoaster new myawesomeapp".green
 		
-		if target.substr 0, 1 != "/"
-			target = pn "#{@basepath}/#{target}"
+		if arg_path.substr 0, 1 != "/"
+			target = "#{@basepath}/#{arg_path}"
+		else
+			target = arg_path
 		
 		console.log ". #{'Wonderful!'.rainbow}",
 			"#{'Let\'s toast something fresh! :)'.grey.bold}"
-		console.log ". With this as your basepath: #{@basepath.cyan}"
+		console.log ". With this as your basepath: #{target.cyan}"
 		console.log ". Please, tell me:"
 		
 		question1 = "\tWhat's your app name? (none)"
@@ -39,10 +38,10 @@ class Project extends Question
 					fs.mkdirSync releasedir, 0755
 					console.log "#{'Created'.green.bold} #{releasedir}"
 					
-					name = name.replace( target, "" ).substr 1
+					name = name
 					srcdir = srcdir.replace( target, "" ).substr 1
 					releasefile = releasefile.replace( target, "" ).substr 1
 					
 					new Config( target ).write name, srcdir, releasefile
 					
-					process.exit() 
+					process.exit()
