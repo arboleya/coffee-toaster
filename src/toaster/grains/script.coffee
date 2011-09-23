@@ -51,7 +51,7 @@ class Script
 				# compile production file
 				contents = cs.compile( contents )
 				fs.writeFileSync @release, contents
-				console.log "#{'Toasted with love:'.bold} #{@release}"
+				# console.log "#{'Toasted with love:'.bold} #{@release}"
 				
 				# compiling test files
 				toaster = "#{@release.split("/").slice(0,-1).join '/'}/toaster"
