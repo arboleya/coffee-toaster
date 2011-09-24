@@ -74,11 +74,12 @@ CoffeeToaster will write a file called 'toaster.coffee' in your app main folder.
 
 This file contains informations about the modules you have in your app, i.e:
 
-	modules = 
-		name: "My Awesome App"
-		src: "src"
-		release: "release/app.js"
-
+````ruby
+modules = 
+	name: "My Awesome App"
+	src: "src"
+	release: "release/app.js"
+````
 
 So you when you call 'toaster' inside this directory, every file and folder start being watched.
 
@@ -98,7 +99,10 @@ Of course, there must to be some file with the 'class B' declared inside of it, 
 
 ## Import directive
 
-The import directive is known by '#<< ClassName' or '#<< ClassNameA, ClassNameB'.
+The import directive is known by:
+
+ * #<< ClassName
+ * #<< ClassNameA, ClassNameB, ClassNameN
 
 By putting '#<< ClassNameA' in your CoffeeScript file, you're telling CoffeeToaster about a dependency.
 
@@ -108,70 +112,79 @@ For example, let's assume you have three files:
 
 **a.coffee**
 
-	#<< C
-	class A extends B
-		constructor:->
-			console.log "C created"
-			console.log new C
+````ruby
+#<< C
+class A extends B
+	constructor:->
+		console.log "C created"
+		console.log new C
+````
 
 **b.coffee**
 
-	class B
-		constructor:-> console.log "B created"
+````ruby
+class B
+	constructor:-> console.log "B created"
+````
 
 **c.coffee**
 
-	class C
-		constructor:-> console.log "C created"
-
+````ruby
+class C
+	constructor:-> console.log "C created"
+````
 This way, everything will be merged in an order like this:
 
 **buffer**
 
-	class B
-		constructor:-> console.log "B created"
-	class C
-		constructor:-> console.log "C created"
-	class A extends B
-		constructor:->
-			console.log "C created"
-			console.log new C
+````ruby
+class B
+	constructor:-> console.log "B created"
+class C
+	constructor:-> console.log "C created"
+class A extends B
+	constructor:->
+		console.log "C created"
+		console.log new C
+````
 
 ## Output (JavaScript)
 
 The output JavaScript compiled after reordering classes will be something like this:
 
-	(function() {
-	  var A, B, C;
-	  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
-	    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
-	    function ctor() { this.constructor = child; }
-	    ctor.prototype = parent.prototype;
-	    child.prototype = new ctor;
-	    child.__super__ = parent.prototype;
-	    return child;
-	  };
-	  B = (function() {
-	    function B() {
-	      console.log("B created");
-	    }
-	    return B;
-	  })();
-	  C = (function() {
-	    function C() {
-	      console.log("C created");
-	    }
-	    return C;
-	  })();
-	  A = (function() {
-	    __extends(A, B);
-	    function A() {
-	      console.log("C created");
-	      console.log(new C);
-	    }
-	    return A;
-	  })();
-	}).call(this);
+````javascript
+(function() {
+  var A, B, C;
+  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+    function ctor() { this.constructor = child; }
+    ctor.prototype = parent.prototype;
+    child.prototype = new ctor;
+    child.__super__ = parent.prototype;
+    return child;
+  };
+  B = (function() {
+    function B() {
+      console.log("B created");
+    }
+    return B;
+  })();
+  C = (function() {
+    function C() {
+      console.log("C created");
+    }
+    return C;
+  })();
+  A = (function() {
+    __extends(A, B);
+    function A() {
+      console.log("C created");
+      console.log(new C);
+    }
+    return A;
+  })();
+}).call(this);
+````
 
 As you can see, things are ordered properly, then you can have your application's tree all tied up with a single start point.
 
@@ -179,17 +192,19 @@ As you can see, things are ordered properly, then you can have your application'
 
 You can also specify multiple modules lilke:
 
-	modules = [
-		{
-			name: "My Awesome App"
-			src: "src"
-			release: "release/app.js"
-		},{
-			name: "My Sub Awesome App"
-			src: "vendors/mysubapp"
-			release: "release/subapp.js"
-		}
-	]
+````ruby
+modules = [
+	{
+		name: "My Awesome App"
+		src: "src"
+		release: "release/app.js"
+	},{
+		name: "My Sub Awesome App"
+		src: "vendors/mysubapp"
+		release: "release/subapp.js"
+	}
+]
+````
 
 # Mailing List
 
