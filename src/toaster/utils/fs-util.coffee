@@ -1,23 +1,23 @@
-fs = require "fs"
 path = require "path"
+fs = require "fs"
 
 pn = path.normalize
 
 
-class FsUtil
+exports.FsUtil = class FsUtil
 	@snapshots: {}
 	
-	
-	@rmdir_rf:(folderpath)->
+	@rmdir_rf:(folderpath, root=true)->
 		files = fs.readdirSync folderpath
 		for file in files
 			file = "#{folderpath}/#{file}"
 			stats = fs.lstatSync file
 			if stats.isDirectory()
-				FsUtil.rmdir_rf file
+				FsUtil.rmdir_rf file, false
 				fs.rmdirSync file
 			else
 				fs.unlinkSync file
+		fs.rmdirSync folderpath if root
 	
 	@mkdir_p:(folderpath)->
 		folders = folderpath.split "/"
