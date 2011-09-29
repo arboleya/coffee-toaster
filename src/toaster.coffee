@@ -25,7 +25,6 @@ argv = null
 exports.run =->
 	toaster = new Toaster
 
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -50,9 +49,9 @@ class Toaster
 			path = pn __dirname + "/../build/VERSION"
 			console.log fs.readFileSync path, "utf-8"
 		if argv.n
-			new Project( @basepath ).create()
+			new Project( @basepath ).create( argv._[0] )
 		else if argv.i
-			new Config( @basepath ).create()
+			new Config( @basepath ).create( argv._[0] )
 		else if argv.w
 			@watch()
 		else
@@ -153,6 +152,10 @@ class Help
 			# .boolean( 'w' )
 			.describe('w', "Start watching/compiling your project, #{adendo}")
 			
+			# .alias('c', 'compile')
+			# .boolean( 'c' )
+			# .describe('c', "Compile the entire project, without watching it.")
+			
 			.alias('d', 'debug')
 			.boolean( 'd' )
 			.default('d', false)
@@ -172,11 +175,11 @@ class Help
 			# .boolean( 'c' )
 			# .default('c', false)
 			# .describe('c', 'Enable CoffeeCss handling')
-			
-			.alias('e', 'examples')
-			.boolean( 'e' )
-			.default( 'e', false )
-			.describe('e', 'Print a list of usage examples, with description')
+			# 
+			# .alias('e', 'examples')
+			# .boolean( 'e' )
+			# .default( 'e', false )
+			# .describe('e', 'Print a list of usage examples, with description')
 			
 			.alias('v', 'version')
 			# .boolean( 'v' )
