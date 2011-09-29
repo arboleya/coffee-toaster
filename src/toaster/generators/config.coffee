@@ -9,10 +9,8 @@ class Config extends Question
 	
 	constructor:(@basepath)->
 	
-	create:()->
-		
-		if arg_path = argv._[0]
-			@basepath = "#{@basepath}/#{arg_path}"
+	create:(folderpath)->
+		@basepath = "#{@basepath}/#{folderpath}" if folderpath
 		
 		console.log ". #{'Wonderful!'.rainbow}",
 			"#{'Let\'s toast this sly little project! :)'.grey.bold}"
