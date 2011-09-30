@@ -16,15 +16,15 @@
     "toaster": "./bin/toaster"
   },
   "scripts": {
-    "test": "test.js"
+    "test": "vows tests/all.js"
   },
   "engines": {
     "node": ">= 0.4.9"
   },
   "dependencies": {
     "coffee-script": "1.x",
-    "colors": "0.5.0",
-    "optimist":"0.2.6"
+    "colors": "0.5.x",
+    "optimist":"0.2.x"
   },
   "devDependencies": {
 	"vows-bdd": "0.1.0",
