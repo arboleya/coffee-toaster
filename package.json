@@ -15,7 +15,7 @@
     "toaster": "./bin/toaster"
   },
   "scripts": {
-    "test": "vows tests/all.js"
+    "test": "vows --spec tests/all.js"
   },
   "engines": {
     "node": ">= 0.4.9"
