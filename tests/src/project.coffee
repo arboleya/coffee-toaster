@@ -12,7 +12,7 @@ feature = require('vows-bdd').Feature
 {FsUtil} = require "#{__dirname}/../lib/toaster.js"
 
 # VARIABLES
-BASEPATH		= "/Users/nybras/Workspace/serpentem/coffee-toaster/tests"
+BASEPATH		= path.resolve "."
 APP_FOLDER		= "myawesomeapp"
 APP_PATH		= "#{BASEPATH}/#{APP_FOLDER}"
 NAME			= "My Awesome App"

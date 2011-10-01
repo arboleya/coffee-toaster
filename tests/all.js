@@ -8,7 +8,7 @@
   feature = require('vows-bdd').Feature;
   Project = require("" + __dirname + "/../lib/toaster.js").Project;
   FsUtil = require("" + __dirname + "/../lib/toaster.js").FsUtil;
-  BASEPATH = "/Users/nybras/Workspace/serpentem/coffee-toaster/tests";
+  BASEPATH = path.resolve(".");
   APP_FOLDER = "myawesomeapp";
   APP_PATH = "" + BASEPATH + "/" + APP_FOLDER;
   NAME = "My Awesome App";
