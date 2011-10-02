@@ -6,16 +6,19 @@ Minimalist dependency management system for CoffeeScript.
 
  * Inheritance support across multiples files for the lazy
   * Just use your extends as you do, dependencies will be resolved automagically
-  * Or add explicit requirements with the simplest possible syntax:
+  * Or add explicit requirements based on both 'ClassName' and 'a/b/c/filepath' simultaneously, with the simplest possible syntax:
    * #<< ClassName
    * #<< ClassNameA, ClassNameB
- * Scaffolding routines
+   * #<< package/filename, ClassNameD, utils/anotherfile
+  * Scaffolding routines
   * Interactive creation of a very simple skeleton for new projects
   * Interactive creation of new config file for existent projects
- * Circular-dependency validation
-  * Helps you prevent some mistakes
+ * Broken/Circular dependency validation
+  * Helps you prevent some mistakes with circular dependencies loops and alert you against dependencies not found
  * Live syntax-check
   * Precise live check for compile problems (syntax-only), with file path and line number informations
+ * Debug Mode
+  * In order to got easing debug when inside the browser, Debug Mode will compile all your files individually into the respectives .js versions and write a smart boot-loader (toaster.js) to load every file in the proper order. Just include this boot-loader in your html file and voilà
 
 # Installation
 
@@ -27,7 +30,7 @@ Minimalist dependency management system for CoffeeScript.
 
 CoffeeToaster suggests a very simple structure for initial projects, you can customize it as you like.
 
-	toaster -ns mynewapp
+	toaster -n mynewapp
 
 You will be asked for some things:
 
@@ -45,11 +48,11 @@ Your scructure will be create with a 'toaster.coffee' file inside it.
 Your can toast an existent project like this:
 
 	cd existing-project
-	toaster -is
+	toaster -i
 
 Or:
 
-	toaster -is existing-project
+	toaster -i existing-project
 
 The same questions (name, src, release) will be made, answer everything according your project structure.
 
@@ -60,11 +63,16 @@ A 'toaster.coffee' file will be created inside it.
 To see all CoffeeToaster can do for you, after creating or toasting a new project, enter in the project folder and type 'toaster':
 
 	cd existing-project
-	toaster
+	toaster -w
+  
+  cd existing-project
+  toaster -wd
 
 Or:
 
-	toaster existing-project
+	toaster -w existing-project
+  toaster -wd existing-project
+
 
 # How everything works?
 
