@@ -50,7 +50,7 @@ class Toaster
 			console.log fs.readFileSync path, "utf-8"
 		
 		else if argv.n
-			new Project( @basepath ).create( argv._[0] )
+			new Project( @basepath ).create( argv.n )
 		
 		else if argv.i
 			new Config( @basepath ).create( argv._[0] )

@@ -7,7 +7,7 @@ exports.Project = class Project extends Question
 	create:(folderpath, name, src, release)->
 		if !folderpath
 			console.log "#{'Error'.bold.red} You need to inform" +
-						"a target path!".red
+						"a target path!"
 			return console.log "\ttoaster new myawesomeapp".green
 		
 		if folderpath.substr 0, 1 != "/"
@@ -15,7 +15,8 @@ exports.Project = class Project extends Question
 		else
 			target = folderpath
 		
-		return @scaffold target, name, src, release if name? && src? && release?
+		if name? && src? && release?
+			return @scaffold target, name, src, release
 		
 		console.log ". #{'Wonderful!'.rainbow}",
 			"#{'Let\'s toast something fresh! :)'.grey.bold}"
@@ -25,9 +26,9 @@ exports.Project = class Project extends Question
 		question2 = "\tWhere's its src folder? (src)"
 		question3 = "\tWhere do you want your release file? (release/app.js)"
 		
-		@ask question1, /.+/, name, (name)=>
-			@ask question2, /.*/, src, (src)=>
-				@ask question3, /.*/, release, (release)=>
+		@ask question1, /.+/, (name)=>
+			@ask question2, /.*/, (src)=>
+				@ask question3, /.*/, (release)=>
 					@scaffold target, name, src, release
 					process.exit()
 	
