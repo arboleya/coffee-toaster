@@ -1,4 +1,4 @@
-# Coffee Toaster (current version - 0.2.1)
+# Coffee Toaster (current version - 0.2.2)
 
 Minimalist dependency management system for CoffeeScript.
 

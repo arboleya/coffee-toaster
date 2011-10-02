@@ -1,6 +1,6 @@
 # CoffeeToaster Changelog
 
-## 0.2.2 - ?
+## 0.2.2 - 10/02/2011
  * Starting tests implementation (using Vows BDD)
  * Implementing debug mode (-d --debug). Files are compiled individually plus a boot file (toaster.js)  file that will load everything in the right order.
  * Improving interactive processes to become good guessers
