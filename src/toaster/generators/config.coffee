@@ -17,7 +17,9 @@ class Config extends Question
 		console.log ". With this as your basepath: #{@basepath.cyan}"
 		console.log ". Please, tell me:"
 		
-		question1 = "\tWhat's your app name? (none)"
+		default_name = @basepath.split( "/" ).pop()
+
+		question1 = "\tWhat's your app name? (#{default_name})"
 		question2 = "\tWhere's its src folder? (i.e. src)"
 		question3 = "\tWhere do you want your release file?" +
 					"(i.e. release/app.js)"
@@ -25,7 +27,7 @@ class Config extends Question
 		@ask question1, /.+/, (name)=>
 			@ask question2, /.+/, (src)=>
 				@ask question3, /.+/, (release)=>
-					@write name, src, release
+					@write name || default_name, src, release
 					process.exit()
 	
 	write:(name, src, release)->
