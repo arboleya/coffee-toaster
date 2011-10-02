@@ -1,6 +1,6 @@
 optimist = require 'optimist'
 
-class Help
+class Parser
 	constructor:->
 		usage = "#{'CoffeeToaster'.bold}\n"
 		usage += "  Minimalist dependency management for CoffeeScript\n\n".grey
@@ -9,9 +9,9 @@ class Help
 		usage += "  toaster [#{'options'.green}] [#{'path'.green}]\n\n"
 		
 		usage += "#{'Examples:'}\n"
-		usage += "  toaster -ns myawsomeapp   (#{'required'.red})\n"
-		usage += "  toaster -is [myawsomeapp] (#{'optional'.green})\n"
-		usage += "  toaster -ws [myawsomeapp] (#{'optional'.green})\n"
+		usage += "  toaster -n myawsomeapp   (#{'required'.red})\n"
+		usage += "  toaster -i [myawsomeapp] (#{'optional'.green})\n"
+		usage += "  toaster -w [myawsomeapp] (#{'optional'.green})\n"
 		
 		# usage += "\n"
 		# usage += "  For more examples, try:\n"
