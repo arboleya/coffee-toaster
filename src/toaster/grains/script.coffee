@@ -106,7 +106,7 @@ class Script
 				if /(class\s)([\S]+)/g.test raw
 					name = /(class\s)([\S]+)/g.exec( raw )[ 2 ]
 				
-				if ArrayUtil.find buffer, name
+				if name && ArrayUtil.find buffer, name
 					continue
 				
 				# class dependencies
