@@ -5,12 +5,12 @@ exports.Project = class Project extends Question
 	constructor:(@basepath)->
 	
 	create:(folderpath, name, src, release)->
-		if !folderpath
+		if !folderpath || folderpath == true
 			console.log "#{'Error'.bold.red} You need to inform" +
 						"a target path!"
 			return console.log "\ttoaster new myawesomeapp".green
 		
-		if folderpath.substr 0, 1 != "/"
+		if folderpath.substr( 0, 1 ) != "/"
 			target = "#{@basepath}/#{folderpath}"
 		else
 			target = folderpath
@@ -18,18 +18,20 @@ exports.Project = class Project extends Question
 		if name? && src? && release?
 			return @scaffold target, name, src, release
 		
+		default_name = target.split('/').pop()
+
 		console.log ". #{'Wonderful!'.rainbow}",
 			"#{'Let\'s toast something fresh! :)'.grey.bold}"
 		console.log ". With this as your basepath: #{target.cyan}"
 		console.log ". Please, tell me:"
-		question1 = "\tWhat's your app name? (none)"
+		question1 = "\tWhat's your app name? (#{default_name})"
 		question2 = "\tWhere's its src folder? (src)"
 		question3 = "\tWhere do you want your release file? (release/app.js)"
 		
-		@ask question1, /.+/, (name)=>
+		@ask question1, /.*/, (name)=>
 			@ask question2, /.*/, (src)=>
 				@ask question3, /.*/, (release)=>
-					@scaffold target, name, src, release
+					@scaffold target, name || default_name, src, release
 					process.exit()
 	
 	scaffold:(target, name, src, release)->
