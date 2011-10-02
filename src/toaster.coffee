@@ -51,7 +51,7 @@ class Toaster
 			new Project( @basepath ).create( argv.n )
 		
 		else if argv.i
-			new Config( @basepath ).create( argv._[0] )
+			new Config( @basepath ).create( argv.i )
 		
 		else if argv.w
 			@watch()

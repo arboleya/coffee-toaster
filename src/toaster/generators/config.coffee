@@ -10,10 +10,13 @@ class Config extends Question
 	constructor:(@basepath)->
 	
 	create:(folderpath)->
-		@basepath = "#{@basepath}/#{folderpath}" if folderpath
+		if folderpath? and folderpath != true
+			@basepath = "#{@basepath}/#{folderpath}" 
 		
-		console.log ". #{'Wonderful!'.rainbow}",
-			"#{'Let\'s toast this sly little project! :)'.grey.bold}"
+		console.log @basepath
+		console.log "asdf >>> #{folderpath}"
+
+		console.log "#{'Let\'s toast this sly little project! :)'.grey.bold}"
 		console.log ". With this as your basepath: #{@basepath.cyan}"
 		console.log ". Please, tell me:"
 		
@@ -24,7 +27,7 @@ class Config extends Question
 		question3 = "\tWhere do you want your release file?" +
 					"(i.e. release/app.js)"
 		
-		@ask question1, /.+/, (name)=>
+		@ask question1, /.*/, (name)=>
 			@ask question2, /.+/, (src)=>
 				@ask question3, /.+/, (release)=>
 					@write name || default_name, src, release

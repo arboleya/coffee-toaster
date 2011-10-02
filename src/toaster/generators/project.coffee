@@ -20,12 +20,11 @@ exports.Project = class Project extends Question
 		
 		default_name = target.split('/').pop()
 
-		console.log ". #{'Wonderful!'.rainbow}",
-			"#{'Let\'s toast something fresh! :)'.grey.bold}"
+		console.log "#{'Let\'s toast something fresh! :)'.grey.bold}"
 		console.log ". With this as your basepath: #{target.cyan}"
-		console.log ". Please, tell me:"
+		console.log ". Please tell me:"
 		question1 = "\tWhat's your app name? (#{default_name})"
-		question2 = "\tWhere's its src folder? (src)"
+		question2 = "\tWhere's its src folder (absolute/relative)? (src)"
 		question3 = "\tWhere do you want your release file? (release/app.js)"
 		
 		@ask question1, /.*/, (name)=>
