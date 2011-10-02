@@ -1,32 +1,39 @@
 {
-  "author": "Anderson Arboleya <me@nybras.com>",
-  "name": "coffee-toaster",
-  "description": "Minimalist dependency management system for coffee-script.",
-  "version": "0.2.1",
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/serpentem/coffee-toaster"
+  "author"         : "Anderson Arboleya <me@nybras.com>",
+  "name"           : "coffee-toaster",
+  "description"    : "Minimalist dependency management system for coffee-script.",
+  "version"        : "0.2.1",
+
+  "repository"     : {
+    "type"           : "git",
+    "url"            : "http://github.com/serpentem/coffee-toaster"
   },
-  "main": "./lib/toaster",
-  "directories": {
-    "lib": "./lib/"
+
+  "main"           : "./lib/toaster",
+    "directories"    : {
+    "lib"            : "./lib/"
   },
-  "bin": {
-    "toaster": "./bin/toaster"
+
+  "bin"            : {
+    "toaster"        : "./bin/toaster"
   },
-  "scripts": {
-    "test": "vows --spec tests/all.js"
+
+  "scripts"        : {
+    "test"           : "vows --spec tests/all.js"
   },
-  "engines": {
-    "node": ">= 0.4.9"
+  
+  "engines"        : {
+    "node"           : ">= 0.4.9"
   },
-  "dependencies": {
-    "coffee-script": "1.x",
-    "colors": "0.5.x",
-    "optimist":"0.2.x"
+  
+  "dependencies"   : {
+    "coffee-script"  : "1.x",
+    "colors"         : "0.5.x",
+    "optimist"       :"0.2.x"
   },
+
   "devDependencies": {
-	"vows-bdd": "0.1.0",
-	"vows":"0.5.11"
+    "vows-bdd"       : "0.1.0",
+    "vows"           :"0.5.11"
   }
 }
