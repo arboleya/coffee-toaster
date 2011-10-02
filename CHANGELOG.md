@@ -3,6 +3,8 @@
 ## 0.2.2 - ?
  * Starting tests implementation (using Vows BDD)
  * Implementing debug mode (-d --debug). Files are compiled individually plus a boot file (toaster.js)  file that will load everything in the right order.
+ * Improving interactive processes to become good guessers
+ * Bumping 'build/coffee-toaster' submodule to use tag 0.2.2 (level up)
 
 ## 0.2.1 - 09/22/2011
  * Implementing OptionParser (using Optimist)
