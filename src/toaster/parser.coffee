@@ -11,7 +11,7 @@ class Parser
 		usage += "#{'Examples:'}\n"
 		usage += "  toaster -n myawsomeapp   (#{'required'.red})\n"
 		usage += "  toaster -i [myawsomeapp] (#{'optional'.green})\n"
-		usage += "  toaster -w [myawsomeapp] (#{'optional'.green})\n"
+		usage += "  toaster -w [myawsomeapp] (#{'optional'.green})"
 		
 		# usage += "\n"
 		# usage += "  For more examples, try:\n"

@@ -26,16 +26,16 @@ exports.run =->
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
-#<< Project, Config, Help
+#<< Project, Config, Parser
 #<< Script, Kup, Css
 
 
 class Toaster
 	
 	constructor:->
-		@help = new Help
+		@parser = new Parser
 		
-		[opts, argv] = [@help.opts, @help.argv]
+		[opts, argv] = [@parser.opts, @parser.argv]
 		
 		if( argv.h )
 			console.log opts.help()
