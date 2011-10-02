@@ -106,8 +106,11 @@ class Script
 				# class name
 				if /(class\s)([\S]+)/g.test raw
 					name = /(class\s)([\S]+)/g.exec( raw )[ 2 ]
+				else
+					name = file.replace( @src, "" ).substr( 1 )
+					name = name.split(".").shift()
 				
-				if name && ArrayUtil.find buffer, name
+				if ArrayUtil.find buffer, name
 					continue
 				
 				# class dependencies
