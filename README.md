@@ -4,21 +4,25 @@ Minimalist dependency management system for CoffeeScript.
 
 # Features
 
- * Inheritance support across multiples files for the lazy
-  * Just use your extends as you do, dependencies will be resolved automagically
-  * Or add explicit requirements based on both 'ClassName' and 'a/b/c/filepath' simultaneously, with the simplest possible syntax:
-   * #<< ClassName
-   * #<< ClassNameA, ClassNameB
-   * #<< package/filename, ClassNameD, utils/anotherfile
-  * Scaffolding routines
-  * Interactive creation of a very simple skeleton for new projects
-  * Interactive creation of new config file for existent projects
- * Broken/Circular dependency validation
-  * Helps you prevent some mistakes with circular dependencies loops and alert you against dependencies not found
- * Live syntax-check
-  * Precise live check for compile problems (syntax-only), with file path and line number informations
- * Debug Mode
-  * In order to got easing debug when inside the browser, Debug Mode will compile all your files individually into the respectives .js versions and write a smart boot-loader (toaster.js) to load every file in the proper order. Just include this boot-loader in your html file and voilà
+* Inheritance support across multiples files for the lazy
+ * Just use your extends as you do, dependencies will be resolved automagically
+ * You can also require based 'ClassName' and 'a/b/c/filepath' simultaneously
+
+````
+	#<< ClassName
+	#<< ClassNameA, ClassNameB
+	#<< package/filename, ClassNameD, utils/anotherfile
+````
+
+* Scaffolding routines
+ * Interactive creation of a very simple skeleton for new projects
+ * Interactive creation of new config file for existent projects
+* Broken/Circular dependency validation
+ * Helps you prevent some mistakes with circular dependencies loops and alert you against dependencies not found
+* Live syntax-check
+ * Precise live check for compile problems (syntax-only), with file path and line number informations
+* Debug Mode
+ * In order to provide easy debugging when inside the browser, Debug Mode will compile all your files individually into the respectives .js versions and write a smart boot-loader (toaster.js) to load every file in the proper order. Just include this boot-loader in your html file and voilà
 
 # Installation
 
@@ -65,13 +69,13 @@ To see all CoffeeToaster can do for you, after creating or toasting a new projec
 	cd existing-project
 	toaster -w
   
-  cd existing-project
-  toaster -wd
+	cd existing-project
+	toaster -wd
 
 Or:
 
 	toaster -w existing-project
-  toaster -wd existing-project
+	toaster -wd existing-project
 
 
 # How everything works?
@@ -89,7 +93,9 @@ modules =
 	release: "release/app.js"
 ````
 
-So you when you call 'toaster' inside this directory, every file and folder start being watched.
+So when you call 'toaster -w' inside this directory, every file and folder start being watched.
+
+Or with debug enabled 'toaster -wd', so files are also compiled individually for a sane debugging routine.
 
 Every time something changes, CoffeeToaster re-compiles all your application by doing:
 
