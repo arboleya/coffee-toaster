@@ -1,11 +1,11 @@
-fs = require "coffee-script"
+fs = require "fs"
 cs = require "coffee-script"
 
 #<< FsUtil, ArrayUtil, StringUtil
 
 class Script
 	
-	constructor:(@config)->
+	constructor:(@config, @opts)->
 		@src = @config.src
 		@release = @config.release
 		@compile( @watch )
@@ -52,8 +52,20 @@ class Script
 				contents = cs.compile( contents )
 				fs.writeFileSync @release, contents
 				# console.log "#{'Toasted with love:'.bold} #{@release}"
-				
-				# compiling test files
+			
+			catch err
+				msg = err.message
+				line = msg.match( /(line\s)([0-9]+)/ )[2]
+				for file in ordered
+					if line >= file.start && line <= file.end
+						line = (line - file.start) + 1
+						msg = msg.replace /line\s[0-9]+/, "line #{line}"
+						msg = StringUtil.ucasef msg
+						console.log "ERROR!".bold.red, msg,
+							"\n\t#{file.path.red}"
+			
+			# compiling test files
+			if @opts.argv.debug
 				toaster = "#{@release.split("/").slice(0,-1).join '/'}/toaster"
 				classes = "#{toaster}/classes"
 				
@@ -80,18 +92,7 @@ class Script
 				# write toaster loader
 				toaster = "#{toaster}/toaster.js"
 				fs.writeFileSync toaster, cs.compile buffer, {bare:1}
-			
-			catch err
-				msg = err.message
-				line = msg.match( /(line\s)([0-9]+)/ )[2]
-				for file in ordered
-					if line >= file.start && line <= file.end
-						line = (line - file.start) + 1
-						msg = msg.replace /line\s[0-9]+/, "line #{line}"
-						msg = StringUtil.ucasef msg
-						console.log "ERROR!".bold.red, msg,
-							"\n\t#{file.path.red}"
-			
+
 			fn?()
 	
 	collect:(fn)->

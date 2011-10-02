@@ -68,7 +68,7 @@ class Toaster
 			for module in modules
 				module.src = pn "#{@basepath}/#{module.src}"
 				module.release = pn "#{@basepath}/#{module.release}"
-				new Script module
+				new Script module, opts
 				
 				# ANNOTATIONS FOR FUTURE IMPLEMENTATION, BASED IN THIS CONFIG
 				# FILE EXAMPLE:
