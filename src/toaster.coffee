@@ -48,12 +48,16 @@ class Toaster
 		if argv.v
 			path = pn __dirname + "/../build/VERSION"
 			console.log fs.readFileSync path, "utf-8"
-		if argv.n
+		
+		else if argv.n
 			new Project( @basepath ).create( argv._[0] )
+		
 		else if argv.i
 			new Config( @basepath ).create( argv._[0] )
+		
 		else if argv.w
 			@watch()
+		
 		else
 			console.log opts.help()
 	
@@ -126,17 +130,18 @@ class Help
 		usage += "#{'Examples:'}\n"
 		usage += "  toaster -ns myawsomeapp   (#{'required'.red})\n"
 		usage += "  toaster -is [myawsomeapp] (#{'optional'.green})\n"
-		usage += "  toaster -ws [myawsomeapp] (#{'optional'.green})\n\n"
+		usage += "  toaster -ws [myawsomeapp] (#{'optional'.green})\n"
 		
-		usage += "  For more examples, try:\n"
-		usage += "    toaster -e\n"
-		usage += "    toaster --exammples"
+		# usage += "\n"
+		# usage += "  For more examples, try:\n"
+		# usage += "    toaster -e\n"
+		# usage += "    toaster --exammples"
 		
 		# usage += "  toaster -nk myawsomeapp\n"
 		# usage += "  toaster -nc myawsomeapp\n"
 		# usage += "  toaster -nskc myawsomeapp"
 		
-		adendo = "use w/ [-s]"
+		adendo = "" #"use w/ [-s]"
 		# adendo = "use w/ [-s, -k, -c]"
 		
 		@argv = (@opts = optimist.usage( usage )
@@ -161,10 +166,10 @@ class Help
 			.default('d', false)
 			.describe('d', 'Debug mode (compile js files individually)')
 			
-			.alias('s', 'script')
-			.boolean( 's' )
-			.default('s', false)
-			.describe('s', 'Enable CoffeeScript handling')
+			# .alias('s', 'script')
+			# .boolean( 's' )
+			# .default('s', false)
+			# .describe('s', 'Enable CoffeeScript handling')
 			
 			# .alias('k', 'kup')
 			# .boolean( 'k' )	
