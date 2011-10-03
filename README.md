@@ -40,12 +40,27 @@ You will be asked for some things:
 
 1. **name** - The name of your main module.
   * i.e.: mynewapp
-1. **src** - The source folder for your main module
+1. **src** - The source folder for your main module, it can be relative or absolute.
   * i.e.: src
-1. **release** - The release file for your main module
+1. **release** - The release file for your main module, can be relative or absolute.
   * i.e.: release/app.js
 
-Your scructure will be create with a 'toaster.coffee' file inside it.
+Considering all the default values, you'll end up with a structure like this:
+
+	├── /mynewapp
+	    ├── /release
+	    ├── /src
+	    └── toaster.coffee
+
+The toaster.coffee file will have this content:\
+
+````ruby
+modules =
+	name: 'mynewapp'
+	src: 'src'
+	release: 'release/app.js'
+````
+
 
 ## Toasting an existing project
 
@@ -68,14 +83,53 @@ To see all CoffeeToaster can do for you, after creating or toasting a new projec
 
 	cd existing-project
 	toaster -w
-  
-	cd existing-project
-	toaster -wd
 
 Or:
 
 	toaster -w existing-project
-	toaster -wd existing-project
+
+# Debug Mode
+
+In debug mode (option -d) files will be all compiled individually inside a folder called "toaster" in the same directory you have your release file, aiming to ease the debugging process.
+
+For example, if you have "release/app.js", a folder will be created in "/release/toaster" and all your CoffeeScript files will be copileted to Javascript inside "release/toaster/classes/".
+
+Bellow is a directory structure representing this:
+
+	├── /release
+	│   ├── app.js
+	│   ├── index.html
+	│   └── /toaster
+	│       ├── /classes
+	│       │   ├── /a
+	│       │   │   ├── a.js
+	│       │   │   └── /b
+	│       │   │       └── b.js
+	│       │   └── c.js
+	│       └── toaster.js
+	├── /src
+	│   ├── /a
+	│   │   ├── a.coffee
+	│   │   └── /b
+	│   │       └── b.coffee
+	│   └── c.coffee
+	└── toaster.coffee
+
+There's also a 'toaster.js' file inside the 'release/toaster' folder, this Javascript file is responsible to load all your classes into the right order.
+
+So in your .html your have to options:
+
+**1)** Include your release file (release/app.js)
+
+````html
+	<script src="app.js"></script>
+````
+ 
+**2)** Include the toaster boot-loader (release/toaster/toaster.js)
+
+````html
+	<script src="toaster/toaster.js"></script>
+````
 
 
 # How everything works?
