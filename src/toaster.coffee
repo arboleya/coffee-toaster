@@ -53,13 +53,13 @@ class Toaster
 		else if argv.i
 			new Config( @basepath ).create( argv.i )
 		
-		else if argv.w
-			@watch()
+		else if argv.c || argv.w
+			@compile_and_watch()
 		
 		else
 			console.log opts.help()
 	
-	watch:->
+	compile_and_watch:->
 		filepath = pn "#{@basepath}/toaster.coffee"
 		
 		if path.existsSync filepath

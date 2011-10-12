@@ -8,7 +8,7 @@ class Script
 	constructor:(@config, @opts)->
 		@src = @config.src
 		@release = @config.release
-		@compile( @watch )
+		@compile if @opts.argv.w then @watch else null 
 	
 	watch:=>
 		FsUtil.watch_folder @src, (info)=>
