@@ -47,6 +47,7 @@ class Script
 	compile: (cb) ->
 		# collect all files
 		@collect (files)=>
+
 			# process all wild-card dependencies
 			processed = @process_wild_cards files
 
@@ -117,7 +118,7 @@ class Script
 				
 				# prints the error msg
 				console.log "ERROR!".bold.red, msg,
-					"\n\t#{file.path.red}"
+					"\n\t#{file.classpath.red}"
 			
 			# if debug is enabled and no error has ocurred, then compile
 			# individual files as well
@@ -151,7 +152,7 @@ class Script
 					relative = relative.replace ".coffee", ".js"
 					
 					# then computes the filepath
-					filepath = classes + relative
+					filepath = "#{classes}/#{relative}"
 					
 					# ..and extract its folder path
 					folderpath = filepath.split('/').slice(0,-1).join "/"
@@ -162,7 +163,7 @@ class Script
 						FsUtil.mkdir_p folderpath
 					
 					# computing relative path to test folder
-					relative = "./toaster/classes#{relative}"
+					relative = "./toaster/classes/#{relative}"
 					
 					# writing file
 					fs.writeFileSync filepath, cs.compile file.raw, {bare:1}
