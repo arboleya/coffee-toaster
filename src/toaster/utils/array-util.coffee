@@ -1,9 +1,41 @@
 class ArrayUtil
 	@find:(source, search, by_property)->
-		for j, i in source
-			if j == search || j[by_property] == search
-				return {item: j, index: i}
+		if by_property is null
+			for v, k in source
+				return {item: v, index: k} if v == search
+		else
+			by_property = [].concat by_property
+			for v, k in source
+				for p in by_property
+					return {item: v, index: k} if search == v[p]
+		return null
 	
+	@find_all:(source, search, by_property, regexp)->
+		_output = []
+
+		if by_property is null
+			for v, k in source
+				if regexp
+					if search.test v
+						_output.push {item: v, index: k}
+				else
+					if search == v
+						_output.push {item: v, index: k}
+		else
+			by_property = [].concat by_property
+			for v, k in source
+				for p in by_property
+					if regexp
+						if search.test v[p]
+							_output.push {item: v, index: k}
+					else
+						if search == v[p]
+							_output.push {item: v, index: k}
+		
+		return if _output.length then _output else null
+	
+
+
 	@diff:(a, b, by_property)->
 		diff = []
 		

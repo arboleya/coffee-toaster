@@ -5,39 +5,55 @@ cs = require "coffee-script"
 
 class Script
 	
-	constructor:(@config, @opts)->
+	constructor: (@config, @opts) ->
 		@src = @config.src
 		@release = @config.release
 		@compile if @opts.argv.w then @watch else null 
 	
-	watch:=>
-		FsUtil.watch_folder @src, (info)=>
+	watch: =>
+
+		# watch entire source folder
+		FsUtil.watch_folder @src, (info) =>
+
+			# Titleize the type for use in the log messages bellow
 			type = StringUtil.titleize info.type
 			
+			# seitch over created, deleted, updated and watching
 			switch info.action
+
+				# when a new file is created
 				when "created"
 					msg = "#{('New ' + info.type + ' created:').green}"
 					console.log "#{msg} #{info.path}"
 					@compile()
 				
+				# when a file is deleted
 				when "deleted"
 					msg = "#{(type + ' deleted, stop watching: ').red}"
 					console.log "#{msg} #{info.path}"
 					@compile()
 				
+				# when a file is updated
 				when "updated"
 					msg = "#{(type + ' changed').yellow}"
 					console.log "#{msg} #{info.path}"
 					@compile()
 				
+				# when a file starts being watched
 				when "watching"
 					msg = "#{('Watching ' + info.type).cyan}"
 					console.log "#{msg} #{info.path}"
 	
-	compile:(fn)->
+	compile: (cb) ->
+		# collect all files
 		@collect (files)=>
-			ordered = @reorder( files )
+			# process all wild-card dependencies
+			processed = @process_wild_cards files
+
+			# reorder everything charmingly
+			ordered = @reorder processed
 			
+			# gather all information about files x line numbers inside each one
 			linenum = 1
 			for file, i in ordered
 				file.start = linenum
@@ -45,135 +61,345 @@ class Script
 				file.end = file.start + ( file.length - 1 )
 				linenum = file.end + 1
 			
-			contents = @merge( ordered )
+			# gets the root package from the first file (all MUST have the same)
+			root_package = files[0].namespace.split(".").shift()
+
+			# pkg_helper to be appended to the generated javascript
+			# in order to provide packaging functionality
+			pkg_helper = """
+				#{root_package} = {}
+				pkg = ( ns )->
+					curr = #{root_package}
+					parts = [].concat = ns.split( "." )
+					for part, index in parts
+						continue if part is "#{root_package}"
+						curr = curr[ part ] = {} unless curr[ part ]?
+					curr
+				
+			"""
 			
+			# merge all classes into one single string buffer to be compiled
+			contents = @merge ordered
+			
+			# tries to compile production file
 			try
-				# compile production file
-				contents = cs.compile( contents )
+				# compiling coffeescript
+				contents = cs.compile contents
+
+				# writing file
 				fs.writeFileSync @release, contents
-				# console.log "#{'Toasted with love:'.bold} #{@release}"
+
+				# informing user through cli
+				console.log "#{'.'.green} #{@release}"
 			
+			# if there's some error
 			catch err
+
+				# get the error msg
 				msg = err.message
-				line = msg.match( /(line\s)([0-9]+)/ )[2]
-				for file in ordered
-					if line >= file.start && line <= file.end
-						line = (line - file.start) + 1
-						msg = msg.replace /line\s[0-9]+/, "line #{line}"
-						msg = StringUtil.ucasef msg
-						console.log "ERROR!".bold.red, msg,
-							"\n\t#{file.path.red}"
+				
+				# if it has some line information
+				if /(line\s)([0-9]+)/g.test msg
+
+					# get the line number
+					line = msg.match( /(line\s)([0-9]+)/ )[2]
+
+					# loop through all ordered files/classes
+					for file in ordered
+
+						# checks if the error line corresponds to some line
+						# inside that file/class. then replaces the line info
+						# inside the error msg
+						if line >= file.start && line <= file.end
+							line = (line - file.start) + 1
+							msg = msg.replace /line\s[0-9]+/, "line #{line}"
+							msg = StringUtil.ucasef msg
+				
+				# prints the error msg
+				console.log "ERROR!".bold.red, msg,
+					"\n\t#{file.path.red}"
 			
-			# compiling test files
-			if @opts.argv.debug
+			# if debug is enabled and no error has ocurred, then compile
+			# individual files as well
+			if @opts.argv.debug and msg is undefined
+
+				# evaluating the toaster file folder (path)
 				toaster = "#{@release.split("/").slice(0,-1).join '/'}/toaster"
+
+				# constructs the classes folder
 				classes = "#{toaster}/classes"
 				
+				# cleaning before deploying
 				FsUtil.rmdir_rf toaster if path.existsSync toaster
+
+				# creating new structure
 				FsUtil.mkdir_p classes
 				
+				# template for importing others js's
 				tmpl = "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
-				buffer = ""
-				
+
+				# starting buffer with the pklg_helper
+				buffer = "#{pkg_helper}\n"
+
+				# loop through all ordered files
 				for file, index in ordered
-					relative = file.path.replace @src, ""
+
+					# evaluates its path relative to the src folder
+					relative = file.filepath
+
+					# and replace file extension from .coffee to .js
 					relative = relative.replace ".coffee", ".js"
 					
+					# then computes the filepath
 					filepath = classes + relative
+					
+					# ..and extract its folder path
 					folderpath = filepath.split('/').slice(0,-1).join "/"
 					
+					# if the container folder doesnt exist yet
 					if !path.existsSync folderpath
+						# create it
 						FsUtil.mkdir_p folderpath
 					
+					# computing relative path to test folder
 					relative = "./toaster/classes#{relative}"
+					
+					# writing file
 					fs.writeFileSync filepath, cs.compile file.raw, {bare:1}
+
+					# adding to the buffer
 					buffer += tmpl.replace( "%SRC%", relative ) + "\n"
 					
-				# write toaster loader
+				# write toaster loader file w/ all imports (buffer) inside it
 				toaster = "#{toaster}/toaster.js"
 				fs.writeFileSync toaster, cs.compile buffer, {bare:1}
-
-			fn?()
+			
+			# and finall executs de callback
+			cb?()
 	
-	collect:(fn)->
-		FsUtil.find @src, "*.coffee", (files)=>
+	collect: (cb) ->
+
+		# search for all *.coffee files inside src folder
+		FsUtil.find @src, "*.coffee", (files) =>
+
+			# initializes buffer array to keep all tracked files and classes
 			buffer = []
+
+			# looping through all files
 			for file in files
 				
+				# read file content and initialize dependencies array
 				raw = fs.readFileSync file, "utf-8"
 				dependencies = []
 				
-				# class name
-				if /(class\s)([\S]+)/g.test raw
-					name = /(class\s)([\S]+)/g.exec( raw )[ 2 ]
+				# assemble some information about the file
+				filepath       = file.replace( @src, "" ).substr 1
+				filename       = /\w+\.\w+/.exec( filepath )[ 0 ]
+				filefolder     = filepath.replace "/#{filename}", ""
+
+				# ..and evaluates the root namespace in config, if theres one
+				if @config.root_namespace is not undefined
+					root_namespace = @config.root_namespace + "."
 				else
-					name = file.replace( @src, "" ).substr( 1 )
-					name = name.split(".").shift()
+					root_namespace = ""
 				
-				if ArrayUtil.find buffer, name
+				# if there is a class inside the file
+				if /(class\s)(\S+)/g.test raw
+					namespace = filefolder.replace /\//g, "."
+
+					# ..and if auto_package is enabled, then modify the
+					# class declarations before starting the parser thing,
+					# adding the package headers
+					if @config.auto_package is true
+						repl = "pkg( '#{namespace}' ).$2 = " +
+							   "$2 = $1#{root_namespace}#{namespace}.$2"
+						raw = raw.replace /(class\s+)(\S+)/g, repl
+					
+					# assemble some more infos about the file, i.e.:
+					#	classname: ClassName
+					#	namespace: package.subpackage
+					#	classpath: package.subpackage.ClassName
+					classpath = /(class\s+)(\S+)/g.exec( raw )[ 2 ]
+					classname = classpath.split(".").pop()
+					namespace   = classpath.replace ".#{classname}", ""
+					
+				# otherwise if no class is found inside the file, prints
+				# a warning message
+				else
+					console.log "#{'WARNING'}.bold No class found, ".red +
+								"skiping file: #{file}".red
 					continue
 				
-				# class dependencies
-				if /(extends\s)([\S]+)/g.test raw
-					dependencies.push /(extends\s)([\S]+)/g.exec( raw )[ 2 ]
+				# if the class was already buffered, prints a warning msg,
+				# skip it and move on
+				if ArrayUtil.find buffer, classpath, "classpath"
+					continue
 				
+				# otherwise checks if the class is extending some other class
+				# and add it as the top-level dependency
+				# if /(extends\s)(\S+)/.test raw
+				# 	dependencies.push /(extends\s)(\S+)/g.exec( raw )[ 2 ]
+				
+				# then if there's other dependencies
 				if /(#<<\s)(.*)/g.test raw
+
+					# collect all and loop through them
 					requirements = raw.match /(#<<\s)(.*)/g
 					for item in requirements
-						item = /(#<<\s)(.*)/.exec( item )[ 2 ]
-						item = item.replace /\s/g, ""
-						item = [].concat item.split ","
+						# 1. filter dependency name
+						# 2. trim it 
+						# 3. split all dependencies
+						# 4. concat it with the dependencies array
+						item         = /(#<<\s)(.*)/.exec( item )[ 2 ]
+						item         = item.replace /\s/g, ""
+						item         = [].concat item.split ","
 						dependencies = dependencies.concat item
 				
+				# assemble the class object and push into buffer
 				buffer.push {
-					path: file
-					name:name,
-					dependencies:dependencies,
-					raw:raw
+					raw:           raw
+
+					classname:     classname
+					namespace:     namespace
+					classpath:     classpath
+					
+					filepath:      filepath
+					filename:      filename
+					filefolder:    filefolder
+
+					dependencies:  dependencies
 				}
-			fn buffer
+
+			# console.log buffer
+			# finally executes callback, passing the collected buffer
+			cb buffer
 	
-	missing: {},
-	reorder:(classes, cycling = false)->
-		@missing = {} if !cycling
-		initd = {}
-		
-		for klass, i in classes
-			initd["#{klass.name}"] = 1
-			continue if !klass.dependencies.length
+	process_wild_cards: ( buffer ) ->
+
+		# loop through all classes in buffer
+		for klass in buffer
 			
-			index = 0
-			while index < klass.dependencies.length
-				dependency = klass.dependencies[index]
+			# initialize empty arrays for keeping the processed dependencies
+			# and the dead index, for after removal
+			_dependencies = []
+			_dead_indexes = []
+			
+			# looping through class dependencues
+			for dependency, index in klass.dependencies
 				
-				if initd[dependency]
-					index++
-					continue
+				# if dependency is a wild-card (namespace.*)
+				if dependency.substr( -1 ) == "*"
+
+					# then adds its index to the dead array
+					_dead_indexes.push index
+
+					# and find all classes under that namespace
+					reg = new RegExp dependency
+					props = ["classname", "classpath"]
+					found = ArrayUtil.find_all buffer, reg, props, true
+					
+					# overwrites its indexes with only the classpath property
+					found[k] = found[k].item.classpath for v, k in found
+					
+					# concat all dependencies together
+					_dependencies = _dependencies.concat found
+			
+			# desc sorting dead_indexes for proper removal
+			_dead_indexes = _dead_indexes.sort().reverse()
+
+			# remove all dead_indexes from the dependencies array
+			klass.dependencies.splice dead, 1 for dead in _dead_indexes
+
+			# concat the processed/found dependencies into classes dependencies
+			klass.dependencies = klass.dependencies.concat _dependencies
+		buffer
+	
+	reorder: (classes, cycling = false) ->
+
+		# if cycling is true or @missing is null, initializes empty array
+		# for holding missing dependencies.
+		# 
+		# cycling means the redorder method is being called recursively,
+		# no other methods call it with cycling = true.
+		@missing = {} if cycling is true or @missing is undefined
+
+		# initialized classes array, will cache every class as it is read.
+		initd = []
+		
+		# looping through all classes
+		for klass, i in classes
+
+			# mark class as initialized
+			initd.push klass
+
+			# if theres no dependencies, go to next class
+			continue if klass.dependencies.length is 0
+			
+			
+			# # otherwise loop thourgh all class dependencies 'manually'
+			# 			index = 0
+			# 			while index < klass.dependencies.length
+
+			for dependency, index in klass.dependencies
+
+				# properties for searching
+				props = ["classname", "classpath"]
 				
-				found = ArrayUtil.find classes, dependency, "name"
+				# if it was already initialized, increments
+				# the index and move forward
+				continue if ArrayUtil.find initd, dependency, props
+				
+				# otherwise search by the dependency
+				found = ArrayUtil.find classes, dependency, props
+				
+				# if it's found
 				if found?
-					if ArrayUtil.has found.item.dependencies, klass.name, "name"
-						klass.dependencies.splice( index, 1 )
+
+					# if there's some circular dependency loop
+					if ArrayUtil.has(
+						found.item.dependencies,
+						klass.classpath,
+						props
+					)
+						# remove it from the dependencies
+						klass.dependencies.splice index, 1
+
+						# then prints a warning msg
 						console.log "WARNING! ".bold.yellow,
-							"You have a circular loop between classes",
+							"You have a circular dependcy loop between classes",
 							"#{dependency.yellow.bold} and",
-							"#{klass.name.yellow.bold}."
+							"#{klass.classpath.yellow.bold}."
+						
+						# array and move on..
 						continue
+					
+					# otherwise if no circular dependency is found, reorder
+					# the specific dependency and run reorder recursively until
+					# everything is beautiful
 					else
-						classes.splice( index, 0, found.item )
-						classes.splice( found.index + 1, 1 )
+						classes.splice index, 0, found.item
+						classes.splice found.index + 1, 1
 						classes = @reorder classes, true
 				
+				# otherwise if the dependency is not found
 				else if !@missing[dependency]
-					@missing[dependency] = 1
+					# then add it to the @missing hash (so it will be ignored
+					# until reordering finishes)
+					@missing[dependency] = true
+					
+					# move it to the end of the dependencies array (avoiding
+					# it from being touched again)
 					klass.dependencies.push dependency
 					klass.dependencies.splice index, 1
+
+					# ..and finally prints a warning msg
 					console.log "WARNING! ".bold.yellow,
 						"Dependence #{dependency.yellow.bold} not found",
-						"for class #{klass.name.yellow.bold}."
-				index++
-				
+						"for class #{klass.classpath.yellow.bold}."
+		
+		# after all, return everything in the proper order
 		classes
 	
-	merge:(input)->
+	merge: (input) ->
+		# merge and returns the classes array in the order it is
 		(klass.raw for klass in input).join "\n"
