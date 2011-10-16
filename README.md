@@ -1,6 +1,6 @@
-# Coffee Toaster (current version - 0.2.2)
+# Coffee Toaster (current version - 0.2.3)
 
-Minimalist dependency management system for CoffeeScript.
+Minimalist dependency management system for CoffeeScript, with full package system and automatic folder-as-namespace support.
 
 # Features
 
@@ -348,7 +348,6 @@ The output JavaScript compiled after reordering classes will be something like t
   new A;
 }).call(this);
 ````
-
 As you can see things are ordered properly.
 
 ## Example - Log

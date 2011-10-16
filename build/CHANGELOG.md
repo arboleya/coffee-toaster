@@ -1,5 +1,12 @@
 # CoffeeToaster Changelog
 
+## 0.3 - 10/16/2011
+ * Refactoring entire Script class
+ * Support for extends directive have been remove, now all dependencies must be informed through '#<< package.name.ClassName'
+ * Support for files without class declarations was (sadly) removed
+ * Adding full package support automagically
+ * Implementing wild-cards on requirements '#<< package.name.*'
+
 ## 0.2.2 - 10/02/2011
  * Starting tests implementation (using Vows BDD)
  * Implementing debug mode (-d --debug). Files are compiled individually plus a boot file (toaster.js)  file that will load everything in the right order.
