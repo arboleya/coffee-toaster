@@ -1,6 +1,9 @@
 # CoffeeToaster Changelog
 
-## 0.3 - 10/16/2011
+## 0.3.1 - PENDING
+ * Avoiding tmp files from being watched [closing issue [#4](http://github.com/serpentem/coffee-toaster/issues/4)]
+
+## 0.3.0 - 10/16/2011
  * Refactoring entire Script class
  * Support for extends directive have been remove, now all dependencies must be informed through '#<< package.name.ClassName'
  * Support for files without class declarations was (sadly) removed

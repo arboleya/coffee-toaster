@@ -1,6 +1,6 @@
 # Coffee Toaster (current version - 0.3.0)
 
-Minimalist dependency management system for CoffeeScript, with full package system and automatic folder-as-namespace support.
+Minimalist dependency management system for CoffeeScript.
 
 # Features
 
@@ -379,6 +379,10 @@ modules = [
 	}
 ]
 ````
+
+# Changelog
+
+Please check the [CHANGELOG.md](http://github.com/serpentem/coffee-toaster/blob/master/build/CHANGELOG.md)
 
 # Mailing List
 
