@@ -80,8 +80,8 @@ class Script
 			"""
 			
 			# merge all classes into one single string buffer to be compiled
-			contents = @merge ordered
-			
+			contents = "#{pkg_helper}\n#{@merge ordered}"
+
 			# tries to compile production file
 			try
 				# compiling coffeescript
@@ -197,12 +197,6 @@ class Script
 				filepath       = file.replace( @src, "" ).substr 1
 				filename       = /\w+\.\w+/.exec( filepath )[ 0 ]
 				filefolder     = filepath.replace "/#{filename}", ""
-
-				# ..and evaluates the root namespace in config, if theres one
-				if @config.root_namespace is not undefined
-					root_namespace = @config.root_namespace + "."
-				else
-					root_namespace = ""
 				
 				# if there is a class inside the file
 				if /(class\s)(\S+)/g.test raw
@@ -210,15 +204,10 @@ class Script
 					# assemble namespace info about the file
 					namespace = filefolder.replace /\//g, "."
 
-					# ..and if auto_package is enabled, then modify the
-					# class declarations before starting the parser thing,
-					# adding the package headers
-					if @config.auto_package is true
-						# repl = "pkg( '#{namespace}' ).$2 = " +
-						# 	   "$2 = $1#{root_namespace}#{namespace}.$2"
-
-						repl = "pkg( '#{namespace}' ).$2 = $1$2"
-						raw = raw.replace /(class\s+)(\S+)/, repl
+					# then modify the class declarations before starting the
+					# parser thing, adding the package the headers declarations
+					repl = "pkg( '#{namespace}' ).$2 = $1$2"
+					raw = raw.replace /(class\s+)(\S+)/, repl
 					
 					# assemble some more infos about the file.
 					#		classname: ClassName
