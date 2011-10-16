@@ -5,7 +5,7 @@
 
 ## 0.3.0 - 10/16/2011
  * Refactoring entire Script class
- * Support for extends directive have been remove, now all dependencies must be informed through '#<< package.name.ClassName'
+ * Support for extends directive have been removed, now all dependencies must be informed through '#<< package.name.ClassName'
  * Support for files without class declarations was (sadly) removed
  * Adding full package support automagically
  * Implementing wild-cards on requirements '#<< package.name.*'
