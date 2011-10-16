@@ -5,24 +5,15 @@ Minimalist dependency management system for CoffeeScript.
 # Features
 
 * Inheritance support across multiples files for the lazy
- * Just use your extends as you do, dependencies will be resolved automagically
- * You can also require based 'ClassName' and 'a/b/c/filepath' simultaneously
-
-````
-	#<< ClassName
-	#<< ClassNameA, ClassNameB
-	#<< package/filename, ClassNameD, utils/anotherfile
-````
-
+* Automatic packaging system, with folder as namespaces
 * Scaffolding routines
- * Interactive creation of a very simple skeleton for new projects
- * Interactive creation of new config file for existent projects
-* Broken/Circular dependency validation
+ * Interactive creation of a very simple skeleton for new projects and config file for existent projects
+* Broken and Circular Loop dependency validation
  * Helps you prevent some mistakes with circular dependencies loops and alert you against dependencies not found
 * Live syntax-check
- * Precise live check for compile problems (syntax-only), with file path and line number informations
+ * Precise live check for compile problems (syntax-only), with file path and line number information
 * Debug Mode
- * In order to provide easy debugging when inside the browser, Debug Mode will compile all your files individually into the respectives .js versions and write a smart boot-loader (toaster.js) to load every file in the proper order. Just include this boot-loader in your html file and voilà
+ * In order to provide easy debugging when inside the browser, Debug Mode will compile all your files individually into its respectives .js versions and write a smart boot-loader (toaster.js) to load every file in the proper order. Just include this boot-loader in your html file and voilà
 
 # Installation
 
@@ -147,74 +138,119 @@ modules =
 	release: "release/app.js"
 ````
 
-So when you call 'toaster -w' inside this directory, every file and folder start being watched.
+So when you call 'toaster -w' inside this directory, this config is loaded and every file and folder inside src folder start being watched.
 
-Or with debug enabled 'toaster -wd', so files are also compiled individually for a sane debugging routine.
+If debug is enabled (-d option), files will also compiled individually for a sane debugging routine, inside the browser.
 
 Every time something changes, CoffeeToaster re-compiles all your application by doing:
 
- * merges all *.coffee file into a single string buffer
- * split all classes into arrays
- * re-order everything so classes are defined always before they are needed.
+ * collects all .coffee files and process everything, adding package declarations to the class definitions, based on the folder they are
+ * re-order everything so classes are defined always before they are needed
 
 Wait! How the hell it know when classes are needed?
-
-## Extends directive
-
-Every time you use 'class A extends B', CoffeeToaster reads the dependency -- "B" in this case -- and put it B before A, automagically.
-
-Of course, there must to be some file with the 'class B' declared inside of it, in your src folder.
 
 ## Import directive
 
 The import directive is known by:
 
- * #<< ClassName
- * #<< ClassNameA, ClassNameB, ClassNameN
+ * #<< core.views.View
+ * #<< utils.*
 
-By putting '#<< ClassNameA' in your CoffeeScript file, you're telling CoffeeToaster about a dependency.
+By putting '#<< package.name.View' in your CoffeeScript file, you're telling CoffeeToaster about a dependency.
 
-Dependencies required in this method will be placed **after** the 'extended' one.
+Wild cards '#<< utils.*' are also accepted as a handy option.		
 
-For example, let's assume you have three files:
+## Example
 
-**a.coffee**
+Let's assume you have four files in this structure (a.coffee, b.coffee and c.coffee):
+
+	├── release
+	│   └── app.js
+	├── src
+	│   ├── just
+	│   │   └── another
+	│   │       └── one
+	│   │           └── c.coffee
+	│   ├── some
+	│   │   ├── folder
+	│   │   │   └── a.coffee
+	│   │   └── other
+	│   │       └── folder
+	│   │           └── b.coffee
+	│   └── top.coffee
+	└── toaster.coffee
+
+With the following contents:
+
+**some/folder/a.coffee**
 
 ````ruby
-#<< C
+#<< some.other.folder.B
+#<< just.another.one.*
+
 class A extends B
 	constructor:->
 		console.log "C created"
 		console.log new C
+		console.log new just.another.one.C
 ````
 
-**b.coffee**
+**some/other/folder/b.coffee**
 
 ````ruby
 class B
 	constructor:-> console.log "B created"
 ````
 
-**c.coffee**
+**just/another/one/c.coffee**
 
 ````ruby
 class C
 	constructor:-> console.log "C created"
 ````
-This way, everything will be merged in an order like this:
+
+This way, everything will be merged like this:
 
 **buffer**
 
 ````ruby
-class B
+some = {}
+just = {}
+
+pkg = ( ns )->
+	curr = null
+	parts = [].concat = ns.split( "." )
+	for part, index in parts
+		if curr == null
+			curr = eval part
+			continue
+		else
+			unless curr[ part ]?
+				curr = curr[ part ] = {}
+			else
+				cur = curr[ part ]
+	curr
+	
+pkg( 'some.other.folder' ).B = class B
 	constructor:-> console.log "B created"
-class C
+pkg( 'just.another.one' ).C = class C
 	constructor:-> console.log "C created"
-class A extends B
+#<< some.other.folder.B
+#<< just.another.one.*
+
+pkg( 'some.folder' ).A = class A extends B
 	constructor:->
-		console.log "C created"
+		console.log "A created"
 		console.log new C
+		console.log new just.another.one.C
+		console.log new B
+		console.log new just.another.one.B
+		console.log new some.other.folder.one.B
+class Top
+	constructor: -> console.log "Top created!"
 ````
+
+As you can see toaster will initialize your root namespaces and add a 'pkg' method, to make everything works as intended.
 
 ## Output (JavaScript)
 
@@ -222,7 +258,7 @@ The output JavaScript compiled after reordering classes will be something like t
 
 ````javascript
 (function() {
-  var A, B, C;
+  var A, B, C, Top, just, pkg, some;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -231,25 +267,56 @@ The output JavaScript compiled after reordering classes will be something like t
     child.__super__ = parent.prototype;
     return child;
   };
-  B = (function() {
+  some = {};
+  just = {};
+  pkg = function(ns) {
+    var cur, curr, index, part, parts, _len;
+    curr = null;
+    parts = [].concat = ns.split(".");
+    for (index = 0, _len = parts.length; index < _len; index++) {
+      part = parts[index];
+      if (curr === null) {
+        curr = eval(part);
+        continue;
+      } else {
+        if (curr[part] == null) {
+          curr = curr[part] = {};
+        } else {
+          cur = curr[part];
+        }
+      }
+    }
+    return curr;
+  };
+  pkg('some.other.folder').B = B = (function() {
     function B() {
       console.log("B created");
     }
     return B;
   })();
-  C = (function() {
+  pkg('just.another.one').C = C = (function() {
     function C() {
       console.log("C created");
     }
     return C;
   })();
-  A = (function() {
+  pkg('some.folder').A = A = (function() {
     __extends(A, B);
     function A() {
-      console.log("C created");
+      console.log("A created");
       console.log(new C);
+      console.log(new just.another.one.C);
+      console.log(new B);
+      console.log(new just.another.one.B);
+      console.log(new some.other.folder.one.B);
     }
     return A;
+  })();
+  Top = (function() {
+    function Top() {
+      console.log("Top created!");
+    }
+    return Top;
   })();
 }).call(this);
 ````
