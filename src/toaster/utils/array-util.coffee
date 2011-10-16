@@ -32,7 +32,7 @@ class ArrayUtil
 						if search == v[p]
 							_output.push {item: v, index: k}
 		
-		return if _output.length then _output else null
+		return _output
 	
 
 
