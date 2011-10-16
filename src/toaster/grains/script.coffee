@@ -206,23 +206,26 @@ class Script
 				
 				# if there is a class inside the file
 				if /(class\s)(\S+)/g.test raw
+
+					# assemble namespace info about the file
 					namespace = filefolder.replace /\//g, "."
 
 					# ..and if auto_package is enabled, then modify the
 					# class declarations before starting the parser thing,
 					# adding the package headers
 					if @config.auto_package is true
-						repl = "pkg( '#{namespace}' ).$2 = " +
-							   "$2 = $1#{root_namespace}#{namespace}.$2"
-						raw = raw.replace /(class\s+)(\S+)/g, repl
+						# repl = "pkg( '#{namespace}' ).$2 = " +
+						# 	   "$2 = $1#{root_namespace}#{namespace}.$2"
+
+						repl = "pkg( '#{namespace}' ).$2 = $1$2"
+						raw = raw.replace /(class\s+)(\S+)/, repl
 					
-					# assemble some more infos about the file, i.e.:
-					#	classname: ClassName
-					#	namespace: package.subpackage
-					#	classpath: package.subpackage.ClassName
-					classpath = /(class\s+)(\S+)/g.exec( raw )[ 2 ]
-					classname = classpath.split(".").pop()
-					namespace   = classpath.replace ".#{classname}", ""
+					# assemble some more infos about the file.
+					#		classname: ClassName
+					#		namespace: package.subpackage
+					#		classpath: package.subpackage.ClassName
+					classname = /(class\s+)(\S+)/.exec( raw )[ 2 ]
+					classpath = "#{namespace}.#{classname}"
 					
 				# otherwise if no class is found inside the file, prints
 				# a warning message
@@ -233,13 +236,7 @@ class Script
 				
 				# if the class was already buffered, prints a warning msg,
 				# skip it and move on
-				if ArrayUtil.find buffer, classpath, "classpath"
-					continue
-				
-				# otherwise checks if the class is extending some other class
-				# and add it as the top-level dependency
-				# if /(extends\s)(\S+)/.test raw
-				# 	dependencies.push /(extends\s)(\S+)/g.exec( raw )[ 2 ]
+				continue if ArrayUtil.find buffer, classpath, "classpath"
 				
 				# then if there's other dependencies
 				if /(#<<\s)(.*)/g.test raw
