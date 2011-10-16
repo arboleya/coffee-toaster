@@ -160,9 +160,9 @@ By putting '#<< package.name.View' in your CoffeeScript file, you're telling Cof
 
 Wild cards '#<< utils.*' are also accepted as a handy option.		
 
-## Example
+## Example - Structure
 
-Let's assume you have four files in this structure (a.coffee, b.coffee and c.coffee):
+Let's assume you have this structure:
 
 	├── release
 	│   └── app.js
@@ -170,6 +170,7 @@ Let's assume you have four files in this structure (a.coffee, b.coffee and c.cof
 	│   ├── just
 	│   │   └── another
 	│   │       └── one
+	│   │           ├── b.coffee
 	│   │           └── c.coffee
 	│   ├── some
 	│   │   ├── folder
@@ -180,9 +181,25 @@ Let's assume you have four files in this structure (a.coffee, b.coffee and c.cof
 	│   └── top.coffee
 	└── toaster.coffee
 
-With the following contents:
+## Example - Contents
 
-**some/folder/a.coffee**
+And every file with the following contents:
+
+ * **path:** just/another/one/b.coffee
+
+````ruby
+class B
+	constructor:-> console.log "just/another/one/B created"
+````
+
+ * **path:** just/another/one/c.coffee
+
+````ruby
+class C
+	constructor:-> console.log "just/another/one/C created"
+````
+
+ * **path:** some/folder/a.coffee
 
 ````ruby
 #<< some.other.folder.B
@@ -190,32 +207,38 @@ With the following contents:
 
 class A extends B
 	constructor:->
-		console.log "C created"
+		console.log "some/folder/A created"
 		console.log new C
 		console.log new just.another.one.C
+		console.log new B
+		console.log new just.another.one.B
+		console.log new some.other.folder.B
+		new Top
+
+new A
 ````
 
-**some/other/folder/b.coffee**
+ * **path:** some/other/folder/b.coffee
 
 ````ruby
 class B
-	constructor:-> console.log "B created"
+	constructor:-> console.log "some/other/folder/B created"
 ````
 
-**just/another/one/c.coffee**
+ * **path:** top.coffee
 
 ````ruby
-class C
-	constructor:-> console.log "C created"
+class Top
+	constructor: -> console.log "Top created!"
 ````
+
+## Example - Merge Result (still CoffeeScript)
 
 This way, everything will be merged like this:
 
-**buffer**
-
 ````ruby
-some = {}
 just = {}
+some = {}
 
 pkg = ( ns )->
 	curr = null
@@ -228,49 +251,47 @@ pkg = ( ns )->
 			unless curr[ part ]?
 				curr = curr[ part ] = {}
 			else
-				cur = curr[ part ]
+				curr = curr[ part ]
 	curr
-	
-pkg( 'some.other.folder' ).B = class B
-	constructor:-> console.log "B created"
-pkg( 'just.another.one' ).C = class C
-	constructor:-> console.log "C created"
-#<< some.other.folder.B
-#<< just.another.one.*
 
-pkg( 'some.folder' ).A = class A extends B
-	constructor:->
-		console.log "A created"
-		console.log new C
-		console.log new just.another.one.C
-		console.log new B
-		console.log new just.another.one.B
-		console.log new some.other.folder.one.B
 class Top
 	constructor: -> console.log "Top created!"
+
+pkg( 'just.another.one' ).B = class B
+	constructor:-> console.log "just/another/one/B created"
+
+pkg( 'just.another.one' ).C = class C
+	constructor:-> console.log "just/another/one/C created"
+
+pkg( 'some.other.folder' ).B = class B
+	constructor:-> console.log "some/other/folder/B created"
+
+pkg( 'some.folder' ).A = class A
+	constructor:->
+		console.log "some/folder/A created"
+		new C
+		new just.another.one.C
+		new B
+		new just.another.one.B
+		new some.other.folder.B
+		new Top
+
+new A
 ````
 
-As you can see toaster will initialize your root namespaces and add a 'pkg' method, to make everything works as intended.
+Toaster will initialize your root namespaces and add a 'pkg' method, to make everything works as intended.
 
-## Output (JavaScript)
+## Example - Output (JavaScript)
 
 The output JavaScript compiled after reordering classes will be something like this:
 
 ````javascript
 (function() {
   var A, B, C, Top, just, pkg, some;
-  var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
-    for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
-    function ctor() { this.constructor = child; }
-    ctor.prototype = parent.prototype;
-    child.prototype = new ctor;
-    child.__super__ = parent.prototype;
-    return child;
-  };
-  some = {};
   just = {};
+  some = {};
   pkg = function(ns) {
-    var cur, curr, index, part, parts, _len;
+    var curr, index, part, parts, _len;
     curr = null;
     parts = [].concat = ns.split(".");
     for (index = 0, _len = parts.length; index < _len; index++) {
@@ -282,46 +303,65 @@ The output JavaScript compiled after reordering classes will be something like t
         if (curr[part] == null) {
           curr = curr[part] = {};
         } else {
-          cur = curr[part];
+          curr = curr[part];
         }
       }
     }
     return curr;
   };
-  pkg('some.other.folder').B = B = (function() {
-    function B() {
-      console.log("B created");
-    }
-    return B;
-  })();
-  pkg('just.another.one').C = C = (function() {
-    function C() {
-      console.log("C created");
-    }
-    return C;
-  })();
-  pkg('some.folder').A = A = (function() {
-    __extends(A, B);
-    function A() {
-      console.log("A created");
-      console.log(new C);
-      console.log(new just.another.one.C);
-      console.log(new B);
-      console.log(new just.another.one.B);
-      console.log(new some.other.folder.one.B);
-    }
-    return A;
-  })();
   Top = (function() {
     function Top() {
       console.log("Top created!");
     }
     return Top;
   })();
+  pkg('just.another.one').B = B = (function() {
+    function B() {
+      console.log("just/another/one/B created");
+    }
+    return B;
+  })();
+  pkg('just.another.one').C = C = (function() {
+    function C() {
+      console.log("just/another/one/C created");
+    }
+    return C;
+  })();
+  pkg('some.other.folder').B = B = (function() {
+    function B() {
+      console.log("some/other/folder/B created");
+    }
+    return B;
+  })();
+  pkg('some.folder').A = A = (function() {
+    function A() {
+      console.log("some/folder/A created");
+      new C;
+      new just.another.one.C;
+      new B;
+      new just.another.one.B;
+      new some.other.folder.B;
+      new Top;
+    }
+    return A;
+  })();
+  new A;
 }).call(this);
 ````
 
-As you can see, things are ordered properly, then you can have your application's tree all tied up with a single start point.
+As you can see things are ordered properly.
+
+## Example - Log
+
+Executing the above script in the browser I got this log msgs:
+
+	some/folder/A created
+	just/another/one/C created
+	just/another/one/C created
+	some/other/folder/B created
+	just/another/one/B created
+	some/other/folder/B created
+	Top created!
 
 # Multiple Modules
 
