@@ -62,19 +62,33 @@ class Script
 				file.end = file.start + ( file.length - 1 )
 				linenum = file.end + 1
 			
-			# gets the root package from the first file (all MUST have the same)
-			root_package = files[0].namespace.split(".").shift()
+			# gets all the root packages in src folder
+			root_packages = {}
+			for file in files
+				if file.filefolder != ""
+					pkg = file.namespace.split(".").shift()
+					root_packages[pkg] = "#{pkg} = {}\n"
+			
+			# .. and merge them into a buffer
+			pkg_buffer = ""
+			pkg_buffer += obj for pkg, obj of root_packages
 
 			# pkg_helper to be appended to the generated javascript
 			# in order to provide packaging functionality
 			pkg_helper = """
-				#{root_package} = {}
+				#{pkg_buffer}
 				pkg = ( ns )->
-					curr = #{root_package}
+					curr = null
 					parts = [].concat = ns.split( "." )
 					for part, index in parts
-						continue if part is "#{root_package}"
-						curr = curr[ part ] = {} unless curr[ part ]?
+						if curr == null
+							curr = eval part
+							continue
+						else
+							unless curr[ part ]?
+								curr = curr[ part ] = {}
+							else
+								cur = curr[ part ]
 					curr
 				
 			"""
@@ -197,25 +211,36 @@ class Script
 				filepath       = file.replace( @src, "" ).substr 1
 				filename       = /\w+\.\w+/.exec( filepath )[ 0 ]
 				filefolder     = filepath.replace "/#{filename}", ""
+
+				# if the class is in the top level
+				if filepath.indexOf("/") is -1
+					filefolder = ""
 				
 				# if there is a class inside the file
 				if /(class\s)(\S+)/g.test raw
 
 					# assemble namespace info about the file
 					namespace = filefolder.replace /\//g, "."
-
-					# then modify the class declarations before starting the
-					# parser thing, adding the package the headers declarations
-					repl = "pkg( '#{namespace}' ).$2 = $1$2"
-					raw = raw.replace /(class\s+)(\S+)/, repl
+					
+					# if the file is not in the root src folder (outside any
+					# folder/package )
+					if namespace != ""
+						# then modify the class declarations before starting
+						# the parser thing, adding the package the headers
+						# declarations
+						repl = "pkg( '#{namespace}' ).$2 = $1$2"
+						raw = raw.replace /(class\s+)(\S+)/, repl
 					
 					# assemble some more infos about the file.
 					#		classname: ClassName
 					#		namespace: package.subpackage
 					#		classpath: package.subpackage.ClassName
 					classname = /(class\s+)(\S+)/.exec( raw )[ 2 ]
-					classpath = "#{namespace}.#{classname}"
-					
+					if namespace is ""
+						classpath = classname
+					else
+						classpath = "#{namespace}.#{classname}"
+				
 				# otherwise if no class is found inside the file, prints
 				# a warning message
 				else
@@ -257,7 +282,6 @@ class Script
 					dependencies:  dependencies
 				}
 
-			# console.log buffer
 			# finally executes callback, passing the collected buffer
 			cb buffer
 	
@@ -299,8 +323,11 @@ class Script
 
 			# concat the processed/found dependencies into classes dependencies
 			klass.dependencies = klass.dependencies.concat _dependencies
+		
+		# return the buffer after processing everything
 		buffer
 	
+	missing = {}
 	reorder: (classes, cycling = false) ->
 
 		# if cycling is true or @missing is null, initializes empty array
@@ -308,7 +335,7 @@ class Script
 		# 
 		# cycling means the redorder method is being called recursively,
 		# no other methods call it with cycling = true.
-		@missing = {} if cycling is true or @missing is undefined
+		@missing = {} if cycling is false
 
 		# initialized classes array, will cache every class as it is read.
 		initd = []
@@ -369,7 +396,8 @@ class Script
 						classes = @reorder classes, true
 				
 				# otherwise if the dependency is not found
-				else if !@missing[dependency]
+				else if @missing[dependency] != true
+					
 					# then add it to the @missing hash (so it will be ignored
 					# until reordering finishes)
 					@missing[dependency] = true
@@ -381,7 +409,7 @@ class Script
 
 					# ..and finally prints a warning msg
 					console.log "WARNING! ".bold.yellow,
-						"Dependence #{dependency.yellow.bold} not found",
+						"Dependency #{dependency.yellow.bold} not found",
 						"for class #{klass.classpath.yellow.bold}."
 		
 		# after all, return everything in the proper order
