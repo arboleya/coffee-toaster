@@ -40,32 +40,38 @@ exports.FsUtil = class FsUtil
 				buffer.push item if item != "." && item != ".." && item != ""
 			fn buffer
 	
+	@watched = {}
 	@watch_file:(filepath, onchange)->
 		filepath = pn filepath
 		onchange?( {type:"file", path:filepath, action:"watching"} )
 		
+		@watched[filepath] = true
 		fs.watchFile filepath, {interval : 250}, (curr,prev)=>
 			mtime = curr.mtime.valueOf() != prev.mtime.valueOf()
 			ctime = curr.ctime.valueOf() != prev.ctime.valueOf()
 			if mtime || ctime
 				onchange?( {type: "file", path:filepath, action: "updated"} )
 	
-	@watch_folder:(folderpath, onchange)->
+	@watch_folder:(folderpath, filter_regexp, onchange)->
 		folderpath = pn folderpath
 		onchange?( {type:"folder", path:folderpath, action:"watching"} )
 		
 		exec "ls #{folderpath}", (error, stdout, stderr)=>
 			
 			FsUtil.snapshots[folderpath] = FsUtil.format_ls folderpath, stdout
-			
+
 			for item in FsUtil.snapshots[folderpath]
 				if item.type == "folder"
-					FsUtil.watch_folder item.path, onchange
+					FsUtil.watch_folder item.path, filter_regexp, onchange
 				else
-					FsUtil.watch_file item.path, onchange
+					if filter_regexp == null
+						FsUtil.watch_file item.path, onchange
+					
+					else if filter_regexp.test item.path
+						FsUtil.watch_file item.path, onchange
 		
 		fs.watchFile folderpath, {interval : 250}, (curr,prev)=>
-			
+
 			exec "ls #{folderpath}", (error, stdout, stderr)=>
 				
 				a = FsUtil.snapshots[folderpath]
@@ -77,16 +83,24 @@ exports.FsUtil = class FsUtil
 					info.action = item.action
 					
 					if info.action == "created"
-						onchange?( info )
-						
 						if info.type == "file"
+							if filter_regexp?
+								unless filter_regexp.test info.path
+									continue
+							
+							onchange?( info )	
 							FsUtil.watch_file info.path, onchange
-						else if info.type == "folder"
-							FsUtil.watch_folder info.path, onchange
 						
+						else if info.type == "folder"
+
+							onchange?( info )
+							FsUtil.watch_folder info.path, onchange
+					
 					else if info.action == "deleted"
-						onchange?( info )
-						fs.unwatchFile item.path
+						if @watched[info.path] is true
+							@watched[info.path]
+							onchange?( info )
+							fs.unwatchFile item.path
 				
 				snapshot = FsUtil.format_ls folderpath, stdout
 				FsUtil.snapshots[folderpath] = snapshot

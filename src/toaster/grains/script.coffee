@@ -13,7 +13,7 @@ class Script
 	watch: =>
 
 		# watch entire source folder
-		FsUtil.watch_folder @src, (info) =>
+		FsUtil.watch_folder @src, /.coffee$/, (info) =>
 
 			# Titleize the type for use in the log messages bellow
 			type = StringUtil.titleize info.type
