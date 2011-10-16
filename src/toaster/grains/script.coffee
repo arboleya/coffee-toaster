@@ -88,7 +88,7 @@ class Script
 							unless curr[ part ]?
 								curr = curr[ part ] = {}
 							else
-								cur = curr[ part ]
+								curr = curr[ part ]
 					curr
 				
 			"""
