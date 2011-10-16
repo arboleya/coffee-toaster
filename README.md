@@ -202,17 +202,18 @@ class C
  * **path:** some/folder/a.coffee
 
 ````ruby
-#<< some.other.folder.B
 #<< just.another.one.*
+#<< some.other.folder.*
+#<< Top
 
-class A extends B
+class A
 	constructor:->
 		console.log "some/folder/A created"
-		console.log new C
-		console.log new just.another.one.C
-		console.log new B
-		console.log new just.another.one.B
-		console.log new some.other.folder.B
+		new C
+		new just.another.one.C
+		new B
+		new just.another.one.B
+		new some.other.folder.B
 		new Top
 
 new A
