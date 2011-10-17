@@ -290,22 +290,28 @@ class Script
 			# looping through class dependencues
 			for dependency, index in klass.dependencies
 				
-				# if dependency is a wild-card (namespace.*)
-				if dependency.substr( -1 ) == "*"
+				# continue if dependency is not a wild-card (namespace.*)
+				continue if dependency.substr(-1) != "*"
 
-					# then adds its index to the dead array
-					_dead_indexes.push index
+				# otherwise its index to the dead array
+				_dead_indexes.push index
 
-					# and find all classes under that namespace
-					reg = new RegExp dependency.replace /(\.|\/)/g, "\\$1"
-					props = ["classname", "classpath", "filename", "filefolder"]
-					found = ArrayUtil.find_all buffer, reg, props, true, true
+				# and find all classes under that namespace
+				reg = new RegExp dependency.replace /(\.|\/)/g, "\\$1"
+				props = ["classname", "classpath", "filename", "filefolder"]
+				found = ArrayUtil.find_all buffer, reg, props, true, true
 
-					# overwrites its indexes with only the classpath property
-					found[k] = found[k].item.classpath for v, k in found
-					
-					# concat all dependencies together
-					_dependencies = _dependencies.concat found
+				# if nothing is found under the given namespace
+				if found.length <= 0
+					console.log "#{'WARNING'.bold.yellow} Nothing found".yellow,
+								"inside #{dependency.yellow}"
+					continue
+				
+				# otherwise rewrites found array with classpath info only
+				found[k] = found[k].item.classpath for v, k in found
+				
+				# concat all dependencies together
+				_dependencies = _dependencies.concat found
 			
 			# desc sorting dead_indexes for proper removal
 			_dead_indexes = _dead_indexes.sort().reverse()
@@ -316,7 +322,6 @@ class Script
 			# concat the processed/found dependencies into classes dependencies
 			klass.dependencies = klass.dependencies.concat _dependencies
 
-		
 		# return the buffer after processing everything
 		buffer
 	
