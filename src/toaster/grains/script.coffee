@@ -244,7 +244,7 @@ class Script
 				# otherwise if no class is found inside the file, prints
 				# a warning message
 				else
-					console.log "#{'WARNING'}.bold No class found, ".red +
+					console.log "#{'WARNING'.bold} No class found, ".red +
 								"skiping file: #{file}".red
 					continue
 				
@@ -281,7 +281,7 @@ class Script
 
 					dependencies:  dependencies
 				}
-
+			
 			# finally executes callback, passing the collected buffer
 			cb buffer
 	
@@ -305,10 +305,10 @@ class Script
 					_dead_indexes.push index
 
 					# and find all classes under that namespace
-					reg = new RegExp dependency
-					props = ["classname", "classpath"]
-					found = ArrayUtil.find_all buffer, reg, props, true
-					
+					reg = new RegExp dependency.replace /(\.|\/)/g, "\$1"
+					props = ["classname", "classpath", "filename", "filefolder"]
+					found = ArrayUtil.find_all buffer, reg, props, true, true
+
 					# overwrites its indexes with only the classpath property
 					found[k] = found[k].item.classpath for v, k in found
 					
@@ -357,7 +357,7 @@ class Script
 			for dependency, index in klass.dependencies
 
 				# properties for searching
-				props = ["classname", "classpath"]
+				props = ["classname", "classpath", "filename", "filefolder"]
 				
 				# if it was already initialized, increments
 				# the index and move forward
