@@ -10,32 +10,39 @@ class ArrayUtil
 					return {item: v, index: k} if search == v[p]
 		return null
 	
-	@find_all:(source, search, by_property, regexp)->
+	@find_all:(source, search, by_property, regexp, unique)->
 		_output = []
+		_unique = {}
 
 		if by_property is null
+
 			for v, k in source
 				if regexp
-					if search.test v
-						_output.push {item: v, index: k}
+					item = {item: v, index: k} if search.test v
 				else
-					if search == v
-						_output.push {item: v, index: k}
+					item = {item: v, index: k} if search == v
+				
+				_output.push item if item
 		else
+			
 			by_property = [].concat by_property
 			for v, k in source
 				for p in by_property
 					if regexp
 						if search.test v[p]
-							_output.push {item: v, index: k}
+							if unique && _unique[k]?
+								item = {item: v, index: k}
+							else if !unique
+								item = {item: v, index: k}
 					else
 						if search == v[p]
-							_output.push {item: v, index: k}
+							item = {item: v, index: k}
+					
+					if item
+						_output.push _unique[k] = item
 		
 		return _output
 	
-
-
 	@diff:(a, b, by_property)->
 		diff = []
 		
