@@ -221,7 +221,7 @@ class Script
 				namespace = filefolder.replace(/\//g, ".").slice 0, -1
 
 				# if there is a class inside the file
-				if /(class\s)(\S+)/g.test raw
+				if /(class)+\s+(\w+)($|\s+extends\s+\w+$)/g.test raw
 					
 					# if the file is not in the root src folder (outside any
 					# folder/package )
