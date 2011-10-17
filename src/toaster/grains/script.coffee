@@ -210,17 +210,17 @@ class Script
 				# assemble some information about the file
 				filepath       = file.replace( @src, "" ).substr 1
 				filename       = /\w+\.\w+/.exec( filepath )[ 0 ]
-				filefolder     = filepath.replace "/#{filename}", ""
+				filefolder     = filepath.replace( "/#{filename}", "") + "/"
 
 				# if the class is in the top level
 				if filepath.indexOf("/") is -1
 					filefolder = ""
 				
+				# assemble namespace info about the file
+				namespace = filefolder.replace(/\//g, ".").slice 0, -1
+
 				# if there is a class inside the file
 				if /(class\s)(\S+)/g.test raw
-
-					# assemble namespace info about the file
-					namespace = filefolder.replace /\//g, "."
 					
 					# if the file is not in the root src folder (outside any
 					# folder/package )
@@ -241,16 +241,9 @@ class Script
 					else
 						classpath = "#{namespace}.#{classname}"
 				
-				# otherwise if no class is found inside the file, prints
-				# a warning message
-				else
-					console.log "#{'WARNING'.bold} No class found, ".red +
-								"skiping file: #{file}".red
-					continue
-				
 				# if the class was already buffered, prints a warning msg,
 				# skip it and move on
-				continue if ArrayUtil.find buffer, classpath, "classpath"
+				continue if ArrayUtil.find buffer, filepath, "filepath"
 				
 				# then if there's other dependencies
 				if /(#<<\s)(.*)/g.test raw
@@ -281,7 +274,6 @@ class Script
 
 					dependencies:  dependencies
 				}
-			
 			# finally executes callback, passing the collected buffer
 			cb buffer
 	
@@ -305,7 +297,7 @@ class Script
 					_dead_indexes.push index
 
 					# and find all classes under that namespace
-					reg = new RegExp dependency.replace /(\.|\/)/g, "\$1"
+					reg = new RegExp dependency.replace /(\.|\/)/g, "\\$1"
 					props = ["classname", "classpath", "filename", "filefolder"]
 					found = ArrayUtil.find_all buffer, reg, props, true, true
 
@@ -323,6 +315,7 @@ class Script
 
 			# concat the processed/found dependencies into classes dependencies
 			klass.dependencies = klass.dependencies.concat _dependencies
+
 		
 		# return the buffer after processing everything
 		buffer
@@ -349,11 +342,7 @@ class Script
 			# if theres no dependencies, go to next class
 			continue if klass.dependencies.length is 0
 			
-			
-			# # otherwise loop thourgh all class dependencies 'manually'
-			# 			index = 0
-			# 			while index < klass.dependencies.length
-
+			# otherwise loop thourgh all class dependencies
 			for dependency, index in klass.dependencies
 
 				# properties for searching
