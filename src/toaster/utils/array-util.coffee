@@ -27,19 +27,23 @@ class ArrayUtil
 			
 			by_property = [].concat by_property
 			for v, k in source
+				
 				for p in by_property
+					item = null
+
 					if regexp
 						if search.test v[p]
-							if unique && _unique[k]?
+							if unique && !_unique[k]
 								item = {item: v, index: k}
-							else if !unique
+							else if unique is not true
 								item = {item: v, index: k}
 					else
 						if search == v[p]
 							item = {item: v, index: k}
 					
 					if item
-						_output.push _unique[k] = item
+						_unique[k] = true
+						_output.push item
 		
 		return _output
 	
