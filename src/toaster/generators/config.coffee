@@ -13,9 +13,6 @@ class Config extends Question
 		if folderpath? and folderpath != true
 			@basepath = "#{@basepath}/#{folderpath}" 
 		
-		console.log @basepath
-		console.log "asdf >>> #{folderpath}"
-
 		console.log "#{'Let\'s toast this sly little project! :)'.grey.bold}"
 		console.log ". With this as your basepath: #{@basepath.cyan}"
 		console.log ". Please, tell me:"
