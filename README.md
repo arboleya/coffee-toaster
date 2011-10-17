@@ -70,7 +70,7 @@ A 'toaster.coffee' file will be created inside it.
 
 ## When the magic happens
 
-To see all CoffeeToaster can do for you, after creating or toasting a new project, enter in the project folder and type 'toaster':
+To see all CoffeeToaster can do for you, after creating or toasting a new project, enter in the project folder and type 'toaster -w':
 
 	cd existing-project
 	toaster -w
@@ -83,7 +83,7 @@ Or:
 
 In debug mode (option -d) files will be all compiled individually inside a folder called "toaster" in the same directory you have your release file, aiming to ease the debugging process.
 
-For example, if you have "release/app.js", a folder will be created in "/release/toaster" and all your CoffeeScript files will be copileted to Javascript inside "release/toaster/classes/".
+For example, if you have "release/app.js", a folder will be created in "release/toaster" and all your CoffeeScript files will be compiled to Javascript inside "release/toaster/classes/".
 
 Bellow is a directory structure representing this:
 
@@ -108,7 +108,7 @@ Bellow is a directory structure representing this:
 
 There's also a 'toaster.js' file inside the 'release/toaster' folder, this Javascript file is responsible to load all your classes into the right order.
 
-So in your .html your have to options:
+So in your .html your have two options:
 
 **1)** Include your release file (release/app.js)
 
@@ -140,7 +140,7 @@ modules =
 
 So when you call 'toaster -w' inside this directory, this config is loaded and every file and folder inside src folder start being watched.
 
-If debug is enabled (-d option), files will also compiled individually for a sane debugging routine, inside the browser.
+If debug is enabled (option -d), files will also compiled individually for a sane debugging routine, inside the browser.
 
 Every time something changes, CoffeeToaster re-compiles all your application by doing:
 
