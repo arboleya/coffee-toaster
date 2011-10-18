@@ -5,7 +5,7 @@ App = (function() {
     new Red;
     new Black;
     new TopLevel;
-    console.log(">>> namespaces are also welcome :)");
+    console.log("--------------------------------------------------------------------\n:: namespaces are also welcome :)\n\t and helps you differ between two classes with the same name.\n\t in the lines bellow, two classes named 'Black' are instantiated\n\t independently, through namespaces usage.\n--------------------------------------------------------------------");
     new colors.Red;
     new colors.Black;
     new misc.Black;

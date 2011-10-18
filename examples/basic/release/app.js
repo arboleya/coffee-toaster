@@ -28,7 +28,7 @@
     }
     return Black;
   })();
-  console.log("I am the single/script file, you wont find any class declaration", "in me!\n\tSo I will run as soon as I am processed, without the", "needing to be instantiated instantiated etc -- and thats why this", "log message will appear before the others (in this example).");
+  console.log("----------------------------------------------------------------------------\n:: I am the single/script file, you wont find any class declaration in me!\n\t So I will run as soon as I am processed, without the needing to be\n\t instantiated etc -- and thats why this log message will appear before\n\t the others (in this example).\n----------------------------------------------------------------------------");
   TopLevel = (function() {
     function TopLevel() {
       console.log("TopLevel created!");
@@ -53,7 +53,7 @@
       new Red;
       new Black;
       new TopLevel;
-      console.log(">>> namespaces are also welcome :)");
+      console.log("--------------------------------------------------------------------\n:: namespaces are also welcome :)\n\t and helps you differ between two classes with the same name.\n\t in the lines bellow, two classes named 'Black' are instantiated\n\t independently, through namespaces usage.\n--------------------------------------------------------------------");
       new colors.Red;
       new colors.Black;
       new misc.Black;
