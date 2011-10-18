@@ -22,26 +22,26 @@
     }
     return curr;
   };
-  Black = (function() {
+  pkg('misc').Black = Black = (function() {
     function Black() {
       console.log("misc/Black created!");
     }
     return Black;
   })();
-  console.log("I am the single/script file, you wont find any class declaration in me!\nSo I will run as soon as I am processed, without the needing of instantiated\netc -- thats why this log message will appear before the others.");
+  console.log("I am the single/script file, you wont find any class declaration", "in me!\n\tSo I will run as soon as I am processed, without the", "needing to be instantiated instantiated etc -- and thats why this", "log message will appear before the others (in this example).");
   TopLevel = (function() {
     function TopLevel() {
       console.log("TopLevel created!");
     }
     return TopLevel;
   })();
-  Black = (function() {
+  pkg('colors').Black = Black = (function() {
     function Black() {
       console.log("colors/Black created!");
     }
     return Black;
   })();
-  Red = (function() {
+  pkg('colors').Red = Red = (function() {
     function Red() {
       console.log("colors/Red created!");
     }
