@@ -221,8 +221,8 @@ class Script
 				namespace = filefolder.replace(/\//g, ".").slice 0, -1
 
 				# if there is a class inside the file
-				rgx = "(class)+\\s+(\\w+)?($|\\s+(extends)\\s+(\\w+)$)"
-				if raw.match( new RegExp( rgx, "m" )?
+				rgx = "(class)+\\s+(\\w+)(\\s*$|\\s+extends\\s+\\w+\\s*$)"
+				if raw.match( new RegExp rgx, "m" )?
 					
 					# if the file is not in the root src folder (outside any
 					# folder/package )
@@ -237,7 +237,7 @@ class Script
 					#		classname: ClassName
 					#		namespace: package.subpackage
 					#		classpath: package.subpackage.ClassName
-					classname = new RegExp( rgx, "gm").exec( raw )[ 2 ]
+					classname = raw.match( new RegExp( rgx, "m") )[2]
 					
 					if namespace is ""
 						classpath = classname
