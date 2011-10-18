@@ -221,7 +221,8 @@ class Script
 				namespace = filefolder.replace(/\//g, ".").slice 0, -1
 
 				# if there is a class inside the file
-				if /(class)+\s+(\w+)($|\s+extends\s+\w+$)/g.test raw
+				rgx = "(class)+\\s+(\\w+)?($|\\s+(extends)\\s+(\\w+)$)"
+				if raw.match( new RegExp( rgx, "m" )?
 					
 					# if the file is not in the root src folder (outside any
 					# folder/package )
@@ -229,14 +230,15 @@ class Script
 						# then modify the class declarations before starting
 						# the parser thing, adding the package the headers
 						# declarations
-						repl = "pkg( '#{namespace}' ).$2 = $1$2"
-						raw = raw.replace /(class\s+)(\S+)/, repl
+						repl = "pkg( '#{namespace}' ).$2 = $1 $2 "
+						raw = raw.replace new RegExp( rgx, "gm" ), repl
 					
 					# assemble some more infos about the file.
 					#		classname: ClassName
 					#		namespace: package.subpackage
 					#		classpath: package.subpackage.ClassName
-					classname = /(class\s+)(\S+)/.exec( raw )[ 2 ]
+					classname = new RegExp( rgx, "gm").exec( raw )[ 2 ]
+					
 					if namespace is ""
 						classpath = classname
 					else
