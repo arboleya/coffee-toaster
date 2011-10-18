@@ -221,22 +221,23 @@ class Script
 				namespace = filefolder.replace(/\//g, ".").slice 0, -1
 
 				# validate if there is a class inside the file
-				rgx = "(class)+\\s+(\\w+)(\\s*$|\\s+(extends)\\s+(\\w+)\\s*$)"
+				rgx = "(^|=\\s*)(class)+\\s+(\\w+)" +
+					  "(\\s*$|\\s+(extends)\\s+(\\w+)\\s*$)"
 				
 				# validate if there is a class extends inside the file
-				rgx_ext = /(class)+\s+(\w+)\s+(extends)\s+(\w+)\s*$/m
+				rgx_ext = /(^|=\s*)(class)+\s+(\w+)\s+(extends)\s+(\w+)\s*$/m
 				
 				# if there is a class inside the file
 				if raw.match( new RegExp rgx, "m" )?
-					
+
 					# if the file is not in the root src folder (outside any
 					# folder/package )
 					if namespace != ""
 						# then modify the class declarations before starting
 						# the parser thing, adding the package the headers
 						# declarations
-						repl = "pkg( '#{namespace}' ).$2 = $1 $2"
-						repl += "$3" if rgx_ext.test raw
+						repl = "pkg( '#{namespace}' ).$3 = $2 $3"
+						repl += "$4" if rgx_ext.test raw
 						raw = raw.replace new RegExp( rgx, "gm" ), repl
 					
 					# assemble some more infos about the file.
@@ -283,6 +284,7 @@ class Script
 
 					dependencies:  dependencies
 				}
+			
 			# finally executes callback, passing the collected buffer
 			cb buffer
 	
