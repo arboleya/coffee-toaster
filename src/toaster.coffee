@@ -54,12 +54,12 @@ class Toaster
 			new Config( @basepath ).create( argv.i )
 		
 		else if argv.c || argv.w
-			@compile_and_watch()
+			@compile_andor_watch()
 		
 		else
 			console.log opts.help()
 	
-	compile_and_watch:->
+	compile_andor_watch:->
 		filepath = pn "#{@basepath}/toaster.coffee"
 		
 		if path.existsSync filepath
@@ -95,7 +95,7 @@ class Toaster
 				# --------------------------------------------------------------
 				# 
 				# INDIVUDAL HANDLERS FOR EACH KING, THE CS ONE IS ALREADY DONE.
-				# THE OTHER TWO IS PENDING.
+				# THE OTHER TWO ARE PENDING.
 				# 
 				# handling coffeescript 
 				# if module.grains.scripts?
@@ -106,11 +106,11 @@ class Toaster
 				#
 				# handling coffeekup
 				# if module.grains.kup?
-				# 	TODO: implement coffeeku support
+				# 	TODO: implement markupsupport
 				#
 				# handling coffeecss
 				# if module.grains.css?
-				#	TODO: implement coffeeku support
+				#	TODO: implement styles support
 		else
 			console.log "ERROR! ".bold.red
 			console.log "\tFile not found: #{filepath.red}"
