@@ -5,7 +5,7 @@ App = (function() {
     new Red;
     new Black;
     new TopLevel;
-    console.log("--------------------------------------------------------------------\n:: namespaces are also welcome :)\n\t and helps you differ between two classes with the same name.\n\t in the lines bellow, two classes named 'Black' are instantiated\n\t independently, through namespaces usage.\n--------------------------------------------------------------------");
+    console.log("--------------------------------------------------------------------\n:: Namespaces are also welcome :)\n\t ..and helps you to differ two classes with the same name.\n\t In the lines bellow, two classes named 'Black' are instantiated\n\t independently, through namespaces.\n\t Namespaces are automatically generated based on the folder the\n\t the file are, relative to the src folder.\n--------------------------------------------------------------------");
     new colors.Red;
     new colors.Black;
     new misc.Black;

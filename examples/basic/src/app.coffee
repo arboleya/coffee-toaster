@@ -13,14 +13,19 @@ class App
 
 		console.log """
 			--------------------------------------------------------------------
-			:: namespaces are also welcome :)
-			\t and helps you differ between two classes with the same name.
-			\t in the lines bellow, two classes named 'Black' are instantiated
-			\t independently, through namespaces usage.
+			:: Namespaces are also welcome :)
+			\t ..and helps you to differ two classes with the same name.
+			\t In the lines bellow, two classes named 'Black' are instantiated
+			\t independently, through namespaces.
+			\t Namespaces are automatically generated based on the folder the
+			\t the file are, relative to the src folder.
 			--------------------------------------------------------------------
 		"""
+
 		new colors.Red
 		new colors.Black
 		new misc.Black
 
 new App
+
+
