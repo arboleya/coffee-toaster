@@ -1,8 +1,8 @@
 (function() {
-  var App, Black, Red, TopLevel, colors, misc, pkg, single;
-  misc = {};
+  var A, App, B, TopLevel, letters, pkg, repeating, single;
+  repeating = {};
   single = {};
-  colors = {};
+  letters = {};
   pkg = function(ns) {
     var curr, index, part, parts, _len;
     curr = null;
@@ -22,11 +22,17 @@
     }
     return curr;
   };
-  pkg('misc').Black = Black = (function() {
-    function Black() {
-      console.log("misc/Black created!");
+  pkg('repeating').A = A = (function() {
+    function A() {
+      console.log("repeating/A created!");
     }
-    return Black;
+    return A;
+  })();
+  pkg('repeating').B = B = (function() {
+    function B() {
+      console.log("repeating/B created!");
+    }
+    return B;
   })();
   console.log("----------------------------------------------------------------------------\n:: I am the single/script file, you wont find any class declaration in me!\n\t So I will run as soon as I am processed, without the needing to be\n\t instantiated etc -- and thats why this log message will appear before\n\t the others (in this example).\n----------------------------------------------------------------------------");
   TopLevel = (function() {
@@ -35,28 +41,29 @@
     }
     return TopLevel;
   })();
-  pkg('colors').Black = Black = (function() {
-    function Black() {
-      console.log("colors/Black created!");
+  pkg('letters').A = A = (function() {
+    function A() {
+      console.log("letters/A created!");
     }
-    return Black;
+    return A;
   })();
-  pkg('colors').Red = Red = (function() {
-    function Red() {
-      console.log("colors/Red created!");
+  pkg('letters').B = B = (function() {
+    function B() {
+      console.log("letters/B created!");
     }
-    return Red;
+    return B;
   })();
   App = (function() {
     function App() {
       console.log("App created!");
-      new Red;
-      new Black;
+      new A;
+      new B;
       new TopLevel;
-      console.log("--------------------------------------------------------------------\n:: Namespaces are also welcome :)\n\t ..and helps you to differ two classes with the same name.\n\t In the lines bellow, two classes named 'Black' are instantiated\n\t independently, through namespaces.\n\t Namespaces are automatically generated based on the folder the\n\t the file are, relative to the src folder.\n--------------------------------------------------------------------");
-      new colors.Red;
-      new colors.Black;
-      new misc.Black;
+      console.log("--------------------------------------------------------------------\n:: Namespaces are also welcome :)\n\t ..and helps you to differ two classes with the same name.\n\t In the lines bellow, two classes named 'A' and 'B' are\n\t instantiated independently, through namespaces.\n\t Namespaces are automatically generated based on the folder the\n\t the files are, relative to the src folder.\n--------------------------------------------------------------------");
+      new letters.A;
+      new letters.B;
+      new repeating.A;
+      new repeating.B;
     }
     return App;
   })();
