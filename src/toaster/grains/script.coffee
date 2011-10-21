@@ -18,31 +18,30 @@ class Script
 			# Titleize the type for use in the log messages bellow
 			type = StringUtil.titleize info.type
 			
-			# seitch over created, deleted, updated and watching
+			# switch over created, deleted, updated and watching
 			switch info.action
 
 				# when a new file is created
 				when "created"
 					msg = "#{('New ' + info.type + ' created:').green}"
 					console.log "#{msg} #{info.path}"
-					@compile()
 				
 				# when a file is deleted
 				when "deleted"
 					msg = "#{(type + ' deleted, stop watching: ').red}"
 					console.log "#{msg} #{info.path}"
-					@compile()
 				
 				# when a file is updated
 				when "updated"
 					msg = "#{(type + ' changed').yellow}"
 					console.log "#{msg} #{info.path}"
-					@compile()
 				
 				# when a file starts being watched
 				when "watching"
 					msg = "#{('Watching ' + info.type).cyan}"
 					console.log "#{msg} #{info.path}"
+			
+			@compile() unless info.action is "watching"
 	
 	compile: (cb) ->
 		# collect all files
@@ -203,16 +202,18 @@ class Script
 
 			# looping through all files
 			for file in files
-				
-				# read file content and initialize dependencies array
+
+				# read file content and initialize dependencies
+				# and extends array
 				raw = fs.readFileSync file, "utf-8"
 				dependencies = []
-				
-				# assemble some information about the file
-				filepath       = file.replace( @src, "" ).substr 1
-				filename       = /\w+\.\w+/.exec( filepath )[ 0 ]
-				filefolder     = filepath.replace( "/#{filename}", "") + "/"
+				baseclasses = []
 
+				# assemble some information about the file
+				filepath   = file.replace( @src, "" ).substr 1
+				filename   = /\w+\.\w+/.exec( filepath )[ 0 ]
+				filefolder = filepath.replace( "/#{filename}", "") + "/"
+				namespace  = ""
 				# if the file is in the top level
 				if filepath.indexOf("/") is -1
 					filefolder = ""
@@ -224,8 +225,8 @@ class Script
 				rgx = "(^|=\\s*)(class)+\\s+(\\w+)" +
 					  "(\\s*$|\\s+(extends)\\s+(\\w+)\\s*$)"
 				
-				# validate if there is a class extends inside the file
-				rgx_ext = /(^|=\s*)(class)+\s+(\w+)\s+(extends)\s+(\w+)\s*$/m
+				# filter classes that extends another classes
+				rgx_ext = "(^|=\\s*)(class)\\s(\\w+)\\s(extends)\\s(\\w+)\\s*$"
 				
 				# if there is a class inside the file
 				if raw.match( new RegExp rgx, "m" )?
@@ -237,19 +238,26 @@ class Script
 						# the parser thing, adding the package the headers
 						# declarations
 						repl = "pkg( '#{namespace}' ).$3 = $2 $3"
-						repl += "$4" if rgx_ext.test raw
+						repl += "$4" if new RegExp(rgx_ext, "m").test raw
 						raw = raw.replace new RegExp( rgx, "gm" ), repl
 					
 					# assemble some more infos about the file.
 					#		classname: ClassName
 					#		namespace: package.subpackage
 					#		classpath: package.subpackage.ClassName
-					classname = raw.match( new RegExp( rgx, "m") )[2]
+					classname = raw.match( new RegExp( rgx, "m") )[3]
 					
+					# assure namespace is correct
 					if namespace is ""
 						classpath = classname
 					else
 						classpath = "#{namespace}.#{classname}"
+					
+					# colletcts the base classes, in case some class in the file
+					# extends something
+					for klass in raw.match( new RegExp rgx_ext, "gm" ) ? []
+						baseclass = klass.match( new RegExp(rgx_ext, "m"))[5]
+						baseclasses.push baseclass
 				
 				# if the file was already buffered, prints a warning msg,
 				# skip it and move on
@@ -283,6 +291,7 @@ class Script
 					filefolder:    filefolder
 
 					dependencies:  dependencies
+					baseclasses:   baseclasses
 				}
 			
 			# finally executes callback, passing the collected buffer
@@ -358,7 +367,7 @@ class Script
 			initd.push file
 
 			# if theres no dependencies, go to next file
-			continue if file.dependencies.length is 0
+			continue if !file.dependencies.length && !file.baseclasses.length
 			
 			# otherwise loop thourgh all file dependencies
 			for dependency, index in file.dependencies
@@ -409,9 +418,22 @@ class Script
 
 					# ..and finally prints a warning msg
 					console.log "WARNING! ".bold.yellow,
-						"Dependency #{dependency.yellow.bold} not found",
-						"for class #{file.classpath.yellow.bold}."
-		
+								"Dependency #{Dependencybold}".yellow,
+								"not found for class".yellow,
+								"#{file.classpath.yellow.bold}."
+			
+			for bc in file.baseclasses
+				found = ArrayUtil.find( initd, bc, "classname" )
+				if found == null && !@missing[bc]
+					@missing[bc] = true
+					console.log "#{'WARNING!'.bold} Base class".yellow,
+								bc.bold.white,
+								"not found for class".yellow,
+								file.classname.bold.white,
+								"in file".yellow,
+								file.filepath.yellow
+
+
 		# after all, return everything in the proper order
 		files
 	
