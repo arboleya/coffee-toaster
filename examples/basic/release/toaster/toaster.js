@@ -1,7 +1,7 @@
 var letters, pkg, repeating, single;
+letters = {};
 repeating = {};
 single = {};
-letters = {};
 pkg = function(ns) {
   var curr, index, part, parts, _len;
   curr = null;
@@ -21,10 +21,10 @@ pkg = function(ns) {
   }
   return curr;
 };
+document.write('<scri' + 'pt src="./toaster/src/letters/a.js"></scr' + 'ipt>');
+document.write('<scri' + 'pt src="./toaster/src/letters/b.js"></scr' + 'ipt>');
 document.write('<scri' + 'pt src="./toaster/src/repeating/a.js"></scr' + 'ipt>');
 document.write('<scri' + 'pt src="./toaster/src/repeating/b.js"></scr' + 'ipt>');
 document.write('<scri' + 'pt src="./toaster/src/single/script.js"></scr' + 'ipt>');
 document.write('<scri' + 'pt src="./toaster/src/toplevel.js"></scr' + 'ipt>');
-document.write('<scri' + 'pt src="./toaster/src/letters/a.js"></scr' + 'ipt>');
-document.write('<scri' + 'pt src="./toaster/src/letters/b.js"></scr' + 'ipt>');
 document.write('<scri' + 'pt src="./toaster/src/app.js"></scr' + 'ipt>');

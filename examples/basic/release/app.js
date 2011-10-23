@@ -1,8 +1,8 @@
 (function() {
   var A, App, B, TopLevel, letters, pkg, repeating, single;
+  letters = {};
   repeating = {};
   single = {};
-  letters = {};
   pkg = function(ns) {
     var curr, index, part, parts, _len;
     curr = null;
@@ -22,6 +22,18 @@
     }
     return curr;
   };
+  pkg('letters').A = A = (function() {
+    function A() {
+      console.log("letters/A created!");
+    }
+    return A;
+  })();
+  pkg('letters').B = B = (function() {
+    function B() {
+      console.log("letters/B created!");
+    }
+    return B;
+  })();
   pkg('repeating').A = A = (function() {
     function A() {
       console.log("repeating/A created!");
@@ -40,18 +52,6 @@
       console.log("TopLevel created!");
     }
     return TopLevel;
-  })();
-  pkg('letters').A = A = (function() {
-    function A() {
-      console.log("letters/A created!");
-    }
-    return A;
-  })();
-  pkg('letters').B = B = (function() {
-    function B() {
-      console.log("letters/B created!");
-    }
-    return B;
   })();
   App = (function() {
     function App() {
