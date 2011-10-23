@@ -64,3 +64,10 @@ class ArrayUtil
 	
 	@has:(source, search, by_property)->
 		return ArrayUtil.find( source, search, by_property )?
+	
+	@replace_into:( src, index, items )->
+		items = [].concat items
+		src.splice index, 1
+		while items.length
+			src.splice index++, 0, items.shift()
+		src
