@@ -154,7 +154,7 @@ Every time something changes, CoffeeToaster re-compiles all your application by 
  * collects all .coffee files and process everything, adding package declarations to the class definitions, based on the folder they are
  * re-order everything so files and classes are defined always before they are needed
 
-Wait! How the hell it know when my files or classes are needed?
+Wait! How the hell it knows when my files or classes are needed?
 
 ## Import directive
 
@@ -352,6 +352,10 @@ Executing the above script in the browser I got this log msgs:
 	letters/A created!
 	letters/B created!
 	repeating/A created!
+
+# Example - more
+
+You can find another exaple right into [/examples](http://github.com/serpentem/coffee-toaster/blob/master/examples)) folder.
 
 # Multiple Modules
 
