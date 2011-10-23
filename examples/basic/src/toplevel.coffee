@@ -1,3 +1,2 @@
 class TopLevel
-	constructor:->
-		console.log "TopLevel created!"
+	constructor:-> console.log "TopLevel created!"
