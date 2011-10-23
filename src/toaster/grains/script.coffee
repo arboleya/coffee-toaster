@@ -48,10 +48,10 @@ class Script
 		@collect (files)=>
 
 			# process all requirements
-			processed = @process_requirements files
+			expanded = @expand_wildcards files
 
 			# reorder everything charmingly
-			ordered = @reorder processed
+			ordered = @reorder expanded
 			
 			# gather all information about files x line numbers inside each one
 			linenum = 1
@@ -297,7 +297,7 @@ class Script
 			# finally executes callback, passing the collected buffer
 			cb buffer
 	
-	process_requirements: ( files ) ->
+	expand_wildcards: ( files ) ->
 
 		# loop through all files
 		for file in files
@@ -316,7 +316,7 @@ class Script
 					file.dependencies[index] += ".coffee"
 					continue
 
-				# otherwise its index to the dead array
+				# otherwise adds its index to the dead array
 				_dead_indexes.push index
 
 				# and find all files under that namespace
@@ -326,24 +326,20 @@ class Script
 				# if nothing is found under the given namespace
 				if found.length <= 0
 					console.log "#{'WARNING'.bold.yellow} Nothing found".yellow,
-								"inside #{dependency.yellow}"
+								"inside #{dependency}".yellow
 					continue
 				
 				# otherwise rewrites found array with filepath info only
 				found[k] = found[k].item.filepath for v, k in found
 				
-				# concat all dependencies together
-				_dependencies = _dependencies.concat found
+				# save index and found itens, to be processed bellow
+				_dependencies.push found
 			
-			# desc sorting dead_indexes for proper removal
-			_dead_indexes = _dead_indexes.sort().reverse()
-
-			# remove all dead_indexes from the dependencies array
-			file.dependencies.splice dead, 1 for dead in _dead_indexes
-
-			# concat the found dependencies into the file dependencies
-			file.dependencies = file.dependencies.concat _dependencies
-
+			# replace all wildcars by its found matches
+			while len = _dependencies.length
+				f = _dependencies.pop()
+				ArrayUtil.replace_into file.dependencies, len-1, f
+			
 		# return the files after processing everything
 		files
 	
