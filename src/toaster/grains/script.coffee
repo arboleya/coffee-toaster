@@ -414,7 +414,7 @@ class Script
 
 					# ..and finally prints a warning msg
 					console.log "WARNING! ".bold.yellow,
-								"Dependency #{Dependencybold}".yellow,
+								"Dependency #{dependency.bold}".yellow,
 								"not found for class".yellow,
 								"#{file.classpath.yellow.bold}."
 			
@@ -428,8 +428,7 @@ class Script
 								file.classname.bold.white,
 								"in file".yellow,
 								file.filepath.yellow
-
-
+		
 		# after all, return everything in the proper order
 		files
 	
