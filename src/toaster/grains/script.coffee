@@ -237,7 +237,7 @@ class Script
 						# then modify the class declarations before starting
 						# the parser thing, adding the package the headers
 						# declarations
-						repl = "pkg( '#{namespace}' ).$3 = $2 $3"
+						repl = "$1pkg( '#{namespace}' ).$3 = $2 $3"
 						repl += "$4" if new RegExp(rgx_ext, "m").test raw
 						raw = raw.replace new RegExp( rgx, "gm" ), repl
 					
