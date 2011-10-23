@@ -31,5 +31,3 @@ class App
 		
 
 new App
-
-
