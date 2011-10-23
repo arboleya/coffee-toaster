@@ -5,13 +5,14 @@ Minimalist dependency management system for CoffeeScript.
 # Features
 
 * Inheritance support across multiples files for the lazy
-* Automatic packaging system, with folder as namespaces
+* Namespaces
+ * Automagically packaging system that uses folders as namespaces
 * Scaffolding routines
  * Interactive creation of a very simple skeleton for new projects and config file for existent projects
-* Broken and Circular Loop dependency validation
+* Broken and circular-loop dependency validation
  * Helps you prevent some mistakes with circular dependencies loops and alert you against dependencies not found
 * Live syntax-check
- * Precise live check for compile problems (syntax-only), with file path and line number information
+ * Precise live syntax-check with file path and line number information
 * Debug Mode
  * In order to provide easy debugging when inside the browser, Debug Mode will compile all your files individually into its respectives .js versions and write a smart boot-loader (toaster.js) to load every file in the proper order. Just include this boot-loader in your html file and voilà
 
@@ -43,7 +44,7 @@ Considering all the default values, you'll end up with a structure like this:
 	    ├── /src
 	    └── toaster.coffee
 
-The toaster.coffee file will have this content:\
+The toaster.coffee file will have this content:
 
 ````ruby
 modules =
@@ -83,30 +84,36 @@ Or:
 
 In debug mode (option -d) files will be all compiled individually inside a folder called "toaster" in the same directory you have your release file, aiming to ease the debugging process.
 
-For example, if you have "release/app.js", a folder will be created in "release/toaster" and all your CoffeeScript files will be compiled to Javascript inside "release/toaster/classes/".
+For example, if you have "release/app.js", a folder will be created in "release/toaster" and all your CoffeeScript files will be compiled to Javascript inside it.
 
 Bellow is a directory structure representing this:
 
-	├── /release
+	├── release
 	│   ├── app.js
 	│   ├── index.html
-	│   └── /toaster
-	│       ├── /classes
-	│       │   ├── /a
+	│   └── toaster
+	│       ├── src
+	│       │   ├── app.js
+	│       │   ├── letters
 	│       │   │   ├── a.js
-	│       │   │   └── /b
-	│       │   │       └── b.js
-	│       │   └── c.js
+	│       │   │   └── b.js
+	│       │   ├── repeating
+	│       │   │   └── a.js
+	│       │   └── single
+	│       │       └── script.js
 	│       └── toaster.js
-	├── /src
-	│   ├── /a
+	├── src
+	│   ├── app.coffee
+	│   ├── letters
 	│   │   ├── a.coffee
-	│   │   └── /b
-	│   │       └── b.coffee
-	│   └── c.coffee
+	│   │   └── b.coffee
+	│   ├── repeating
+	│   │   └── a.coffee
+	│   └── single
+	│       └── script.coffee
 	└── toaster.coffee
 
-There's also a 'toaster.js' file inside the 'release/toaster' folder, this Javascript file is responsible to load all your classes into the right order.
+There's also a 'toaster.js' file inside the 'release/toaster' folder, this Javascript file is responsible to load all your files into the right order.
 
 So in your .html your have two options:
 
@@ -145,92 +152,86 @@ If debug is enabled (option -d), files will also compiled individually for a san
 Every time something changes, CoffeeToaster re-compiles all your application by doing:
 
  * collects all .coffee files and process everything, adding package declarations to the class definitions, based on the folder they are
- * re-order everything so classes are defined always before they are needed
+ * re-order everything so files and classes are defined always before they are needed
 
-Wait! How the hell it know when classes are needed?
+Wait! How the hell it know when my files or classes are needed?
 
 ## Import directive
 
 The import directive is known by:
 
- * #<< core.views.View
- * #<< utils.*
+ * #<< core/views/View
+ * #<< utils/*
 
-By putting '#<< package.name.View' in your CoffeeScript file, you're telling CoffeeToaster about a dependency.
+By putting '#<< package/name/View' in your CoffeeScript file, you're telling CoffeeToaster about a dependency.
 
-Wild cards '#<< utils.*' are also accepted as a handy option.		
+Wild cards '#<< utils/*' are also accepted as a handy option.
 
 ## Example - Structure
 
 Let's assume you have this structure:
 
 	├── release
-	│   └── app.js
+	│   ├── app.js
+	│   ├── index.html
 	├── src
-	│   ├── just
-	│   │   └── another
-	│   │       └── one
-	│   │           ├── b.coffee
-	│   │           └── c.coffee
-	│   ├── some
-	│   │   ├── folder
-	│   │   │   └── a.coffee
-	│   │   └── other
-	│   │       └── folder
-	│   │           └── b.coffee
-	│   └── top.coffee
+	│   ├── app.coffee
+	│   ├── letters
+	│   │   ├── a.coffee
+	│   │   └── b.coffee
+	│   ├── repeating
+	│   │   ├── a.coffee
+	│   ├── single
+	│   │   └── script.coffee
 	└── toaster.coffee
 
 ## Example - Contents
 
 And every file with the following contents:
 
- * **path:** just/another/one/b.coffee
+ * **path:** letters/a.coffee
 
 ````ruby
-class B
-	constructor:-> console.log "just/another/one/B created"
-````
-
- * **path:** just/another/one/c.coffee
-
-````ruby
-class C
-	constructor:-> console.log "just/another/one/C created"
-````
-
- * **path:** some/folder/a.coffee
-
-````ruby
-#<< just.another.one.*
-#<< some.other.folder.*
-#<< Top
-
 class A
-	constructor:->
-		console.log "some/folder/A created"
-		new C
-		new just.another.one.C
-		new B
-		new just.another.one.B
-		new some.other.folder.B
-		new Top
-
-new A
+	constructor:-> console.log "letters/A created!"
 ````
 
- * **path:** some/other/folder/b.coffee
+ * **path:** letters/b.coffee
 
 ````ruby
 class B
-	constructor:-> console.log "some/other/folder/B created"
+	constructor:-> console.log "letters/B created!"
 ````
 
- * **path:** top.coffee
+ * **path:** repeating/a.coffee
 
 ````ruby
-class Top
-	constructor: -> console.log "Top created!"
+class A
+	constructor:-> console.log "repeating/A created!"
+````
+
+ * **path:** single/script.coffee
+
+````ruby
+console.log "I am a script!"
+````
+
+ * **path:** app.coffee
+
+````ruby
+#<< letters/*
+#<< repeating/a
+#<< single/script
+
+class App
+	constructor:->
+		console.log "App created!"
+
+		new letters.A
+		new letters.B
+		new repeating.A
+
+new App
 ````
 
 ## Example - Merge Result (still CoffeeScript)
@@ -238,8 +239,9 @@ class Top
 This way, everything will be merged like this:
 
 ````ruby
-just = {}
-some = {}
+letters = {}
+repeating = {}
+single = {}
 
 pkg = ( ns )->
 	curr = null
@@ -255,42 +257,40 @@ pkg = ( ns )->
 				curr = curr[ part ]
 	curr
 
-class Top
-	constructor: -> console.log "Top created!"
+pkg( 'letters' ).A = class A
+	constructor:-> console.log "letters/A created!"
 
-pkg( 'just.another.one' ).B = class B
-	constructor:-> console.log "just/another/one/B created"
+pkg( 'letters' ).B = class B
+	constructor:-> console.log "letters/B created!"
 
-pkg( 'just.another.one' ).C = class C
-	constructor:-> console.log "just/another/one/C created"
+pkg( 'repeating' ).A = class A
+	constructor:-> console.log "repeating/A created!"
 
-pkg( 'some.other.folder' ).B = class B
-	constructor:-> console.log "some/other/folder/B created"
+console.log "I am a simple script!"
 
-pkg( 'some.folder' ).A = class A
+class App
 	constructor:->
-		console.log "some/folder/A created"
-		new C
-		new just.another.one.C
-		new B
-		new just.another.one.B
-		new some.other.folder.B
-		new Top
+		console.log "App created!"
 
-new A
+		new letters.A
+		new letters.B
+		new repeating.A
+
+new App
 ````
 
 Toaster will initialize your root namespaces and add a 'pkg' method, to make everything works as intended.
 
 ## Example - Output (JavaScript)
 
-The output JavaScript compiled after reordering classes will be something like this:
+The output JavaScript compiled after reordering files and classes will be something like this:
 
 ````javascript
 (function() {
-  var A, B, C, Top, just, pkg, some;
-  just = {};
-  some = {};
+  var A, App, B, letters, pkg, repeating, single;
+  letters = {};
+  repeating = {};
+  single = {};
   pkg = function(ns) {
     var curr, index, part, parts, _len;
     curr = null;
@@ -310,43 +310,35 @@ The output JavaScript compiled after reordering classes will be something like t
     }
     return curr;
   };
-  Top = (function() {
-    function Top() {
-      console.log("Top created!");
-    }
-    return Top;
-  })();
-  pkg('just.another.one').B = B = (function() {
-    function B() {
-      console.log("just/another/one/B created");
-    }
-    return B;
-  })();
-  pkg('just.another.one').C = C = (function() {
-    function C() {
-      console.log("just/another/one/C created");
-    }
-    return C;
-  })();
-  pkg('some.other.folder').B = B = (function() {
-    function B() {
-      console.log("some/other/folder/B created");
-    }
-    return B;
-  })();
-  pkg('some.folder').A = A = (function() {
+  pkg('letters').A = A = (function() {
     function A() {
-      console.log("some/folder/A created");
-      new C;
-      new just.another.one.C;
-      new B;
-      new just.another.one.B;
-      new some.other.folder.B;
-      new Top;
+      console.log("letters/A created!");
     }
     return A;
   })();
-  new A;
+  pkg('letters').B = B = (function() {
+    function B() {
+      console.log("letters/B created!");
+    }
+    return B;
+  })();
+  pkg('repeating').A = A = (function() {
+    function A() {
+      console.log("repeating/A created!");
+    }
+    return A;
+  })();
+  console.log("I am a simple script!");
+  App = (function() {
+    function App() {
+      console.log("App created!");
+      new letters.A;
+      new letters.B;
+      new repeating.A;
+    }
+    return App;
+  })();
+  new App;
 }).call(this);
 ````
 As you can see things are ordered properly.
@@ -355,13 +347,11 @@ As you can see things are ordered properly.
 
 Executing the above script in the browser I got this log msgs:
 
-	some/folder/A created
-	just/another/one/C created
-	just/another/one/C created
-	some/other/folder/B created
-	just/another/one/B created
-	some/other/folder/B created
-	Top created!
+	I am a simple script!
+	App created!
+	letters/A created!
+	letters/B created!
+	repeating/A created!
 
 # Multiple Modules
 
