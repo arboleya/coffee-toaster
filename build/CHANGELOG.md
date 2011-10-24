@@ -1,7 +1,11 @@
 # CoffeeToaster Changelog
 
-## 0.3.1 - PENDING
+## 0.3.5 - 10/24/2011
  * Avoiding tmp files from being watched [closing issue [#4](http://github.com/serpentem/coffee-toaster/issues/4)]
+ * Adding support for ordinary files again (files with no class definitions inside)
+ * Now all requirements must to be done based on filepath with slash notation "foldera/folderb/filename"
+ * Adding extra base class validation
+ * Lots of improvements and bugfixes
 
 ## 0.3.0 - 10/16/2011
  * Refactoring entire Script class
