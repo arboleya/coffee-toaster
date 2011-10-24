@@ -13,6 +13,9 @@
     "directories"    : {
     "lib"            : "./lib/"
   },
+  "files"          : [
+    "build"
+  ],
 
   "bin"            : {
     "toaster"        : "./bin/toaster"
