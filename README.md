@@ -355,7 +355,7 @@ Executing the above script in the browser I got this log msgs:
 
 # Example - more
 
-You can find another exaple right into [/examples](http://github.com/serpentem/coffee-toaster/blob/master/examples)) folder.
+You can find another example right into the [examples](http://github.com/serpentem/coffee-toaster/blob/master/examples) folder.
 
 # Multiple Modules
 
