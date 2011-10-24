@@ -22,18 +22,18 @@ class Parser
 		# usage += "  toaster -nc myawsomeapp\n"
 		# usage += "  toaster -nskc myawsomeapp"
 		
-		adendo = "" #"use w/ [-s]"
-		# adendo = "use w/ [-s, -k, -c]"
+		adendo = "" #", use w/ [-s]"
+		# adendo = ", use w/ [-s, -k, -c]"
 		
 		@argv = (@opts = optimist.usage( usage )
     		.alias('n', 'new')
-			.describe('n', "Scaffold a very basic new App, #{adendo}")
+			.describe('n', "Scaffold a very basic new App#{adendo}")
 			
 			.alias('i', 'init')
-			.describe('i', "Create a config (toaster.coffee) file, #{adendo}")
+			.describe('i', "Create a config (toaster.coffee) file#{adendo}")
 			
 			.alias('w', 'watch')
-			.describe('w', "Start watching/compiling your project, #{adendo}")
+			.describe('w', "Start watching/compiling your project#{adendo}")
 			
 			.alias('c', 'compile')
 			.boolean( 'c' )
