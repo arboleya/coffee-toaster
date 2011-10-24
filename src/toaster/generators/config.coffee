@@ -1,3 +1,5 @@
+#<< toaster/generators/question
+
 class Config extends Question
 	
 	tpl: """modules =

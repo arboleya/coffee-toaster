@@ -26,8 +26,8 @@ exports.run =->
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
-#<< Project, Config, Parser
-#<< Script, Kup, Css
+#<< toaster/generators/*
+#<< toaster/grains/*
 
 
 class Toaster

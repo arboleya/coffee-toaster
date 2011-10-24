@@ -1,7 +1,7 @@
 fs = require "fs"
 cs = require "coffee-script"
 
-#<< FsUtil, ArrayUtil, StringUtil
+#<< toaster/utils/*
 
 class Script
 	
@@ -326,7 +326,7 @@ class Script
 				# if nothing is found under the given namespace
 				if found.length <= 0
 					console.log "#{'WARNING'.bold.yellow} Nothing found".yellow,
-								"inside #{dependency}".yellow
+								"#{'inside'.yellow} #{dependency.white}"
 					continue
 				
 				# otherwise rewrites found array with filepath info only
@@ -366,13 +366,13 @@ class Script
 			continue if !file.dependencies.length && !file.baseclasses.length
 			
 			# otherwise loop thourgh all file dependencies
-			for dependency, index in file.dependencies
+			for filepath, index in file.dependencies
 
 				# continue if the dependency was already initialized
-				continue if ArrayUtil.has initd, dependency, "filepath"
+				continue if ArrayUtil.has initd, filepath, "filepath"
 
 				# otherwise search by the dependency
-				found = ArrayUtil.find files, dependency, "filepath"
+				found = ArrayUtil.find files, filepath, "filepath"
 
 				# if it's found
 				if found?
@@ -389,8 +389,8 @@ class Script
 						# then prints a warning msg and continue
 						console.log "WARNING! ".bold.yellow,
 							"You have a circular dependcy loop between files",
-							"#{dependency.yellow.bold} and",
-							"#{file.filepath.yellow.bold}."
+							"#{filepath.yellow.bold} and",
+							file.filepath.yellow.bold
 						continue
 					
 					# otherwise if no circular dependency is found, reorder
@@ -402,25 +402,32 @@ class Script
 						files = @reorder files, true
 				
 				# otherwise if the dependency is not found
-				else if @missing[dependency] != true
+				else if @missing[filepath] != true
 					# then add it to the @missing hash (so it will be ignored
 					# until reordering finishes)
-					@missing[dependency] = true
-					
+					@missing[filepath] = true
+
 					# move it to the end of the dependencies array (avoiding
 					# it from being touched again)
-					file.dependencies.push dependency
+					file.dependencies.push filepath
 					file.dependencies.splice index, 1
 
 					# ..and finally prints a warning msg
 					console.log "WARNING! ".bold.yellow,
-								"Dependency #{dependency.bold}".yellow,
+								"Dependency #{filepath.bold.white}".yellow,
 								"not found for class".yellow,
-								"#{file.classpath.yellow.bold}."
-			
+								"#{file.classpath.white.bold}."
+
+			file_index = ArrayUtil.find files, file.filepath, "filepath"
+			file_index = file_index.index
+
 			for bc in file.baseclasses
-				found = ArrayUtil.find( initd, bc, "classname" )
-				if found == null && !@missing[bc]
+				found = ArrayUtil.find files, bc, "classname"
+				not_found = (found.index > file_index) || (found == null)
+				# console.log "\tFOUND: " + found.index
+				# console.log "\tNOT_FOUND: " + not_found
+
+				if not_found && !@missing[bc]
 					@missing[bc] = true
 					console.log "#{'WARNING!'.bold} Base class".yellow,
 								bc.bold.white,
@@ -428,7 +435,7 @@ class Script
 								file.classname.bold.white,
 								"in file".yellow,
 								file.filepath.yellow
-		
+
 		# after all, return everything in the proper order
 		files
 	

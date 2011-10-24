@@ -1,4 +1,5 @@
-#<< Config
+#<< toaster/generators/question
+#<< toaster/generators/config
 
 exports.Project = class Project extends Question
 	
