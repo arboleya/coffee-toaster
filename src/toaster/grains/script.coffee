@@ -5,7 +5,7 @@ cs = require "coffee-script"
 
 class Script
 	
-	constructor: (@config, @opts) ->
+	constructor: (@toaster, @config, @opts) ->
 		@src = @config.src
 		@release = @config.release
 		@compile if @opts.argv.w then @watch else null 
@@ -188,6 +188,9 @@ class Script
 				# write toaster loader file w/ all imports (buffer) inside it
 				toaster = "#{toaster}/toaster.js"
 				fs.writeFileSync toaster, cs.compile buffer, {bare:1}
+			
+			# and rebuilds everything
+			@toaster.build()
 			
 			# and finall executs de callback
 			cb?()
