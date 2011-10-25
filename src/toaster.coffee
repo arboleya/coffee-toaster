@@ -76,7 +76,7 @@ class Toaster
 			for build in @builds
 				build.release = pn "#{@basepath}/#{build.release}"
 			
-			for module in modules
+			for module in @modules
 				module.src = pn "#{@basepath}/#{module.src}"
 				module.release = pn "#{@basepath}/#{module.release}"
 				new Script @, module, opts
