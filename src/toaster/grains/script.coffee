@@ -214,7 +214,7 @@ class Script
 
 				# assemble some information about the file
 				filepath   = file.replace( @src, "" ).substr 1
-				filename   = /\w+\.\w+/.exec( filepath )[ 0 ]
+				filename   = /[\w-]+\.[\w-]+/.exec( filepath )[ 0 ]
 				filefolder = filepath.replace( "/#{filename}", "") + "/"
 				namespace  = ""
 				# if the file is in the top level
@@ -356,14 +356,8 @@ class Script
 		# no other methods call it with cycling = true
 		@missing = {} if cycling is false
 
-		# initialized files array, will cache every file as it is read
-		initd = []
-		
 		# looping through all files
 		for file, i in files
-
-			# mark file as initialized
-			initd.push file
 
 			# if theres no dependencies, go to next file
 			continue if !file.dependencies.length && !file.baseclasses.length
@@ -371,18 +365,19 @@ class Script
 			# otherwise loop thourgh all file dependencies
 			for filepath, index in file.dependencies
 
-				# continue if the dependency was already initialized
-				continue if ArrayUtil.has initd, filepath, "filepath"
+				# search for dependency
+				dependency = ArrayUtil.find files, filepath, "filepath"
+				dependency_index = dependency.index if dependency?
 
-				# otherwise search by the dependency
-				found = ArrayUtil.find files, filepath, "filepath"
+				# continue if the dependency was already initialized
+				continue if dependency_index < i && dependency?
 
 				# if it's found
-				if found?
+				if dependency?
 
 					# if there's some circular dependency loop
 					if ArrayUtil.has(
-						found.item.dependencies,
+						dependency.item.dependencies,
 						file.filepath,
 						"filepath"
 					)
@@ -400,9 +395,10 @@ class Script
 					# the specific dependency and run reorder recursively until
 					# everything is beautiful
 					else
-						files.splice index, 0, found.item
-						files.splice found.index + 1, 1
+						files.splice index, 0, dependency.item
+						files.splice dependency.index + 1, 1
 						files = @reorder files, true
+						break
 				
 				# otherwise if the dependency is not found
 				else if @missing[filepath] != true
