@@ -330,7 +330,7 @@ class Script
 
 				# if nothing is found under the given namespace
 				if found.length <= 0
-					console.log "#{'WARNING'.bold.yellow} Nothing found".yellow,
+					console.log "#{'WARNING!'.bold.yellow} Nothing found".yellow,
 								"#{'inside'.yellow} #{dependency.white}"
 					continue
 				
@@ -414,7 +414,7 @@ class Script
 					file.dependencies.splice index, 1
 
 					# ..and finally prints a warning msg
-					console.log "WARNING! ".bold.yellow,
+					console.log "WARNING!".bold.yellow,
 								"Dependency #{filepath.bold.white}".yellow,
 								"not found for class".yellow,
 								"#{file.classpath.white.bold}."
