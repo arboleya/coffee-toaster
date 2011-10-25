@@ -1,4 +1,4 @@
-#<< toaster/utils/array-util
+#<< toaster/utils/array_util
 
 fs = require 'fs'
 path = require 'path'
