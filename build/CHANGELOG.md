@@ -1,5 +1,10 @@
 # CoffeeToaster Changelog
 
+## 0.3.6 - 10/25/2011
+  * Critical bugfixes in the reorder routine
+  * Optimizing architecture
+  * Condesing src scructure
+
 ## 0.3.5 - 10/24/2011
  * Avoiding tmp files from being watched [closing issue [#4](http://github.com/serpentem/coffee-toaster/issues/4)]
  * Adding support for ordinary files again (files with no class definitions inside)
