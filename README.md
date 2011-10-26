@@ -6,7 +6,7 @@ Minimalist dependency management system for CoffeeScript.
 
 * Inheritance support across multiples files for the lazy
 * Namespaces
- * Automagically packaging system that uses folders as namespaces
+ * Automagic packaging system that uses folders as namespaces
 * Scaffolding routines
  * Interactive creation of a very simple skeleton for new projects and config file for existent projects
 * Broken and circular-loop dependency validation
