@@ -31,7 +31,10 @@ exports.run =->
 #<< toaster/parser
 
 class Toaster
-	
+	modules: []
+	vendors: []
+	builds: []
+
 	constructor:->
 		@parser = new Parser
 		@builder = new Builder
@@ -58,27 +61,39 @@ class Toaster
 		else
 			console.log opts.help()
 	
-	build:()->
+	build_all:()->
 		@builder.join @modules, @builds if @builds?
 	
+
+	module:(name, params)=>
+		params.name = name
+		params.src = pn "#{@basepath}/#{params.src}"
+		params.release = pn "#{@basepath}/#{params.release}"
+		@modules.push params
+
+	vendor:(name, params)=>
+		params.name = name
+		params.src = pn "#{@basepath}/#{params.src}"
+		@vendors.push params
+
+	build:( name, params )=>
+		params.name = name
+		params.release = pn "#{@basepath}/#{params.release}"
+		@builds.push params
+
+
 	compile_andor_watch:->
+		module = @module
+		vendor = @vendor
+		build = @build
+
 		filepath = pn "#{@basepath}/toaster.coffee"
 		
 		if path.existsSync filepath
 			
-			contents = cs.compile fs.readFileSync( filepath, "utf-8" ), {bare:1}
-			eval contents
-
-			@modules = [].concat modules ? []
-			@builds = [].concat builds ? []
-
-			for build in @builds
-				build.release = pn "#{@basepath}/#{build.release}"
-			
-			for module in @modules
-				module.src = pn "#{@basepath}/#{module.src}"
-				module.release = pn "#{@basepath}/#{module.release}"
-				new Script @, module, opts
+			eval( cs.compile fs.readFileSync( filepath, "utf-8" ), {bare:1} )
+			new Script @, module, opts for module in @modules
+		
 		else
 			console.log "ERROR! ".bold.red
 			console.log "\tFile not found: #{filepath.red}"

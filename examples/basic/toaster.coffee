@@ -1,4 +1,3 @@
-modules =
-	name: 'basic example using coffee-toaster'
+module 'basic'
 	src: 'src'
 	release: 'release/app.js'

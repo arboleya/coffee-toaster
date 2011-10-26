@@ -190,7 +190,7 @@ class Script
 				fs.writeFileSync toaster, cs.compile buffer, {bare:1}
 			
 			# and rebuilds everything
-			@toaster.build()
+			@toaster.build_all()
 			
 			# and finall executs de callback
 			cb?()
