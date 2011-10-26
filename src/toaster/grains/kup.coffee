@@ -1,2 +1,0 @@
-class Kup
-	constructor:->
