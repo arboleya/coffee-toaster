@@ -79,46 +79,6 @@ class Toaster
 				module.src = pn "#{@basepath}/#{module.src}"
 				module.release = pn "#{@basepath}/#{module.release}"
 				new Script @, module, opts
-				
-				# ANNOTATIONS FOR FUTURE IMPLEMENTATION, BASED IN THIS CONFIG
-				# FILE EXAMPLE:
-				#
-				# --------------------------------------------------------------
-				# 	project =
-				# 		name: "My Awesome App"
-				# 		grains:
-				# 			scripts: [
-				# 				name: "My Script Module"
-				# 				src: "src/scripts"
-				# 				release: "release/app.js"
-				# 			]
-				# 			kup: [
-				# 				name: "My Kup Module"
-				# 				something_more_here: "third_eye"
-				# 			]
-				# 			css: [
-				# 				name: "My Css Module"
-				# 				something_else: "pituitary_gland"
-				# 			]
-				# --------------------------------------------------------------
-				# 
-				# INDIVUDAL HANDLERS FOR EACH KING, THE CS ONE IS ALREADY DONE.
-				# THE OTHER TWO ARE PENDING.
-				# 
-				# handling coffeescript 
-				# if module.grains.scripts?
-				# 	for script in module.grains.scripts
-				# 		script.src = pn "#{@basepath}/#{script.src}"
-				# 		script.release = pn "#{@basepath}/#{script.release}"
-				# 		new Script script
-				#
-				# handling coffeekup
-				# if module.grains.kup?
-				# 	TODO: implement markupsupport
-				#
-				# handling coffeecss
-				# if module.grains.css?
-				#	TODO: implement styles support
 		else
 			console.log "ERROR! ".bold.red
 			console.log "\tFile not found: #{filepath.red}"
