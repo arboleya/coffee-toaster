@@ -27,9 +27,8 @@ exports.run =->
 # Imports
 # ------------------------------------------------------------------------------
 #<< toaster/generators/*
-#<< toaster/grains/*
+#<< toaster/core/*
 #<< toaster/parser
-#<< toaster/builder
 
 class Toaster
 	

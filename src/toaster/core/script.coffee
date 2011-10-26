@@ -1,9 +1,7 @@
 fs = require "fs"
 cs = require "coffee-script"
 
-#<< toaster/utils/fs-util
-#<< toaster/utils/string-util
-#<< toaster/utils/array-util
+#<< toaster/utils/*
 
 class Script
 	
