@@ -41,8 +41,12 @@ exports.FsUtil = class FsUtil
 			fn buffer
 	
 	@watched = {}
-	@watch_file:(filepath, onchange)->
+	@watch_file:(filepath, onchange, dispatch_create)->
 		filepath = pn filepath
+
+		if dispatch_create
+			onchange?( {type:"file", path:filepath, action:"create"} )
+		
 		onchange?( {type:"file", path:filepath, action:"watching"} )
 		
 		@watched[filepath] = true
@@ -52,7 +56,7 @@ exports.FsUtil = class FsUtil
 			if mtime || ctime
 				onchange?( {type: "file", path:filepath, action: "updated"} )
 	
-	@watch_folder:(folderpath, filter_regexp, onchange)->
+	@watch_folder:(folderpath, filter_regexp, onchange, dispatch_create)->
 		folderpath = pn folderpath
 		onchange?( {type:"folder", path:folderpath, action:"watching"} )
 		
@@ -64,11 +68,14 @@ exports.FsUtil = class FsUtil
 				if item.type == "folder"
 					FsUtil.watch_folder item.path, filter_regexp, onchange
 				else
-					if filter_regexp == null
-						FsUtil.watch_file item.path, onchange
-					
-					else if filter_regexp.test item.path
-						FsUtil.watch_file item.path, onchange
+					if filter_regexp == null || filter_regexp.test item.path
+						if dispatch_create
+							onchange {
+								type:item.type,
+								path:item.path
+								action: "created"
+							}
+							FsUtil.watch_file item.path, onchange
 		
 		fs.watchFile folderpath, {interval : 250}, (curr,prev)=>
 
@@ -89,19 +96,22 @@ exports.FsUtil = class FsUtil
 									continue
 							
 							onchange?( info )	
-							FsUtil.watch_file info.path, onchange
+							FsUtil.watch_file info.path, onchange, true
 						
 						else if info.type == "folder"
-
+							
 							onchange?( info )
-							FsUtil.watch_folder info.path, onchange
-					
+							FsUtil.watch_folder	info.path,
+												filter_regexp,
+												onchange,
+												true
+
 					else if info.action == "deleted"
 						if @watched[info.path] is true
 							@watched[info.path]
 							onchange?( info )
 							fs.unwatchFile item.path
-				
+
 				snapshot = FsUtil.format_ls folderpath, stdout
 				FsUtil.snapshots[folderpath] = snapshot
 

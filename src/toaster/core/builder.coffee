@@ -15,10 +15,10 @@ class Builder
 				found = ArrayUtil.find modules, module, "name"
 				files.push found.item.release if found?
 
-			buffer = ""
+			mods_buffer = ""
 			for file in files
 				if path.existsSync file
-					buffer += "\n" + fs.readFileSync file, "utf-8"
-
-			fs.writeFileSync build.release, buffer
+					mods_buffer += "\n" + fs.readFileSync file, "utf-8"
+			
+			fs.writeFileSync build.release, mods_buffer
 			console.log "#{'.'.green} #{build.release}"

@@ -29,73 +29,56 @@ exports.run =->
 #<< toaster/generators/*
 #<< toaster/core/*
 #<< toaster/parser
+#<< toaster/config
 
 class Toaster
 	modules: []
-	vendors: []
-	builds: []
 
 	constructor:->
+
 		@parser = new Parser
 		@builder = new Builder
-		
-		[opts, argv] = [@parser.opts, @parser.argv]
-		
-		return console.log opts.help() if argv.h
-		
+
+		if @parser.argv.h
+			return console.log @parser.opts.help()
+
 		@basepath = path.resolve "."
-		
-		if argv.v
+		@config = new toaster.Config( @basepath )
+
+		if @parser.argv.v
 			path = pn __dirname + "/../build/VERSION"
 			console.log fs.readFileSync path, "utf-8"
 		
-		else if argv.n
+		else if @parser.argv.n
 			new Project( @basepath ).create argv.n
 		
-		else if argv.i
-			new Config( @basepath ).create argv.i
-		
-		else if argv.c || argv.w
-			@compile_andor_watch()
+		else if @parser.argv.i
+			new toaster.generators.Config( @basepath ).create argv.i
 		
 		else
-			console.log opts.help()
-	
-	build_all:()->
-		@builder.join @modules, @builds if @builds?
-	
+			@init_modules()
+
+
+	init_modules:->
+		for k, v of @config.modules
+			@modules[module.name] = new Module @, v, @parser.opts
+
 
 	module:(name, params)=>
 		params.name = name
 		params.src = pn "#{@basepath}/#{params.src}"
 		params.release = pn "#{@basepath}/#{params.release}"
-		@modules.push params
+		@modules[name] = params
 
-	vendor:(name, params)=>
-		params.name = name
-		params.src = pn "#{@basepath}/#{params.src}"
-		@vendors.push params
+	vendor:(name, src)=>
+		@vendors[name] = pn "#{@basepath}/#{src}"
 
 	build:( name, params )=>
 		params.name = name
 		params.release = pn "#{@basepath}/#{params.release}"
-		@builds.push params
+		@builds[name] = params
 
 
-	compile_andor_watch:->
-		module = @module
-		vendor = @vendor
-		build = @build
-
-		filepath = pn "#{@basepath}/toaster.coffee"
-		
-		if path.existsSync filepath
-			
-			eval( cs.compile fs.readFileSync( filepath, "utf-8" ), {bare:1} )
-			new Script @, module, opts for module in @modules
-		
-		else
-			console.log "ERROR! ".bold.red
-			console.log "\tFile not found: #{filepath.red}"
-			console.log "\tTry running: "+ "toaster -i".green +
-				" or type #{'toaster -h'.green} for more info"
+	# build_all:()->
+	# 	@builder.join @modules, @builds if @builds?
+	# 
