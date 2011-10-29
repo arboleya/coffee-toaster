@@ -1,3 +1,5 @@
+// UNDERSCORE
+// JQUERY
 (function() {
   var A, App, B, TopLevel, letters, pkg, repeating, single;
   letters = {};
