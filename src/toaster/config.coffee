@@ -45,5 +45,6 @@ class Config
 
 	build:( name, params )=>
 		params.name = name
+		params.vendors = params.vendors ? []
 		params.release = pn "#{@basepath}/#{params.release}"
-		@builds[name] params
+		@builds[name] = params
