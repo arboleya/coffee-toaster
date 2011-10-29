@@ -51,8 +51,7 @@ Considering all the default values, you'll end up with a structure like this:
 The toaster.coffee file will have this content:
 
 ````ruby
-modules =
-	name: 'mynewapp'
+module 'mynewapp'
 	src: 'src'
 	release: 'release/app.js'
 ````
@@ -366,17 +365,13 @@ You can find another example right into the [examples](http://github.com/serpent
 You can also specify multiple modules lilke:
 
 ````ruby
-modules = [
-	{
-		name: "My Awesome App"
-		src: "src"
-		release: "release/app.js"
-	},{
-		name: "My Sub Awesome App"
-		src: "vendors/mysubapp"
-		release: "release/subapp.js"
-	}
-]
+module "my-awesome-module"
+	src: "src"
+	release: "release/module.js"
+
+module "my-super-awesome-module"
+	src: "super_src"
+	release: "release/super_module.js"
 ````
 
 # Changelog
