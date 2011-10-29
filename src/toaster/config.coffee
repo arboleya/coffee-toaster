@@ -36,6 +36,7 @@ class Config
 
 	module:(name, params)=>
 		params.name = name
+		params.vendors = params.vendors ? []
 		params.src = pn "#{@basepath}/#{params.src}"
 		params.release = pn "#{@basepath}/#{params.release}"
 		@modules[name] = params
