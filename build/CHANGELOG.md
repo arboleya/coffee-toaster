@@ -1,9 +1,14 @@
 # CoffeeToaster Changelog
 
+## 0.3.7 - 10/29/2011
+ * Simplify config file syntax [feature done [#8](https://github.com/serpentem/coffee-toaster/issues/8)]
+ * Adding buid routines [feature done [#9](https://github.com/serpentem/coffee-toaster/issues/9)]
+ * Adding support for vendors across modules and build configs [feature done [#10](https://github.com/serpentem/coffee-toaster/issues/10)]
+
 ## 0.3.6 - 10/25/2011
-  * Critical bugfixes in the reorder routine
-  * Optimizing architecture
-  * Condesing src scructure
+ * Critical bugfixes in the reorder routine
+ * Optimizing architecture
+ * Condensing src scructure
 
 ## 0.3.5 - 10/24/2011
  * Avoiding tmp files from being watched [closing issue [#4](http://github.com/serpentem/coffee-toaster/issues/4)]

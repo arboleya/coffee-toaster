@@ -1,10 +1,13 @@
-# Coffee Toaster (current version - 0.3.6)
+# Coffee Toaster (current version - 0.3.7)
 
 Minimalist dependency management system for CoffeeScript.
 
 # Features
 
 * Inheritance support across multiples files for the lazy
+* Vendors management
+* Multi modules support in the same environment
+* Micro build routines across all modules
 * Namespaces
  * Automagic packaging system that uses folders as namespaces
 * Scaffolding routines
@@ -15,6 +18,7 @@ Minimalist dependency management system for CoffeeScript.
  * Precise live syntax-check with file path and line number information
 * Debug Mode
  * In order to provide easy debugging when inside the browser, Debug Mode will compile all your files individually into its respectives .js versions and write a smart boot-loader (toaster.js) to load every file in the proper order. Just include this boot-loader in your html file and voilà
+
 
 # Installation
 
