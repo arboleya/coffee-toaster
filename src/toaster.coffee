@@ -32,12 +32,12 @@ exports.run =->
 #<< toaster/config
 
 class Toaster
-	modules: []
+	modules: {}
 
 	constructor:->
 
 		@parser = new Parser
-		@builder = new Builder
+		@builder = new Builder @
 
 		if @parser.argv.h
 			return console.log @parser.opts.help()
@@ -61,24 +61,4 @@ class Toaster
 
 	init_modules:->
 		for k, v of @config.modules
-			@modules[module.name] = new Module @, v, @parser.opts
-
-
-	module:(name, params)=>
-		params.name = name
-		params.src = pn "#{@basepath}/#{params.src}"
-		params.release = pn "#{@basepath}/#{params.release}"
-		@modules[name] = params
-
-	vendor:(name, src)=>
-		@vendors[name] = pn "#{@basepath}/#{src}"
-
-	build:( name, params )=>
-		params.name = name
-		params.release = pn "#{@basepath}/#{params.release}"
-		@builds[name] = params
-
-
-	# build_all:()->
-	# 	@builder.join @modules, @builds if @builds?
-	# 
+			@modules[v.name] = new Module @, v, @parser.opts
