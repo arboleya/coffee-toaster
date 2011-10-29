@@ -1,6 +1,6 @@
 class ArrayUtil
 	@find:(source, search, by_property)->
-		if by_property is null
+		if !by_property
 			for v, k in source
 				return {item: v, index: k} if v == search
 		else
