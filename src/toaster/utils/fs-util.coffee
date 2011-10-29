@@ -45,7 +45,7 @@ exports.FsUtil = class FsUtil
 		filepath = pn filepath
 
 		if dispatch_create
-			onchange?( {type:"file", path:filepath, action:"create"} )
+			onchange?( {type:"file", path:filepath, action:"created"} )
 		
 		onchange?( {type:"file", path:filepath, action:"watching"} )
 		
@@ -97,7 +97,7 @@ exports.FsUtil = class FsUtil
 									continue
 							
 							onchange?( info )	
-							FsUtil.watch_file info.path, onchange, true
+							FsUtil.watch_file info.path, onchange
 						
 						else if info.type == "folder"
 							
