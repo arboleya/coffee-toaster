@@ -1,5 +1,9 @@
 # CoffeeToaster Changelog
 
+## 0.3.8 - 10/29/2011
+ * Fixing bugs in generators
+ * Fixing a bunch of small emergencial bugs
+
 ## 0.3.7 - 10/29/2011
  * Simplify config file syntax [feature done [#8](https://github.com/serpentem/coffee-toaster/issues/8)]
  * Adding buid routines [feature done [#9](https://github.com/serpentem/coffee-toaster/issues/9)]
