@@ -4,21 +4,66 @@ fs = require 'fs'
 path = require 'path'
 
 class Builder
-	constructor:(@toster)->
+	constructor:(@toaster)->
 
-	join:( modules, builds )->
+	build:()->
 
-		for build in builds
+		builds = @toaster.config.builds
 
-			files = []
-			for module in build.modules
-				found = ArrayUtil.find modules, module, "name"
-				files.push found.item.release if found?
+		for name, build of builds
 
-			mods_buffer = ""
-			for file in files
-				if path.existsSync file
-					mods_buffer += "\n" + fs.readFileSync file, "utf-8"
+			modules = @merge_modules build.modules
+			vendors = @merge_vendors @unify_vendors( build.modules )
+
+			fs.writeFileSync build.release, "#{vendors}\n#{modules}"
+			# console.log "#{'.'.green} #{build.release}"
+
+	unify_vendors:( modules )->
+
+		unique = []
+		for module in modules
+
+			unless (module = @toaster.modules[module])?
+				return console.log "MODULE NOT FOUND!"
 			
-			fs.writeFileSync build.release, mods_buffer
-			console.log "#{'.'.green} #{build.release}"
+			for vendor in module.vendors
+				unique.push vendor unless ArrayUtil.has unique, vendor
+		
+		unique
+
+	merge_vendors:( vendors )->
+
+		# merge all vendors in the proper order and return it
+		buffer = []
+
+		for vendor_name in vendors
+
+			if (vendor = @toaster.config.vendors[vendor_name])?
+
+				if path.existsSync vendor
+					buffer.push fs.readFileSync vendor, 'utf-8'
+				else
+					console.log "WARNING!".bold.yellow,
+						"Vendor".white,
+						vendor_name.yellow.bold,
+						"not found at".white,
+						vendor.yellow.bold
+			else
+				console.log "WARNING!".bold.yellow,
+					"Vendor".yellow,
+					vendor_name.white.bold
+					"not found for module".yellow,
+					@name.white.bold
+
+		return buffer.join "\n"
+
+	merge_modules:( modules )->
+
+		buffer = []
+		for module in modules
+			if (module=@toaster.modules[module])?
+				buffer.push module.compile()
+			else
+				console.log "MODULE NOT FOUN!"
+		
+		buffer.join "\n"
