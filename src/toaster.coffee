@@ -43,19 +43,19 @@ class Toaster
 			return console.log @parser.opts.help()
 
 		@basepath = path.resolve "."
-		@config = new toaster.Config( @basepath )
 
 		if @parser.argv.v
 			path = pn __dirname + "/../build/VERSION"
 			console.log fs.readFileSync path, "utf-8"
 		
 		else if @parser.argv.n
-			new Project( @basepath ).create argv.n
+			new Project( @basepath ).create @parser.argv.n
 		
 		else if @parser.argv.i
-			new toaster.generators.Config( @basepath ).create argv.i
+			new toaster.generators.Config( @basepath ).create @parser.argv.i
 		
 		else
+			@config = new toaster.Config @basepath
 			@init_modules()
 
 
