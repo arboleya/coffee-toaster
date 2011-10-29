@@ -1,3 +1,6 @@
+# MODULES
+# ------------------------------------------------------------------------------
+
 vendor 'jquery', 'vendors/jquery.js'
 vendor '_', 'vendors/_.js'
 
