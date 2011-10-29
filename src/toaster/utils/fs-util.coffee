@@ -75,7 +75,8 @@ exports.FsUtil = class FsUtil
 								path:item.path
 								action: "created"
 							}
-							FsUtil.watch_file item.path, onchange
+						
+						FsUtil.watch_file item.path, onchange
 		
 		fs.watchFile folderpath, {interval : 250}, (curr,prev)=>
 
