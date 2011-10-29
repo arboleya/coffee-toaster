@@ -2,7 +2,7 @@
 
 class Config extends Question
 	
-	tpl: """modules =
+	tpl = """modules =
 				\tname: '%name'
 				\tsrc: '%src'
 				\trelease: '%release'

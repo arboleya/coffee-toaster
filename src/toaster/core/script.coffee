@@ -5,21 +5,6 @@ cs = require "coffee-script"
 
 class Script
 
-	raw: null
-
-	classname: null
-	namespace: null
-	classpath: null
-
-	filepath: null
-	filename: null
-	filefolder: null
-
-	baseclasses: []
-	dependencies: []
-	dependencies_collapsed: []
-
-
 	constructor: (@module, @realpath, @opts) ->
 		@getinfo()
 

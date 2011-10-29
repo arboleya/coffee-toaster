@@ -5,7 +5,7 @@ cs = require "coffee-script"
 
 class Module
 
-	pkg_helper: """
+	pkg_helper = """
 		pkg = ( ns )->
 			curr = null
 			parts = [].concat = ns.split( "." )
@@ -22,8 +22,16 @@ class Module
 
 	"""
 
-	# initializes buffer array to keep all tracked files
-	files: []
+	# # module requirements to load
+	# 	toaster
+	# 	config
+	# 	opts
+
+	# # module config variables
+	# 	name
+	# 	src
+	# 	vendors
+	# release
 
 	constructor: (@toaster, @config, @opts) ->
 
@@ -33,25 +41,15 @@ class Module
 		@vendors = @config.vendors
 		@release = @config.release
 
-		# @files = []
+		# initializes buffer array to keep all tracked files
+		@files = []
+
 		# search for all *.coffee files inside src folder
 		FsUtil.find @src, "*.coffee", (result) =>
-
-			# console.log ">>>>>>>>>>>>>>> (#{@name})"
-			# console.log file.filepath for file in @files
-			# console.log ">>>>>>>>>>>>>>>"
-
-			# console.log "::::::::"
-			# console.log o for o in result
-			# console.log "..............."
 
 			# instantiates everything, on class for each file
 			for file in result
 				@files.push new Script @, file, @opts
-
-			# console.log "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-			# console.log file.filepath for file in @files
-			# console.log "!!!!!!!!!!!!!!!!!!"
 
 			# compile module for the first time and write it to the filesystem
 			@write()
@@ -115,6 +113,7 @@ class Module
 			@write() unless info.action is "watching"
 
 	compile:(include_vendors = true)->
+		
 		# expands all dependencies wild-cards
 		file.expand_dependencies() for file in @files
 
