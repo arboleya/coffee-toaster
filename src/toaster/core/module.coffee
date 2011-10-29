@@ -6,7 +6,6 @@ cs = require "coffee-script"
 class Module
 
 	pkg_helper: """
-		{root_namespaces}
 		pkg = ( ns )->
 			curr = null
 			parts = [].concat = ns.split( "." )
@@ -20,7 +19,7 @@ class Module
 					else
 						curr = curr[ part ]
 			curr
-		
+
 	"""
 
 	# initializes buffer array to keep all tracked files
@@ -34,14 +33,28 @@ class Module
 		@vendors = @config.vendors
 		@release = @config.release
 
+		# @files = []
 		# search for all *.coffee files inside src folder
 		FsUtil.find @src, "*.coffee", (result) =>
 
-			# instantiates everything, on class for each file
-			@files.push new Script @, file, @opts for file in result
+			# console.log ">>>>>>>>>>>>>>> (#{@name})"
+			# console.log file.filepath for file in @files
+			# console.log ">>>>>>>>>>>>>>>"
 
-			# compile module for the first time
-			@write @compile()
+			# console.log "::::::::"
+			# console.log o for o in result
+			# console.log "..............."
+
+			# instantiates everything, on class for each file
+			for file in result
+				@files.push new Script @, file, @opts
+
+			# console.log "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			# console.log file.filepath for file in @files
+			# console.log "!!!!!!!!!!!!!!!!!!"
+
+			# compile module for the first time and write it to the filesystem
+			@write()
 
 			# watch for file changes
 			@watch() if @opts.argv.w
@@ -68,19 +81,19 @@ class Module
 						@files.push new Script @, info.path, @opts
 
 					# cli msg
-					msg = "#{('New ' + info.type + ' created:').green}"
-					console.log "#{msg} #{info.path}"
+					msg = "#{('New ' + info.type + ' created:').bold.green}"
+					console.log "#{msg} #{info.path.green}"
 
 				# when a file is deleted
 				when "deleted"
-				
+
 					# removes files from array
 					file = ArrayUtil.find @files, relative_path, "filepath"
 					@files.splice file.index, 1
 
 					# cli msg
-					msg = "#{(type + ' deleted, stop watching: ').red}"
-					console.log "#{msg} #{info.path}"
+					msg = "#{(type + ' deleted, stop watching: ').bold.red}"
+					console.log "#{msg} #{info.path.red}"
 
 
 				# when a file is updated
@@ -91,15 +104,15 @@ class Module
 					file.item.getinfo()
 
 					# cli msg
-					msg = "#{(type + ' changed').yellow}"
-					console.log "#{msg} #{info.path}"
+					msg = "#{(type + ' changed').bold.yellow}"
+					console.log "#{msg} #{info.path.yellow}"
 
 				# when a file starts being watched
 				when "watching"
-					msg = "#{('Watching ' + info.type).cyan}"
-					console.log "#{msg} #{info.path}"
+					msg = "#{('Watching ' + info.type + ':').bold.cyan}"
+					console.log "#{msg} #{info.path.cyan}"
 
-			@write @compile() unless info.action is "watching"
+			@write() unless info.action is "watching"
 
 	compile:(include_vendors = true)->
 		# expands all dependencies wild-cards
@@ -109,7 +122,47 @@ class Module
 		@reorder()
 
 		# merge everything
-		output = @pkg_helper + (file.raw for file in @files).join "\n"
+		output = "#{@get_root_namespaces()}\n#{@pkg_helper}\n"
+		output += (file.raw for file in @files).join "\n"
+
+		# .. write it to the output with the root namespaces inside of it
+		output = output.replace "{root_namespaces}", @get_root_namespaces()
+
+		# tries to compile production file
+		try
+			# .. compile with coffee
+			compiled = cs.compile output
+
+		# if there's some error
+		catch err
+
+			# get the error msg
+			msg = err.message
+
+			# if it has some line information
+			if /(line\s)([0-9]+)/g.test msg
+
+				# get the line number
+				line = msg.match( /(line\s)([0-9]+)/ )[2]
+
+				# loop through all ordered files
+				for file in ordered
+
+					# checks if the error line corresponds to some line
+					# inside that file. if yes, then replaces the line info
+					# inside the error msg
+					if line >= file.start && line <= file.end
+						line = (line - file.start) + 1
+						msg = msg.replace /line\s[0-9]+/, "line #{line}"
+						msg = StringUtil.ucasef msg
+
+			return null
+
+		# returns the compiled output
+		return compiled
+
+
+	get_root_namespaces:()->
 
 		# gets all the root namespaces in src folder
 		root_namespaces = {}
@@ -122,45 +175,79 @@ class Module
 		namespaces_buffer = ""
 		namespaces_buffer += k for v, k of root_namespaces
 
-		# .. write it to the output
-		output = output.replace "{root_namespaces}", namespaces_buffer
+		return namespaces_buffer
 
-		# .. compile with coffee
-		compiled = cs.compile output
+	write:()->
 
-		# if include_vendors is true
-		if include_vendors
+		# assigns compiled buffer to variable and abort method if its null
+		return unless (contents = @compile())?
 
-			# them merge all vendors in the proper order
-			vendors = ""
-			for vendor_name in @vendors
+		# gets all vendors concatenated the right way
+		vendors = @toaster.builder.merge_vendors @vendors
 
-				if (vendor = @toaster.config.vendors[vendor_name])
-
-					if path.existsSync vendor
-						vendors += "#{fs.readFileSync vendor, 'utf-8'}\n"
-					else
-						console.log "WARNING!".bold.yellow,
-							"Vendor".white,
-							vendor_name.yellow.bold,
-							"not found at".white,
-							vendor.yellow.bold
-				else
-					console.log "WARNING!".bold.yellow,
-						"Vendor".yellow,
-						vendor_name.white.bold
-						"not found for module".yellow,
-						@name.white.bold
-
-			# and prepend to the output
-			compiled = vendors + compiled
-
-	write:(contents)->
 		# writing file
-		fs.writeFileSync @release, contents
+		fs.writeFileSync @release, "#{vendors}\n#{contents}"
 
 		# informing user through cli
-		console.log "#{'.'.green} #{@release}"
+		console.log "#{'.'.bold.green} #{@release}"
+
+		# if debug is enabled and no error has ocurred, then compile
+		# individual files as well
+		if @opts.argv.debug
+
+			# evaluating the toaster file folder (path)
+			toaster = @release.split("/").slice(0,-1).join('/') + "/toaster"
+
+			# constructs the toaster/src folder
+			toaster_src = "#{toaster}/src"
+
+			# cleaning before deploying
+			FsUtil.rmdir_rf toaster if path.existsSync toaster
+
+			# creating new structure
+			FsUtil.mkdir_p toaster_src
+
+			# template for importing others js's
+			tmpl = "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
+
+			# starting buffer with the pklg_helper
+			toaster_buffer = "#{vendors}\n#{@get_root_namespaces()}\n" +
+							 "#{@pkg_helper}\n"
+
+			# loop through all ordered files
+			for file, index in @files
+
+				# evaluates its path relative to the src folder
+				relative = file.filepath
+
+				# and replace file extension from .coffee to .js
+				relative = relative.replace ".coffee", ".js"
+
+				# then computes the filepath
+				filepath = "#{toaster_src}/#{relative}"
+
+				# ..and extract its folder path
+				folderpath = filepath.split('/').slice(0,-1).join "/"
+
+				# if the container folder doesnt exist yet
+				if !path.existsSync folderpath
+					# create it
+					FsUtil.mkdir_p folderpath
+
+				# computing relative path to test folder
+				relative = "./toaster/src/#{relative}"
+
+				# writing file
+				fs.writeFileSync filepath, cs.compile file.raw, {bare:1}
+
+				# adding to the buffer
+				toaster_buffer += tmpl.replace( "%SRC%", relative ) + "\n"
+
+			# write toaster loader file w/ all imports (buffer) inside it
+			toaster = "#{toaster}/toaster.js"
+			fs.writeFileSync toaster, toaster_buffer
+
+		@toaster.builder.build()
 
 
 	missing = {}
