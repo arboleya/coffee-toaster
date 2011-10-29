@@ -5,7 +5,7 @@ cs = require "coffee-script"
 
 class Module
 
-	pkg_helper = """
+	pkg_helper : """
 		pkg = ( ns )->
 			curr = null
 			parts = [].concat = ns.split( "." )
