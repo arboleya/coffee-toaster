@@ -142,8 +142,7 @@ CoffeeToaster will write a file called 'toaster.coffee' in your app main folder.
 This file contains informations about the modules you have in your app, i.e:
 
 ````ruby
-modules = 
-	name: "My Awesome App"
+module "My Awesome App"
 	src: "src"
 	release: "release/app.js"
 ````
