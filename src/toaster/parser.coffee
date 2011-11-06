@@ -13,42 +13,49 @@ class Parser
 		usage += "  toaster -i [myawsomeapp] (#{'optional'.green})\n"
 		usage += "  toaster -w [myawsomeapp] (#{'optional'.green})"
 		
-		# usage += "\n"
-		# usage += "  For more examples, try:\n"
-		# usage += "    toaster -e\n"
-		# usage += "    toaster --exammples"
-		
-		# usage += "  toaster -nk myawsomeapp\n"
-		# usage += "  toaster -nc myawsomeapp\n"
-		# usage += "  toaster -nskc myawsomeapp"
-		
-		adendo = "" #", use w/ [-s]"
-		# adendo = ", use w/ [-s, -k, -c]"
-		
 		@argv = (@opts = optimist.usage( usage )
     		.alias('n', 'new')
-			.describe('n', "Scaffold a very basic new App#{adendo}")
+			.describe('n', "Scaffold a very basic new App")
 			
 			.alias('i', 'init')
-			.describe('i', "Create a config (toaster.coffee) file#{adendo}")
+			.describe('i', "Create a config (toaster.coffee) file")
 			
 			.alias('w', 'watch')
-			.describe('w', "Start watching/compiling your project#{adendo}")
+			.describe('w', "Start watching/compiling your project")
 			
 			.alias('c', 'compile')
 			.boolean( 'c' )
 			.describe('c', "Compile the entire project, without watching it.")
-			
+
 			.alias('d', 'debug')
 			.boolean( 'd' )
 			.default('d', false)
 			.describe('d', 'Debug mode (compile js files individually)')
-			
-			# .alias('e', 'examples')
-			# .boolean( 'e' )
-			# .default( 'e', false )
-			# .describe('e', 'Print a list of usage examples, with description')
-			
+
+			.alias('b', 'bare')
+			.boolean( 'b' )
+			.default('b', false)
+			.describe('b', 'Compile files with "coffee --bare" (no js wrapper)')
+
+			# .alias('p', 'packaging')
+			# .boolean( 'p' )
+			# .default('p', true)
+			# .describe('p', 'Enables/disables the packaging system')
+
+			# .alias('m', 'minify')
+			# .boolean( 'm' )
+			# .default('m', false)
+			# .describe('m', 'Minify release code using uglify.')
+
+			# .alias('u', 'uncompiled')
+			# .boolean( 'u' )
+			# .default('u', false)
+			# .describe('u', 'Export everything as pure CoffeeScript')
+
+			# .alias('e', 'exports')
+			# .default('e', 'exports')
+			# .describe('e', 'Specify a macro scope to list everything.')
+
 			.alias('v', 'version')
 			.describe('v', '')
 			

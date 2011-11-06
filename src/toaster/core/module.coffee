@@ -40,6 +40,7 @@ class Module
 		@src = @config.src
 		@vendors = @config.vendors
 		@release = @config.release
+		@bare = @config.bare
 
 		# initializes buffer array to keep all tracked files
 		@files = []
@@ -49,7 +50,7 @@ class Module
 
 			# instantiates everything, on class for each file
 			for file in result
-				@files.push new Script @, file, @opts
+				@files.push new Script @, file, @opts, @bare
 
 			# compile module for the first time and write it to the filesystem
 			@write()
@@ -130,7 +131,7 @@ class Module
 		# tries to compile production file
 		try
 			# .. compile with coffee
-			compiled = cs.compile output
+			compiled = cs.compile output, {bare:@opts.argv.bare || @bare}
 
 		# if there's some error
 		catch err
