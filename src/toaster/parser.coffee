@@ -52,9 +52,10 @@ class Parser
 			# .default('u', false)
 			# .describe('u', 'Export everything as pure CoffeeScript')
 
-			# .alias('e', 'exports')
-			# .default('e', 'exports')
-			# .describe('e', 'Specify a macro scope to list everything.')
+			.alias('e', 'exports')
+			.string('e')
+			.default('e', 'exports')
+			.describe('e', 'Specify a macro scope to list everything.')
 
 			.alias('v', 'version')
 			.describe('v', '')
