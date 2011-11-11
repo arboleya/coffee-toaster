@@ -1,6 +1,6 @@
 optimist = require 'optimist'
 
-class Parser
+class Cli
 	constructor:->
 		usage = "#{'CoffeeToaster'.bold}\n"
 		usage += "  Minimalist dependency management for CoffeeScript\n\n".grey
@@ -37,24 +37,19 @@ class Parser
 			.default('b', false)
 			.describe('b', 'Compile files with "coffee --bare" (no js wrapper)')
 
-			# .alias('p', 'packaging')
-			# .boolean( 'p' )
-			# .default('p', true)
-			# .describe('p', 'Enables/disables the packaging system')
+			.alias('p', 'packaging')
+			.boolean( 'p' )
+			.default('p', false)
+			.describe('p', 'Enables/disables the packaging system')
 
-			# .alias('m', 'minify')
-			# .boolean( 'm' )
-			# .default('m', false)
-			# .describe('m', 'Minify release code using uglify.')
-
-			# .alias('u', 'uncompiled')
-			# .boolean( 'u' )
-			# .default('u', false)
-			# .describe('u', 'Export everything as pure CoffeeScript')
+			.alias('m', 'minify')
+			.boolean( 'm' )
+			.default('m', false)
+			.describe('m', 'Minify release code using uglify.')
 
 			.alias('e', 'exports')
 			.string('e')
-			.default('e', 'exports')
+			.default('e', false )
 			.describe('e', 'Specify a macro scope to list everything.')
 
 			.alias('v', 'version')

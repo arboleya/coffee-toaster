@@ -28,31 +28,31 @@ exports.run =->
 # ------------------------------------------------------------------------------
 #<< toaster/generators/*
 #<< toaster/core/*
-#<< toaster/parser
 #<< toaster/config
+#<< toaster/cli
 
 class Toaster
 	modules: {}
 
 	constructor:->
 
-		@parser = new Parser
+		@cli = new Cli
 		@builder = new Builder @
 
-		if @parser.argv.h
-			return console.log @parser.opts.help()
+		if @cli.argv.h
+			return console.log @cli.opts.help()
 
 		@basepath = path.resolve "."
 		@config = new toaster.Config( @basepath )
 
-		if @parser.argv.v
+		if @cli.argv.v
 			path = pn __dirname + "/../build/VERSION"
 			console.log fs.readFileSync path, "utf-8"
 		
-		else if @parser.argv.n
+		else if @cli.argv.n
 			new Project( @basepath ).create argv.n
 		
-		else if @parser.argv.i
+		else if @cli.argv.i
 			new toaster.generators.Config( @basepath ).create argv.i
 		
 		else
@@ -61,4 +61,4 @@ class Toaster
 
 	init_modules:->
 		for k, v of @config.modules
-			@modules[v.name] = new Module @, v, @parser.opts
+			@modules[v.name] = new Module @, v, @cli.opts

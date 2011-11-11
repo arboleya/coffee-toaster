@@ -1,5 +1,8 @@
 cs = require "coffee-script"
 
+uglify = require("uglify-js").uglify;
+uglify_parser = require("uglify-js").parser;
+
 #<< toaster/utils/*
 #<< toaster/core/script
 
@@ -15,23 +18,12 @@ class Module
 					continue
 				else
 					unless curr[ part ]?
-						curr = curr[ part ] = {}
+						curr = curr[ part ] = %exports%{}
 					else
 						curr = curr[ part ]
 			curr
 
 	"""
-
-	# # module requirements to load
-	# 	toaster
-	# 	config
-	# 	opts
-
-	# # module config variables
-	# 	name
-	# 	src
-	# 	vendors
-	# release
 
 	constructor: (@toaster, @config, @opts) ->
 
@@ -40,8 +32,20 @@ class Module
 		@src = @config.src
 		@vendors = @config.vendors
 		@release = @config.release
-		@bare = @config.bare
 
+		@bare = @opts.argv.bare ? @config.bare
+		@exports = @opts.argv.exports ? @config.exports
+		@packaging = @opts.argv.packaging ? @config.packaging
+		@minify = @opts.argv.minify ? @config.minify
+
+		# overrides the default macro scope
+		if @exports != false
+			exports = "#{@exports}[part] = "
+		else
+			exports = ""
+		
+		@pkg_helper = @pkg_helper.replace "%exports%", exports
+		
 		# initializes buffer array to keep all tracked files
 		@files = []
 
@@ -122,16 +126,19 @@ class Module
 		@reorder()
 
 		# merge everything
-		output = "#{@get_root_namespaces()}\n#{@pkg_helper}\n"
+		output = ""
+		output = "#{@get_root_namespaces()}\n#{@pkg_helper}\n" if @packaging
+		
 		output += (file.raw for file in @files).join "\n"
 
 		# .. write it to the output with the root namespaces inside of it
-		output = output.replace "{root_namespaces}", @get_root_namespaces()
+		namespaces = if @packaging then @get_root_namespaces() else ""
+		output = output.replace "{root_namespaces}", namespaces
 
 		# tries to compile production file
 		try
 			# .. compile with coffee
-			compiled = cs.compile output, {bare:@opts.argv.bare || @bare}
+			compiled = cs.compile output, {bare: @bare}
 
 		# if there's some error
 		catch err
@@ -146,7 +153,7 @@ class Module
 				line = msg.match( /(line\s)([0-9]+)/ )[2]
 
 				# loop through all ordered files
-				for file in ordered
+				for file in @files
 
 					# checks if the error line corresponds to some line
 					# inside that file. if yes, then replaces the line info
@@ -155,7 +162,9 @@ class Module
 						line = (line - file.start) + 1
 						msg = msg.replace /line\s[0-9]+/, "line #{line}"
 						msg = StringUtil.ucasef msg
-
+			
+			console.log output
+			console.log "ERROR: ".bold.red + msg
 			return null
 
 		# returns the compiled output
@@ -169,6 +178,10 @@ class Module
 		for file in @files
 			if file.filefolder != ""
 				pkg = file.namespace.split(".").shift()
+
+				if @exports != false
+					pkg = "#{@exports}.#{pkg} = #{pkg}"
+				
 				root_namespaces[pkg] = "#{pkg} = {}\n"
 
 		# .. merge them into one single buffer
@@ -185,8 +198,18 @@ class Module
 		# gets all vendors concatenated the right way
 		vendors = @toaster.builder.merge_vendors @vendors
 
+		# merge vendors and content
+		contents = "#{vendors}\n#{contents}"
+
+		# uglify
+		if @minify
+			ast = uglify_parser.parse contents
+			ast = uglify.ast_mangle ast
+			ast = uglify.ast_squeeze ast
+			contents = uglify.gen_code ast
+		
 		# writing file
-		fs.writeFileSync @release, "#{vendors}\n#{contents}"
+		fs.writeFileSync @release, contents
 
 		# informing user through cli
 		console.log "#{'.'.bold.green} #{@release}"
@@ -212,7 +235,7 @@ class Module
 
 			# starting buffer with the pklg_helper
 			toaster_buffer = "#{vendors}\n#{@get_root_namespaces()}\n" +
-							 "#{@pkg_helper}\n"
+							 "#{cs.compile @pkg_helper, {bare:1}}\n\n"
 
 			# loop through all ordered files
 			for file, index in @files
@@ -242,6 +265,8 @@ class Module
 
 				# adding to the buffer
 				toaster_buffer += tmpl.replace( "%SRC%", relative ) + "\n"
+			
+			console.log toaster_buffer
 
 			# write toaster loader file w/ all imports (buffer) inside it
 			toaster = "#{toaster}/toaster.js"
@@ -333,7 +358,7 @@ class Module
 					@missing[bc] = true
 					console.log "#{'WARNING!'.bold} Base class".yellow,
 								bc.bold.white,
-								"not found for class".yellow,
+								"not found fc class".yellow,
 								file.classname.bold.white,
 								"in file".yellow,
 								file.filepath.yellow

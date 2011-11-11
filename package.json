@@ -32,7 +32,8 @@
   "dependencies"   : {
     "coffee-script"  : "1.x",
     "colors"         : "0.5.x",
-    "optimist"       :"0.2.x"
+    "uglify-js"      : "1.1.1",
+    "optimist"       : "0.2.x"
   },
 
   "devDependencies": {
