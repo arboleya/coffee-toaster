@@ -34,9 +34,9 @@ class Module
 		@release = @config.release
 
 		@bare = @opts.argv.bare ? @config.bare
-		@exports = @opts.argv.exports ? @config.exports
-		@packaging = @opts.argv.packaging ? @config.packaging
-		@minify = @opts.argv.minify ? @config.minify
+		@exports = @config.exports ? @opts.argv.exports
+		@packaging = @config.packaging ? @opts.argv.packaging
+		@minify = @config.minify ? @opts.argv.minify
 
 		# overrides the default macro scope
 		if @exports != false
@@ -85,7 +85,7 @@ class Module
 
 					# cli msg
 					msg = "#{('New ' + info.type + ' created:').bold.green}"
-					console.log "#{msg} #{info.path.green}"
+					log "#{msg} #{info.path.green}"
 
 				# when a file is deleted
 				when "deleted"
@@ -96,7 +96,7 @@ class Module
 
 					# cli msg
 					msg = "#{(type + ' deleted, stop watching: ').bold.red}"
-					console.log "#{msg} #{info.path.red}"
+					log "#{msg} #{info.path.red}"
 
 
 				# when a file is updated
@@ -108,12 +108,12 @@ class Module
 
 					# cli msg
 					msg = "#{(type + ' changed: ').bold.cyan}"
-					console.log "#{msg} #{info.path.cyan}"
+					log "#{msg} #{info.path.cyan}"
 
 				# when a file starts being watched
 				when "watching"
 					msg = "#{('Watching ' + info.type + ':').bold.cyan}"
-					console.log "#{msg} #{info.path.cyan}"
+					log "#{msg} #{info.path.cyan}"
 
 			@write() unless info.action is "watching"
 
@@ -149,6 +149,13 @@ class Module
 		# if no error has ocurried, compile the release file
 		compiled = cs.compile output, {bare: @bare}
 
+		# uglify
+		if @minify
+			ast = uglify_parser.parse compiled
+			ast = uglify.ast_mangle ast
+			ast = uglify.ast_squeeze ast
+			compiled = uglify.gen_code ast
+		
 		# returns the compiled output
 		return compiled
 
@@ -182,19 +189,12 @@ class Module
 
 		# merge vendors and content
 		contents = "#{vendors}\n#{contents}"
-
-		# uglify
-		if @minify
-			ast = uglify_parser.parse contents
-			ast = uglify.ast_mangle ast
-			ast = uglify.ast_squeeze ast
-			contents = uglify.gen_code ast
 		
 		# writing file
 		fs.writeFileSync @release, contents
 
 		# informing user through cli
-		console.log "#{'.'.bold.green} #{@release}"
+		log "#{'.'.bold.green} #{@release}"
 
 		# if debug is enabled and no error has ocurred, then compile
 		# individual files as well
@@ -248,7 +248,7 @@ class Module
 				# adding to the buffer
 				toaster_buffer += tmpl.replace( "%SRC%", relative ) + "\n"
 			
-			console.log toaster_buffer
+			log toaster_buffer
 
 			# write toaster loader file w/ all imports (buffer) inside it
 			toaster = "#{toaster}/toaster.js"
