@@ -1,8 +1,8 @@
-// UNDERSCORE
-// JQUERY
+UNDERSCORE = {}
+JQUERY = {}
 (function() {
   var Bee, insects, pkg;
-  insects = {};
+  exports.insects = insects = {};
   pkg = function(ns) {
     var curr, index, part, parts, _len;
     curr = null;
@@ -14,7 +14,7 @@
         continue;
       } else {
         if (curr[part] == null) {
-          curr = curr[part] = {};
+          curr = curr[part] = exports[part] = {};
         } else {
           curr = curr[part];
         }
@@ -22,7 +22,7 @@
     }
     return curr;
   };
-  pkg('insects').Bee = Bee = (function() {
+  pkg('insects').Bee = exports.Bee = Bee = (function() {
     function Bee() {
       console.log("Bee created!");
     }

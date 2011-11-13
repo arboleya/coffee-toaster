@@ -1,1 +1,1 @@
-// JQUERY
+JQUERY = {}

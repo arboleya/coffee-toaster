@@ -1,8 +1,8 @@
-// JQUERY
-// UNDERSCORE
+JQUERY = {}
+UNDERSCORE = {}
 (function() {
   var Horse, animals, pkg;
-  animals = {};
+  window.animals = animals = {};
   pkg = function(ns) {
     var curr, index, part, parts, _len;
     curr = null;
@@ -14,7 +14,7 @@
         continue;
       } else {
         if (curr[part] == null) {
-          curr = curr[part] = {};
+          curr = curr[part] = window[part] = {};
         } else {
           curr = curr[part];
         }
@@ -22,7 +22,7 @@
     }
     return curr;
   };
-  pkg('animals').Horse = Horse = (function() {
+  pkg('animals').Horse = window.Horse = Horse = (function() {
     function Horse() {
       console.log("Horse created!");
     }

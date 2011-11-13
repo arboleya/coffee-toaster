@@ -1,5 +1,5 @@
 var Bee;
-pkg('insects').Bee = Bee = (function() {
+pkg('insects').Bee = exports.Bee = Bee = (function() {
   function Bee() {
     console.log("Bee created!");
   }

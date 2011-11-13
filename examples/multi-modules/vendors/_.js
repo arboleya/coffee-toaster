@@ -1,1 +1,1 @@
-// UNDERSCORE
+UNDERSCORE = {}
