@@ -247,8 +247,6 @@ class Module
 
 				# adding to the buffer
 				toaster_buffer += tmpl.replace( "%SRC%", relative ) + "\n"
-			
-			log toaster_buffer
 
 			# write toaster loader file w/ all imports (buffer) inside it
 			toaster = "#{toaster}/toaster.js"
