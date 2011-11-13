@@ -69,11 +69,11 @@ class Script
 				@classpath = @classname
 			else
 				@classpath = "#{@namespace}.#{@classname}"
-			
+
 			# colletcts the base classes, in case some class in the file
 			# extends something
 			for klass in @raw.match( new RegExp rgx_ext, "gm" ) ? []
-				@baseclass = @klass.match( new RegExp(rgx_ext, "m"))[5]
+				baseclass = klass.match( new RegExp( rgx_ext, "m" ) )[5]
 				@baseclasses.push baseclass
 		
 		# then if there's other dependencies
