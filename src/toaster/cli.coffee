@@ -29,27 +29,27 @@ class Cli
 
 			.alias('d', 'debug')
 			.boolean( 'd' )
-			.default('d', false)
+			.default('d', null )
 			.describe('d', 'Debug mode (compile js files individually)')
 
 			.alias('b', 'bare')
 			.boolean( 'b' )
-			.default('b', false)
+			.default('b', false )
 			.describe('b', 'Compile files with "coffee --bare" (no js wrapper)')
 
 			.alias('p', 'packaging')
 			.boolean( 'p' )
-			.default('p', false)
+			.default('p', false )
 			.describe('p', 'Enables/disables the packaging system')
 
 			.alias('m', 'minify')
 			.boolean( 'm' )
-			.default('m', false)
+			.default('m', false )
 			.describe('m', 'Minify release code using uglify.')
 
 			.alias('e', 'exports')
 			.string('e')
-			.default('e', false )
+			.default('e', null )
 			.describe('e', 'Specify a macro scope to list everything.')
 
 			.alias('v', 'version')
