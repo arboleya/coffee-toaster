@@ -16,7 +16,6 @@ class Builder
 			vendors = @merge_vendors @unify_vendors( build.modules )
 
 			fs.writeFileSync build.release, "#{vendors}\n#{modules}"
-			# console.log "#{'.'.green} #{build.release}"
 
 	unify_vendors:( modules )->
 
