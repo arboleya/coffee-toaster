@@ -107,8 +107,8 @@ class Module
 					file.item.getinfo()
 
 					# cli msg
-					msg = "#{(type + ' changed').bold.yellow}"
-					console.log "#{msg} #{info.path.yellow}"
+					msg = "#{(type + ' changed: ').bold.cyan}"
+					console.log "#{msg} #{info.path.cyan}"
 
 				# when a file starts being watched
 				when "watching"
@@ -119,7 +119,18 @@ class Module
 
 	compile:(include_vendors = true)->
 		
-		# expands all dependencies wild-cards
+		# validating syntax
+		try
+			cs.compile file.raw for file in @files
+		
+		# if there's some error, catches and shows it, and abort the compilation
+		catch err
+			msg = err.message.replace '"', '\\"'
+			msg = "#{msg.white} at file: " + "#{file.filepath}".bold.red
+			error msg
+			return null
+
+		# otherwise mode ahead, and expands all dependencies wild-cards
 		file.expand_dependencies() for file in @files
 
 		# reorder everything
@@ -134,38 +145,9 @@ class Module
 		# .. write it to the output with the root namespaces inside of it
 		namespaces = if @packaging then @get_root_namespaces() else ""
 		output = output.replace "{root_namespaces}", namespaces
-
-		# tries to compile production file
-		try
-			# .. compile with coffee
-			compiled = cs.compile output, {bare: @bare}
-
-		# if there's some error
-		catch err
-
-			# get the error msg
-			msg = err.message
-
-			# if it has some line information
-			if /(line\s)([0-9]+)/g.test msg
-
-				# get the line number
-				line = msg.match( /(line\s)([0-9]+)/ )[2]
-
-				# loop through all ordered files
-				for file in @files
-
-					# checks if the error line corresponds to some line
-					# inside that file. if yes, then replaces the line info
-					# inside the error msg
-					if line >= file.start && line <= file.end
-						line = (line - file.start) + 1
-						msg = msg.replace /line\s[0-9]+/, "line #{line}"
-						msg = StringUtil.ucasef msg
-			
-			console.log output
-			console.log "ERROR: ".bold.red + msg
-			return null
+		
+		# if no error has ocurried, compile the release file
+		compiled = cs.compile output, {bare: @bare}
 
 		# returns the compiled output
 		return compiled
@@ -305,32 +287,30 @@ class Module
 				if dependency?
 
 					# if there's some circular dependency loop
-					if ArrayUtil.has(
-						dependency.item.dependencies,
-						file.filepath,
-						"filepath"
-					)
+					if ArrayUtil.has dependency.item.dependencies, file.filepath
+
 						# remove it from the dependencies
 						file.dependencies.splice index, 1
 
 						# then prints a warning msg and continue
-						console.log "WARNING!".bold.yellow,
-							"You have a circular dependcy loop between files",
-							"#{filepath.yellow.bold} and",
-							file.filepath.yellow.bold
+						warn "Circular dependency found between ".yellow +
+						     filepath.grey.bold + " and ".yellow +
+						     file.filepath.grey.bold
+						
 						continue
-					
+
 					# otherwise if no circular dependency is found, reorder
-					# the specific dependency and run reorder recursively until
-					# everything is beautiful
+					# the specific dependency and run reorder recursively
+					# until everything is beautiful
 					else
 						@files.splice index, 0, dependency.item
 						@files.splice dependency.index + 1, 1
 						@reorder true
 						break
-				
+
 				# otherwise if the dependency is not found
 				else if @missing[filepath] != true
+					
 					# then add it to the @missing hash (so it will be ignored
 					# until reordering finishes)
 					@missing[filepath] = true
@@ -341,24 +321,23 @@ class Module
 					file.dependencies.splice index, 1
 
 					# ..and finally prints a warning msg
-					console.log "WARNING!".bold.yellow,
-								"Dependency #{filepath.bold.white}".yellow,
-								"not found for class".yellow,
-								"#{file.classpath.white.bold}."
+					warn "#{'Dependency'.yellow} #{filepath.bold.grey} " +
+						 "#{'not found for file'.yellow} " +
+						 file.filepath.grey.bold
 
-			# tries to validate if all base classes was imported
+			# validate if all base classes was properly imported
 			file_index = ArrayUtil.find @files, file.filepath, "filepath"
 			file_index = file_index.index
 
 			for bc in file.baseclasses
 				found = ArrayUtil.find @files, bc, "classname"
-				not_found = (found.index > file_index) || (found == null)
+				not_found = (found == null) || (found.index > file_index)
 
 				if not_found && !@missing[bc]
 					@missing[bc] = true
-					console.log "#{'WARNING!'.bold} Base class".yellow,
-								bc.bold.white,
-								"not found fc class".yellow,
-								file.classname.bold.white,
-								"in file".yellow,
-								file.filepath.yellow
+					warn "Base class ".yellow +
+						 "#{bc} ".bold.grey +
+						 "not found for class ".yellow +
+						 "#{file.classname} ".bold.grey +
+						 "in file ".yellow +
+						 file.filepath.bold.grey
