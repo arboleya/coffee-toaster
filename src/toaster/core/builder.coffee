@@ -9,13 +9,24 @@ class Builder
 	build:()->
 
 		builds = @toaster.config.builds
-
 		for name, build of builds
+			
 
 			modules = @merge_modules build.modules
 			vendors = @merge_vendors @unify_vendors( build.modules )
 
 			fs.writeFileSync build.release, "#{vendors}\n#{modules}"
+		
+		# return unless @toaster.cli.argv.d
+
+		# tmpl = "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
+		# buffer = []
+
+		# for name of @toaster.modules
+		# 	buffer.push tmpl.replace "%SRC%", "toaster/#{name}/#{name}.js"
+		
+		# fs.writeFileSync build.release, "#{vendors}\n#{modules}"
+		# log buffer.join "\n"
 
 	unify_vendors:( modules )->
 
