@@ -30,8 +30,8 @@ class Module
 		# expanding config variables
 		@name = @config.name
 		@src = @config.src
-		@vendors = @config.vendors
-		@release = @config.release
+		@vendors = @config.vendors ? []
+		@release = @config.release ? null
 
 		@bare = @opts.argv.bare ? @config.bare
 		@exports = @config.exports ? @opts.argv.exports
