@@ -37,7 +37,6 @@ class Toaster
 	constructor:->
 
 		@cli = new Cli
-		@builder = new Builder @
 
 		if @cli.argv.h
 			return console.log @cli.opts.help()
@@ -50,13 +49,15 @@ class Toaster
 			console.log fs.readFileSync path, "utf-8"
 		
 		else if @cli.argv.n
-			new Project( @basepath ).create argv.n
+			new Project( @basepath ).create @cli.argv.n
 		
 		else if @cli.argv.i
 			new toaster.generators.Config( @basepath ).create argv.i
 		
 		else
 			@init_modules()
+		
+		@builder = new Builder @
 
 
 	init_modules:->
