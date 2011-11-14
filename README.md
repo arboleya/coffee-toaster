@@ -1,23 +1,66 @@
-# Coffee Toaster (current version - 0.3.7)
+# Coffee Toaster (current version - 0.5.0)
 
-Minimalist dependency management system for CoffeeScript.
+CoffeeToaster is a dependency manager and build system for CoffeeScript.
+
+The main purpose is to provide a very comfortable environment to code large<BR>
+libraries using such things as class definitions and namespaces, in order to<BR>
+to help avoid naming collisions in your architecture.
+
+A smart 'require' powered by wild-cards is also provided, together with a<BR>
+powerful build system that concatenates everything and outputs a single<BR>
+javascript release file that can be even minified if you like.
+
+The build system was developed to offer vendors support as well as merging<BR>
+routines for multiple modules, with specific ordering options. If you are<BR>
+adept of the extends directive in CoffeeScript, Toaster will even check if<BR>
+you have required the base classes for the classes that is extends another.
+
+The CLI program informs you about everything that is happening when a new<BR>
+file is created, deleted or modified. You can even drag'n'drop a folder with<BR>
+lots of CoffeeScript files inside your source folder and everything will be<BR>
+handled gracefully.
+
+If you are building for the browser you can use the debug option to compile<BR>
+everything individually -- plus, node targeted support is on the way. In <BR>
+debug mode you'll be gifted with a boot-loader that will load every file in<BR>
+the proper order according your needs.
+
+Keep on reading this README, and please do not hesitate to open a feature<BR>
+request or a bug report.<BR>
+https://github.com/serpentem/coffee-toaster/issues
+
+In case of any doubts, drop an email at the email group and luckily you'll<BR>
+be answered sooner than later.<BR>
+https://groups.google.com/group/coffee-toaster
 
 # Features
 
 * Inheritance support across multiples files for the lazy
+ * You can require any file whenever your want to.
 * Vendors management
-* Multi modules support in the same environment
-* Micro build routines across all modules
-* Namespaces
- * Automagic packaging system that uses folders as namespaces
-* Scaffolding routines
- * Interactive creation of a very simple skeleton for new projects and config file for existent projects
-* Broken and circular-loop dependency validation
- * Helps you prevent some mistakes with circular dependencies loops and alert you against dependencies not found
+* Multiple modules support in the same environment
+* Micro build routines across all modules and vendors
+* Packaging System & Namespaces
+ * Automagic packaging system that uses folders as namespaces, 
+* Exports aliases
+ * Lets you set a top package to list all your modules
+* Broken and circular-loop dependencies validation
+ * Helps you prevent some mistakes with circular dependencies loops and<BR>
+ alerts you against dependencies not found
 * Live syntax-check
  * Precise live syntax-check with file path and line number information
+* Growl support
+ * Warning/Error messages are shown even in growl
 * Debug Mode
- * In order to provide easy debugging when inside the browser, Debug Mode will compile all your files individually into its respectives .js versions and write a smart boot-loader (toaster.js) to load every file in the proper order. Just include this boot-loader in your html file and voilà
+ * In order to provide an easy debugging routine once inside the browser,<BR>
+ all files will be compiled individually into its respectives '.js' versions<BR>
+ and a smart boot-loader (toaster.js) is provided to load every file<BR>
+ orderly. Just include this boot-loader in your html file and voilà
+* Minify support
+ * Aiming to be practical, the output can be even minified (using uglify-js)
+* Scaffolding routines
+ * Interactive creation of a very simple skeleton for new projects and<BR>
+ config file for existent projects
 
 
 # Installation
@@ -28,7 +71,8 @@ Minimalist dependency management system for CoffeeScript.
 
 ## Creating a new App
 
-CoffeeToaster suggests a very simple structure for initial projects, you can customize it as you like.
+CoffeeToaster suggests a very simple structure for initial projects, you can<BR>
+customize it as you like.
 
 	toaster -n mynewapp
 
@@ -36,12 +80,14 @@ You will be asked for some things:
 
 1. **name** - The name of your main module.
   * i.e.: mynewapp
-1. **src** - The source folder for your main module, it can be relative or absolute.
+1. **src** - The source folder for your main module -- the path can be<BR>
+relative or absolute.
   * i.e.: src
-1. **release** - The release file for your main module, can be relative or absolute.
+1. **release** - The release file for your main module -- the path can be<BR>
+relative or absolute.
   * i.e.: release/app.js
 
-Considering all the default values, you'll end up with a structure like this:
+Considering all the default values, you'll end up with a structure as such:
 
 	├── /mynewapp
 	    ├── /release
@@ -51,16 +97,23 @@ Considering all the default values, you'll end up with a structure like this:
 The toaster.coffee file will have this content:
 
 ````ruby
-modules =
-	name: 'mynewapp'
+module 'basic'
+	# mandatory config
 	src: 'src'
 	release: 'release/app.js'
+
+	# optional config
+	vendors: []
+	bare: false # default=false
+	packaging: true # default=false
+	exports: false # default=false
+	minify: false # default=false
 ````
 
 
 ## Toasting an existing project
 
-Your can toast an existent project like this:
+Your can toast an existing project as such:
 
 	cd existing-project
 	toaster -i
@@ -69,13 +122,15 @@ Or:
 
 	toaster -i existing-project
 
-The same questions (name, src, release) will be made, answer everything according your project structure.
+The same information (name, src, release) will be required -- answer<BR>
+everything according to your project's structure.
 
 A 'toaster.coffee' file will be created inside it.
 
 ## When the magic happens
 
-To see all CoffeeToaster can do for you, after creating or toasting a new project, enter in the project folder and type 'toaster -w':
+To see all that CoffeeToaster can do for you, enter the project folder and<BR>
+type 'toaster -w' after creating or toasting a new project:
 
 	cd existing-project
 	toaster -w
@@ -84,11 +139,20 @@ Or:
 
 	toaster -w existing-project
 
+Your release file will be saved according to your needs.
+
 # Debug Mode
 
-In debug mode (option -d) files will be all compiled individually inside a folder called "toaster" in the same directory you have your release file, aiming to ease the debugging process.
+In debug mode (option -d) files will be all compiled individually inside a<BR>
+folder called "toaster" in the same directory you have your release file,<BR>
+aiming to ease the debugging process.
 
-For example, if you have "release/app.js", a folder will be created in "release/toaster" and all your CoffeeScript files will be compiled to Javascript inside it.
+	cd existing-project
+	toaster -wd
+
+For example, if you have "release/app.js", a folder will be created in<BR>
+"release/toaster" and all your CoffeeScript files will be compiled to<BR>
+Javascript inside it.
 
 Bellow is a directory structure representing this:
 
@@ -117,7 +181,8 @@ Bellow is a directory structure representing this:
 	│       └── script.coffee
 	└── toaster.coffee
 
-There's also a 'toaster.js' file inside the 'release/toaster' folder, this Javascript file is responsible to load all your files into the right order.
+There's also a 'toaster.js' file inside the 'release/toaster' folder, this<BR>
+Javascript file is responsible to load all your files into the right order.
 
 So in your .html your have two options:
 
@@ -143,20 +208,32 @@ CoffeeToaster will write a file called 'toaster.coffee' in your app main folder.
 This file contains informations about the modules you have in your app, i.e:
 
 ````ruby
-modules = 
-	name: "My Awesome App"
-	src: "src"
-	release: "release/app.js"
+module 'my_awesome_app'
+
+	# mandatory config
+	src: 'src'
+	release: 'release/app.js'
+	
+	# optional config
+	vendors: []
+	bare: false # default=false
+	packaging: true # default=false
+	exports: false # default=false
+	minify: false # default=false
 ````
 
-So when you call 'toaster -w' inside this directory, this config is loaded and every file and folder inside src folder start being watched.
+So when you call 'toaster -w' inside this directory, this config is loaded<BR>
+and every file and folder inside src folder start being watched.
 
-If debug is enabled (option -d), files will also compiled individually for a sane debugging routine, inside the browser.
+If debug is enabled (option -d), files will also compiled individually for a<BR>
+sane debugging routine, inside the browser.
 
-Every time something changes, CoffeeToaster re-compiles all your application by doing:
+Every time something changes, CoffeeToaster re-compiles all your application<BR>
+by doing:
 
- * collects all .coffee files and process everything, adding package declarations to the class definitions, based on the folder they are
- * re-order everything so files and classes are defined always before they are needed
+* collects all .coffee files and process everything, adding package<BR>
+declarations to the class definitions, based on the folder they are
+* re-order everything defining files and classes always before they're needed
 
 Wait! How the hell it knows when my files or classes are needed?
 
@@ -164,227 +241,217 @@ Wait! How the hell it knows when my files or classes are needed?
 
 The import directive is known by:
 
- * #<< core/views/View
+ * #<< mvc/views/user_view
  * #<< utils/*
 
-By putting '#<< package/name/View' in your CoffeeScript file, you're telling CoffeeToaster about a dependency.
+By putting '#<< package/name/View' in your CoffeeScript file, you're telling<BR>
+CoffeeToaster about a dependency.
 
 Wild cards '#<< utils/*' are also accepted as a handy option.
 
-## Example - Structure
+## Vendors
 
-Let's assume you have this structure:
-
-	├── release
-	│   ├── app.js
-	│   ├── index.html
-	├── src
-	│   ├── app.coffee
-	│   ├── letters
-	│   │   ├── a.coffee
-	│   │   └── b.coffee
-	│   ├── repeating
-	│   │   ├── a.coffee
-	│   ├── single
-	│   │   └── script.coffee
-	└── toaster.coffee
-
-## Example - Contents
-
-And every file with the following contents:
-
- * **path:** letters/a.coffee
+You can define vendor such as:
 
 ````ruby
-class A
-	constructor:-> console.log "letters/A created!"
+vendor 'jquery', 'vendors/jquery.js'
+vendor '_', 'vendors/_.js'
 ````
 
- * **path:** letters/b.coffee
+Basically you give it a name and inform where it is, the file must be<BR>
+pure javascript, preferably minified ones -- Toaster will not be compile or<BR>
+or minify them, just concatenate everything.
+
+## Multi Modules
+
+You can have as many modules as you want such as:
 
 ````ruby
-class B
-	constructor:-> console.log "letters/B created!"
+module 'foo'
+	src: 'foo'
+	release: 'release/foo.js'
+
+module 'boo'
+	src: 'boo'
+	release: 'release/boo.js'
 ````
 
- * **path:** repeating/a.coffee
+In order to concatenate multiple modules, you will need to use build routines.
+
+## Build Routines
+
+Build routines are simple specifications where you tell Toaster how to build<BR>
+your library. You can have as many modules and vendors as you want.
 
 ````ruby
-class A
-	constructor:-> console.log "repeating/A created!"
+vendor 'jquery', 'vendors/jquery.js'
+vendor '_', 'vendors/_.js'
+
+module 'foo'
+	src: 'foo'
+	vendors: ['jquery', "_"]
+	release: 'release/foo.js'
+
+module 'boo'
+	src: 'boo'
+	vendors: ['jquery','_']
+	release: 'release/boo.js'
+
+build 'foo_first_then_boo'
+	modules: ['foo', 'boo']
+	release: 'release/animals_insects.js'
+
+build 'boo_first_then_foo'
+	modules: ['boo', 'foo']
+	release: 'release/insects_animals.js'
 ````
 
- * **path:** single/script.coffee
+Note that the order you choose when informing the modules array for you<BR>
+build will be preserved.
+
+## Minify Supoprt
+
+To minify you release file all you need to do is just turn on the minify<BR>
+property in the 'toaster.coffee' file for you desired module.
 
 ````ruby
-console.log "I am a script!"
+module 'foo'
+	src: 'foo'
+	release: 'release/foo.js'
+	minify: true
 ````
 
- * **path:** app.coffee
+# Examples
 
-````ruby
-#<< letters/*
-#<< repeating/a
-#<< single/script
+You'll certainly find some useful resources in the two examples provided.<BR>
+Examine them and you'll understand how things works more instinctively.
 
-class App
-	constructor:->
-		console.log "App created!"
+Install coffee-toaster, clone the examples and try different config options<BR>
+always looking for the differences in your javascript release file.
 
-		new letters.A
-		new letters.B
-		new repeating.A
+## Basic Example
 
-new App
-````
+This example uses:
 
-## Example - Merge Result (still CoffeeScript)
+* One single module
+* Two vendors
 
-This way, everything will be merged like this:
+There are files and classes with the same name to show the packaging system.
 
-````ruby
-letters = {}
-repeating = {}
-single = {}
+The packaging system will address avery class definition to a namespace,<BR>
+that is computed automatically according the path where your physical file is.
 
-pkg = ( ns )->
-	curr = null
-	parts = [].concat = ns.split( "." )
-	for part, index in parts
-		if curr == null
-			curr = eval part
-			continue
-		else
-			unless curr[ part ]?
-				curr = curr[ part ] = {}
-			else
-				curr = curr[ part ]
-	curr
+Imagine that you have a class "Foo" inside a "my/path/foo.coffee" file. This<BR>
+class will be addressed to the namespace "my.path", so you can instantiate it:
 
-pkg( 'letters' ).A = class A
-	constructor:-> console.log "letters/A created!"
+	# usual way
+	new Foo
+	
+	# unique way using the packaging system
+	new my.path.Foo
 
-pkg( 'letters' ).B = class B
-	constructor:-> console.log "letters/B created!"
+> [Source Code](https://github.com/serpentem/coffee-toaster/tree/master/examples/basic)
 
-pkg( 'repeating' ).A = class A
-	constructor:-> console.log "repeating/A created!"
+## Multi-Modules Example
 
-console.log "I am a simple script!"
+This example uses:
 
-class App
-	constructor:->
-		console.log "App created!"
+* Two modules
+* Two vendors
+* Two build-configs with different merging options to show the possibilities
 
-		new letters.A
-		new letters.B
-		new repeating.A
+The packaging system is enabled here as well, but you can always turn it off<BR>
+to see what happens, try different options and do not forget to check the<BR>
+differences in your javascript release file.
 
-new App
-````
+> [Source Code](https://github.com/serpentem/coffee-toaster/tree/master/examples/multi-modules)
 
-Toaster will initialize your root namespaces and add a 'pkg' method, to make everything works as intended.
+# Issues
 
-## Example - Output (JavaScript)
-
-The output JavaScript compiled after reordering files and classes will be something like this:
-
-````javascript
-(function() {
-  var A, App, B, letters, pkg, repeating, single;
-  letters = {};
-  repeating = {};
-  single = {};
-  pkg = function(ns) {
-    var curr, index, part, parts, _len;
-    curr = null;
-    parts = [].concat = ns.split(".");
-    for (index = 0, _len = parts.length; index < _len; index++) {
-      part = parts[index];
-      if (curr === null) {
-        curr = eval(part);
-        continue;
-      } else {
-        if (curr[part] == null) {
-          curr = curr[part] = {};
-        } else {
-          curr = curr[part];
-        }
-      }
-    }
-    return curr;
-  };
-  pkg('letters').A = A = (function() {
-    function A() {
-      console.log("letters/A created!");
-    }
-    return A;
-  })();
-  pkg('letters').B = B = (function() {
-    function B() {
-      console.log("letters/B created!");
-    }
-    return B;
-  })();
-  pkg('repeating').A = A = (function() {
-    function A() {
-      console.log("repeating/A created!");
-    }
-    return A;
-  })();
-  console.log("I am a simple script!");
-  App = (function() {
-    function App() {
-      console.log("App created!");
-      new letters.A;
-      new letters.B;
-      new repeating.A;
-    }
-    return App;
-  })();
-  new App;
-}).call(this);
-````
-As you can see things are ordered properly.
-
-## Example - Log
-
-Executing the above script in the browser I got this log msgs:
-
-	I am a simple script!
-	App created!
-	letters/A created!
-	letters/B created!
-	repeating/A created!
-
-# Example - more
-
-You can find another example right into the [examples](http://github.com/serpentem/coffee-toaster/blob/master/examples) folder.
-
-# Multiple Modules
-
-You can also specify multiple modules lilke:
-
-````ruby
-modules = [
-	{
-		name: "My Awesome App"
-		src: "src"
-		release: "release/app.js"
-	},{
-		name: "My Sub Awesome App"
-		src: "vendors/mysubapp"
-		release: "release/subapp.js"
-	}
-]
-````
-
-# Changelog
-
-Please check the [CHANGELOG.md](http://github.com/serpentem/coffee-toaster/blob/master/build/CHANGELOG.md)
+Do not hesitate to open a feature request or a bug report.<BR>
+https://github.com/serpentem/coffee-toaster/issues
 
 # Mailing List
 
-A place to talk about it.
-
+A place to talk about it, ask anything, get in touch. Luckily you'll<BR>
+be answered sooner than later.:<BR>
 https://groups.google.com/group/coffee-toaster
+
+# Changelog
+
+## 0.5.0 - ?
+ * Log messages revamped
+ * Growl integration implemented
+ * Export aliases - export your definitions to another scope
+ * Minify support added
+ * On/Off switches for:
+  * Bare option to compile CoffeeScript with the 'bare' option
+  * Packaging system
+  * Minify
+
+## 0.3.8 - 10/29/2011
+ * Fixing bugs in generators
+ * Fixing a bunch of small emergencial bugs
+
+## 0.3.7 - 10/29/2011
+ * Simplify config file syntax [feature done [#8](https://github.com/serpentem/coffee-toaster/issues/8)]
+ * Adding buid routines [feature done [#9](https://github.com/serpentem/coffee-toaster/issues/9)]
+ * Adding support for vendors across modules and build configs [feature [#10](https://github.com/serpentem/coffee-toaster/issues/10)]
+
+## 0.3.6 - 10/25/2011
+ * Critical bugfixes in the reorder routine
+ * Optimizing architecture
+ * Condensing src scructure
+
+## 0.3.5 - 10/24/2011
+ * Avoiding tmp files from being watched [closing issue [#4](http://github.com/serpentem/coffee-toaster/issues/4)]
+ * Adding support for ordinary files again (with no class definitions inside)
+ * Now all requirements must to be done based on filepath with slash<BR>
+notation "foldera/folderb/filename"
+ * Adding extra base class validation
+ * Lots of improvements and bugfixes
+
+## 0.3.0 - 10/16/2011
+ * Refactoring entire Script class
+ * Support for extends directive have been removed, now all dependencies<BR>
+must be informed through '#<< package.name.ClassName'
+ * Support for files without class declarations was (sadly) removed
+ * Adding full package support automagically
+ * Implementing wild-cards on requirements '#<< package.name.*'
+
+## 0.2.2 - 10/02/2011
+ * Starting tests implementation (using Vows BDD)
+ * Implementing debug mode (-d --debug). Files are compiled individually<BR>
+plus a boot file (toaster.js) file that will load everything in the right order.
+ * Improving interactive processes to become good guessers
+ * Adding support for file requirements based on 'a/b/c/filepath'<BR>
+simultaneously with class requirements based in 'ClassName' notation (both<BR>
+are case sensitive)
+ * Bumping 'build/coffee-toaster' submodule to use tag 0.2.2 (level up)
+
+## 0.2.1 - 09/22/2011
+ * Implementing OptionParser (using Optimist)
+
+## 0.2.0 - 09/18/2011
+ * Tag 0.1.2 is now used as submodule in order to self-toast (aka manage<BR>
+dependencies) of new versions of CoffeeToaster itself, starting from now
+ * Refactoring everything, classes are now one per file, using dependency<BR>
+directives from CoffeeToaster itself. From now on, things should evolve<BR>
+a little easier.
+ * Individualizing CoffeeScript handling
+ * Starting plans for CoffeeKup and CoffeeCss support
+
+## 0.1.2 - 09/17/2011
+ * Fixing compilation method that was requiring coffee-script to be installed
+ * Adding precise error handling
+ * Checking circular dependency conflicts [closing issue [#2](http://github.com/serpentem/coffee-toaster/issues/2)]
+
+## 0.1.1 - 09/16/2011
+ * Adding basic error handling [closing issue [#1](http://github.com/serpentem/coffee-toaster/issues/1)]
+
+## 0.1.0 - 09/11/2011
+ * Scaffolding routine for new projects
+ * Scaffolding routine for configuration file (toaster.coffee)
+ * Dependency handlers:
+  * Extends directive (class A extends B)
+  * Include directive (#<< ClassNameA, ClassNameB..)
