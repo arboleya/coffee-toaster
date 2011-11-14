@@ -98,7 +98,6 @@ class Module
 					msg = "#{(type + ' deleted, stop watching: ').bold.red}"
 					log "#{msg} #{info.path.red}"
 
-
 				# when a file is updated
 				when "updated"
 
@@ -191,7 +190,7 @@ class Module
 		contents = "#{vendors}\n#{contents}"
 		
 		# writing file
-		fs.writeFileSync @release, contents
+		fs.writeFileSync @release, contents if /(\/\w+\.\w+$)/gi.test @release
 
 		# informing user through cli
 		log "#{'.'.bold.green} #{@release}"
@@ -202,12 +201,13 @@ class Module
 
 			# evaluating the toaster file folder (path)
 			toaster = @release.split("/").slice(0,-1).join('/') + "/toaster"
+			toaster = @release.replace( /(\/\w+\.\w+$)/gi, "" ) + "/toaster"
 
 			# constructs the toaster/src folder
-			toaster_src = "#{toaster}/src"
+			toaster_src = "#{toaster}/#{@name}/src"
 
 			# cleaning before deploying
-			FsUtil.rmdir_rf toaster if path.existsSync toaster
+			FsUtil.rmdir_rf toaster_src if path.existsSync toaster_src
 
 			# creating new structure
 			FsUtil.mkdir_p toaster_src
@@ -240,7 +240,7 @@ class Module
 					FsUtil.mkdir_p folderpath
 
 				# computing relative path to test folder
-				relative = "./toaster/src/#{relative}"
+				relative = "./toaster/#{@name}/src/#{relative}"
 
 				# writing file
 				fs.writeFileSync filepath, cs.compile file.raw, {bare:1}
@@ -249,7 +249,8 @@ class Module
 				toaster_buffer += tmpl.replace( "%SRC%", relative ) + "\n"
 
 			# write toaster loader file w/ all imports (buffer) inside it
-			toaster = "#{toaster}/toaster.js"
+			toaster = "#{toaster}/#{@name}/#{@name}.js"
+
 			fs.writeFileSync toaster, toaster_buffer
 
 		@toaster.builder.build()
