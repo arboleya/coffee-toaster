@@ -23,4 +23,4 @@ pkg = function(ns) {
   return curr;
 };
 
-document.write('<scri'+'pt src="./toaster/src/insects/bee.js"></scr'+'ipt>')
+document.write('<scri'+'pt src="./toaster/insects/src/insects/bee.js"></scr'+'ipt>')
