@@ -1,4 +1,6 @@
-# Coffee Toaster (current version - 0.5.0)
+![Coffee Toaster](./images/toaster.png?raw=true)
+
+Version 0.5.0
 
 CoffeeToaster is a dependency manager and build system for CoffeeScript.
 
