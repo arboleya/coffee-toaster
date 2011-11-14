@@ -13,7 +13,7 @@ javascript release file that can be even minified if you like.
 The build system was developed to offer vendors support as well as merging<BR>
 routines for multiple modules, with specific ordering options. If you are<BR>
 adept of the extends directive in CoffeeScript, Toaster will even check if<BR>
-you have required the base classes for the classes that is extends another.
+you have required base classes for the classes that extends another.
 
 The CLI program informs you about everything that is happening when a new<BR>
 file is created, deleted or modified. You can even drag'n'drop a folder with<BR>
@@ -143,7 +143,7 @@ Your release file will be saved according to your needs.
 
 # Debug Mode
 
-In debug mode (option -d) files will be all compiled individually inside a<BR>
+In debug mode (option -d) all files will be compiled individually inside a<BR>
 folder called "toaster" in the same directory you have your release file,<BR>
 aiming to ease the debugging process.
 
@@ -152,9 +152,9 @@ aiming to ease the debugging process.
 
 For example, if you have "release/app.js", a folder will be created in<BR>
 "release/toaster" and all your CoffeeScript files will be compiled to<BR>
-Javascript inside it.
+Javascript within.
 
-Bellow is a directory structure representing this:
+Bellow is a representative directory structure:
 
 	├── release
 	│   ├── app.js
@@ -181,10 +181,10 @@ Bellow is a directory structure representing this:
 	│       └── script.coffee
 	└── toaster.coffee
 
-There's also a 'toaster.js' file inside the 'release/toaster' folder, this<BR>
-Javascript file is responsible to load all your files into the right order.
+There's also a 'toaster.js' file inside the 'release/toaster' folder which<BR>
+is responsible to load all your files into the right order.
 
-So in your .html your have two options:
+So in your .html you'll have two options:
 
 **1)** Include your release file (release/app.js)
 
@@ -199,13 +199,13 @@ So in your .html your have two options:
 ````
 
 
-# How everything works?
+# How does everything work?
 
-CoffeeToaster will write a file called 'toaster.coffee' in your app main folder.
+CoffeeToaster will create a file called 'toaster.coffee' in your app main folder.
 
 ## Config File (toaster.coffee)
 
-This file contains informations about the modules you have in your app, i.e:
+This file contains information on the modules you have in your app, i.e:
 
 ````ruby
 module 'my_awesome_app'
@@ -222,20 +222,21 @@ module 'my_awesome_app'
 	minify: false # default=false
 ````
 
-So when you call 'toaster -w' inside this directory, this config is loaded<BR>
-and every file and folder inside src folder start being watched.
+So when you call 'toaster -w' in this directory, this config is loaded and<BR>
+every file and folder inside 'src' folder will be watched.
 
-If debug is enabled (option -d), files will also compiled individually for a<BR>
-sane debugging routine, inside the browser.
+If debug is enabled (option -d), files will be also compiled individually<BR>
+for a sane debugging routine, inside the browser.
 
-Every time something changes, CoffeeToaster re-compiles all your application<BR>
-by doing:
+Every time something changes, CoffeeToaster re-compiles all of your<BR>
+application by:
 
-* collects all .coffee files and process everything, adding package<BR>
-declarations to the class definitions, based on the folder they are
-* re-order everything defining files and classes always before they're needed
+* collecting all .coffee files and processing everything, adding package<BR>
+declarations to class definitions, based on the folder they are located
+* re-ordering everything, always defining files and classes before<BR>
+they're needed
 
-Wait! How the hell it knows when my files or classes are needed?
+Hold it! How the hell does it know when my files or classes are needed?
 
 ## Import directive
 
@@ -245,22 +246,23 @@ The import directive is known by:
  * #<< utils/*
 
 By putting '#<< package/name/View' in your CoffeeScript file, you're telling<BR>
-CoffeeToaster about a dependency.
+CoffeeToaster that there's a dependency.
 
 Wild cards '#<< utils/*' are also accepted as a handy option.
 
 ## Vendors
 
-You can define vendor such as:
+You can define vendors such as:
 
 ````ruby
 vendor 'jquery', 'vendors/jquery.js'
 vendor '_', 'vendors/_.js'
 ````
 
-Basically you give it a name and inform where it is, the file must be<BR>
-pure javascript, preferably minified ones -- Toaster will not be compile or<BR>
-or minify them, just concatenate everything.
+Basically you name it and inform where it is, and the file must be purely<BR>
+in javascript, preferably minified ones -- Toaster will not compile or<BR>
+minify them, only concatenate everything.
+
 
 ## Multi Modules
 
@@ -306,13 +308,13 @@ build 'boo_first_then_foo'
 	release: 'release/insects_animals.js'
 ````
 
-Note that the order you choose when informing the modules array for you<BR>
+Note that the array order you choose when informing the modules for your<BR>
 build will be preserved.
 
-## Minify Supoprt
+## Minify Support
 
-To minify you release file all you need to do is just turn on the minify<BR>
-property in the 'toaster.coffee' file for you desired module.
+To minify you release file all you need to do is turn on the minify<BR>
+property in the 'toaster.coffee' file for your desired module.
 
 ````ruby
 module 'foo'
@@ -338,8 +340,8 @@ This example uses:
 
 There are files and classes with the same name to show the packaging system.
 
-The packaging system will address avery class definition to a namespace,<BR>
-that is computed automatically according the path where your physical file is.
+The packaging system will address every class definition to a namespace,that<BR>
+is computed automatically according to the path where your physical file is.
 
 Imagine that you have a class "Foo" inside a "my/path/foo.coffee" file. This<BR>
 class will be addressed to the namespace "my.path", so you can instantiate it:
@@ -358,7 +360,7 @@ This example uses:
 
 * Two modules
 * Two vendors
-* Two build-configs with different merging options to show the possibilities
+* Two build-configs with different merging options to show possibilities
 
 The packaging system is enabled here as well, but you can always turn it off<BR>
 to see what happens, try different options and do not forget to check the<BR>
@@ -374,7 +376,7 @@ https://github.com/serpentem/coffee-toaster/issues
 # Mailing List
 
 A place to talk about it, ask anything, get in touch. Luckily you'll<BR>
-be answered sooner than later.:<BR>
+be answered sooner than later.<BR>
 https://groups.google.com/group/coffee-toaster
 
 # Changelog
