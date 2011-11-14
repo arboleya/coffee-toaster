@@ -9,10 +9,10 @@ module 'animals'
 
 	# required config
 	src: 'src_animals'
-	vendors: ['jquery', "_"]
 	release: 'release/animals.js'
 
 	# optional config
+	vendors: ['jquery', "_"]
 	bare: false # default = false
 	packaging: true # default = false
 	exports: "window" # default = null (disabled)
@@ -25,10 +25,10 @@ module 'insects'
 	
 	# required config
 	src: 'src_insects'
-	vendors: ['_', 'jquery']
 	release: 'release/insects.js'
 
 	# optional config
+	vendors: ['_', 'jquery']
 	bare: false # default = false
 	packaging: true # default = false
 	exports: "exports" # default = null (disabled)
