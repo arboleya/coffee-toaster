@@ -45,16 +45,16 @@ class Script
 			if @namespace != ""
 				# then modify the class declarations before starting
 				# the parser thing, adding the package headers declarations
-				# as well as the exports thing
+				# as well as the expose thing
 
-				exports = @module.exports
-				if exports != false
-					exports = "#{@module.exports}.$3 = "
+				expose = @module.expose
+				if expose?
+					expose = "#{@module.expose}.$3 = "
 				else
-					exports = ""
+					expose = ""
 				
-				if( @module.packaging )
-					repl = "$1pkg( '#{@namespace}' ).$3 = #{exports} $2 $3"
+				if( @module.package )
+					repl = "$1pkg( '#{@namespace}' ).$3 = #{expose} $2 $3"
 					repl += "$4" if new RegExp(rgx_ext, "m").test @raw
 					@raw = @raw.replace new RegExp( rgx, "gm" ), repl
 			

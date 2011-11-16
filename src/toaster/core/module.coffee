@@ -18,7 +18,7 @@ class Module
 					continue
 				else
 					unless curr[ part ]?
-						curr = curr[ part ] = %exports%{}
+						curr = curr[ part ] = %expose%{}
 					else
 						curr = curr[ part ]
 			curr
@@ -34,17 +34,17 @@ class Module
 		@release = @config.release ? null
 
 		@bare = @opts.argv.bare ? @config.bare
-		@exports = @config.exports ? @opts.argv.exports
-		@packaging = @config.packaging ? @opts.argv.packaging
+		@expose = @config.expose ? @opts.argv.expose
+		@package = @config.package ? @opts.argv.package
 		@minify = @config.minify ? @opts.argv.minify
 
 		# overrides the default macro scope
-		if @exports != false
-			exports = "#{@exports}[part] = "
+		if @expose != false
+			expose = "#{@expose}[part] = "
 		else
-			exports = ""
+			expose = ""
 		
-		@pkg_helper = @pkg_helper.replace "%exports%", exports
+		@pkg_helper = @pkg_helper.replace "%expose%", expose
 		
 		# initializes buffer array to keep all tracked files
 		@files = []
@@ -137,12 +137,12 @@ class Module
 
 		# merge everything
 		output = ""
-		output = "#{@get_root_namespaces()}\n#{@pkg_helper}\n" if @packaging
+		output = "#{@get_root_namespaces()}\n#{@pkg_helper}\n" if @package
 		
 		output += (file.raw for file in @files).join "\n"
 
 		# .. write it to the output with the root namespaces inside of it
-		namespaces = if @packaging then @get_root_namespaces() else ""
+		namespaces = if @package then @get_root_namespaces() else ""
 		output = output.replace "{root_namespaces}", namespaces
 		
 		# if no error has ocurried, compile the release file
@@ -167,8 +167,8 @@ class Module
 			if file.filefolder != ""
 				pkg = file.namespace.split(".").shift()
 
-				if @exports != false
-					pkg = "#{@exports}.#{pkg} = #{pkg}"
+				if @expose != false
+					pkg = "#{@expose}.#{pkg} = #{pkg}"
 				
 				root_namespaces[pkg] = "#{pkg} = {}\n"
 
