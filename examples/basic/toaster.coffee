@@ -12,6 +12,6 @@ module 'basic'
 	# optional config
 	vendors: ['_', 'jquery']
 	bare: false # default = false
-	packaging: true # default = false
-	exports: false # default = null (disabled)
+	package: true # default = false
+	expose: null # default = null (disabled)
 	minify: false # default = false
