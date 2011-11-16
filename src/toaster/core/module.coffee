@@ -39,7 +39,7 @@ class Module
 		@minify = @config.minify ? @opts.argv.minify
 
 		# overrides the default macro scope
-		if @expose != false
+		if @expose?
 			expose = "#{@expose}[part] = "
 		else
 			expose = ""
@@ -167,7 +167,7 @@ class Module
 			if file.filefolder != ""
 				pkg = file.namespace.split(".").shift()
 
-				if @expose != false
+				if @expose?
 					pkg = "#{@expose}.#{pkg} = #{pkg}"
 				
 				root_namespaces[pkg] = "#{pkg} = {}\n"
