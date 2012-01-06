@@ -26,7 +26,7 @@ class Script
 		# if the file is in the top level
 		if @filepath.indexOf("/") is -1
 			@filefolder = ""
-		
+
 		# assemble namespace info about the file
 		@namespace = @filefolder.replace(/\//g, ".").slice 0, -1
 
@@ -53,7 +53,7 @@ class Script
 				else
 					expose = ""
 				
-				if( @module.package )
+				if @module.package
 					repl = "$1pkg( '#{@namespace}' ).$3 = #{expose} $2 $3"
 					repl += "$4" if new RegExp(rgx_ext, "m").test @raw
 					@raw = @raw.replace new RegExp( rgx, "gm" ), repl
