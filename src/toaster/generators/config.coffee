@@ -2,7 +2,7 @@
 
 class Config extends Question
 	
-	tpl = """modules =
+	tpl: """modules =
 				\tname: '%name'
 				\tsrc: '%src'
 				\trelease: '%release'
@@ -20,7 +20,7 @@ class Config extends Question
 		console.log ". Please, tell me:"
 		
 		default_name = @basepath.split( "/" ).pop()
-
+		
 		question1 = "\tWhat's your app name? (#{default_name})"
 		question2 = "\tWhere's its src folder? (i.e. src)"
 		question3 = "\tWhere do you want your release file?" +

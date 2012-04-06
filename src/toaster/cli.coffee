@@ -1,6 +1,8 @@
-optimist = require 'optimist'
-
 class Cli
+
+	# requires
+	optimist = require 'optimist'
+
 	constructor:->
 		usage = "#{'CoffeeToaster'.bold}\n"
 		usage += "  Minimalist dependency management for CoffeeScript\n\n".grey

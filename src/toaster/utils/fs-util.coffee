@@ -1,12 +1,15 @@
-path = require "path"
-fs = require "fs"
+class FsUtil
+	
+	# requires
+	path = 	require "path"
+	fs = require "fs"
+	pn = (require "path").normalize
+	exec = (require "child_process").exec
 
-pn = path.normalize
-
-
-exports.FsUtil = class FsUtil
+	# static variables
 	@snapshots: {}
 	
+	# static methods
 	@rmdir_rf:(folderpath, root=true)->
 		files = fs.readdirSync folderpath
 		for file in files
@@ -23,9 +26,9 @@ exports.FsUtil = class FsUtil
 		folders = folderpath.split "/"
 		for folder, index in folders
 			continue if folder == ""
-			if !path.existsSync folder = folders.slice( 0, index + 1 ).join "/"
+			if !path.existsSync( folder = folders.slice( 0, index + 1 ).join "/" )
 				fs.mkdirSync folder, 0755
-		
+	
 	@find:(folderpath, pattern, fn)->
 		exec "find #{folderpath} -name '#{pattern}'", (error, stdout, stderr)=>
 			buffer = []

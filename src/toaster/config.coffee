@@ -1,46 +1,62 @@
-fs = require "fs"
-path = require "path"
-
-pn = path.normalize
-exec = (require "child_process").exec
-
-colors = require 'colors'
+#<< toaster/core/module
 
 class Config
 
-	modules: {}
+	# requires
+	fs = require "fs"
+	path = require "path"
+	pn = path.normalize
+	exec = (require "child_process").exec
+	colors = require 'colors'
+	cs = require "coffee-script"
+	
+	# variables
 	vendors: {}
+	modules: {}
 	builds: {}
 
-	constructor: (@basepath) ->
+	constructor: (@toaster) ->
+		# console.log "Config created!"
 
-		# creating local references
-		module = @module
-		vendor = @vendor
-		build = @build
+		# basepath
+		@basepath = @toaster.basepath
 
-		# mounting full path
+		# mounting full basepath
 		filepath = pn "#{@basepath}/toaster.coffee"
 		
 		if path.existsSync filepath
-			eval( cs.compile fs.readFileSync( filepath, "utf-8" ), {bare:1} )
+			fix_scope = /(^[\s\t]?)(vendor|src|module|build)+(\()/mg
+			code = cs.compile fs.readFileSync( filepath, "utf-8" ), {bare:1}
+			code = code.replace fix_scope, "$1this.$2$3"
+			eval code
+			
 		else
 			console.log "ERROR! ".bold.red
 			console.log "\tFile not found: #{filepath.red}"
 			console.log "\tTry running: "+ "toaster -i".green +
 				" or type #{'toaster -h'.green} for more info"
-
-	module:(name, params)=>
-		params.name = name
-		params.src = pn "#{@basepath}/#{params.src}"
-		params.release = pn "#{@basepath}/#{params.release}"
-		@modules[name] = params
+	
 
 	vendor:(name, src)=>
 		@vendors[name] = pn "#{@basepath}/#{src}"
+		@
+	
+	src:( path, args... )=>
+		@current_src = path
+		@
+	
+	module:(name, params)=>
+		params.name = name
+		params.src = pn "#{@basepath}/#{@current_src}/"
+		params.release = pn "#{@basepath}/#{params.release}" if params.release?
+		@modules[name] = params
+		@
 
 	build:( name, params )=>
 		params.name = name
 		params.vendors = params.vendors ? []
 		params.release = pn "#{@basepath}/#{params.release}"
+		params.debug = pn "#{@basepath}/#{params.debug}"
 		@builds[name] = params
+
+		@

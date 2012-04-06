@@ -1,66 +1,46 @@
-cs = require "coffee-script"
-
-uglify = require("uglify-js").uglify;
-uglify_parser = require("uglify-js").parser;
-
 #<< toaster/utils/*
 #<< toaster/core/script
 
 class Module
 
-	pkg_helper:	 """
-		pkg = ( ns )->
-			curr = null
-			parts = [].concat = ns.split( "." )
-			for part, index in parts
-				if curr == null
-					curr = eval part
-					continue
-				else
-					unless curr[ part ]?
-						curr = curr[ part ] = %expose%{}
-					else
-						curr = curr[ part ]
-			curr
+	# requires
+	fs = require "fs"
+	cs = require "coffee-script"
+	uglify = require("uglify-js").uglify
+	uglify_parser = require("uglify-js").parser
+	path = require "path"
 
-	"""
 
-	constructor: (@toaster, @config, @opts) ->
 
+	constructor: (@toaster, @config, @opts, callback) ->
 		# expanding config variables
-		@name = @config.name
 		@src = @config.src
+		@name = @config.name
 		@vendors = @config.vendors ? []
-		@release = @config.release ? null
-
-		@bare = @opts.argv.bare ? @config.bare
+		@bare = @config.bare ? @opts.argv.bare
+		@packaging = @config.packaging ? @opts.argv.packaging
 		@expose = @config.expose ? @opts.argv.expose
-		@package = @config.package ? @opts.argv.package
 		@minify = @config.minify ? @opts.argv.minify
 
-		# overrides the default macro scope
-		if @expose?
-			expose = "#{@expose}[part] = "
-		else
-			expose = ""
-		
-		@pkg_helper = @pkg_helper.replace "%expose%", expose
-		
+
+
+	init:( after_init )->
 		# initializes buffer array to keep all tracked files
 		@files = []
 
 		# search for all *.coffee files inside src folder
 		FsUtil.find @src, "*.coffee", (result) =>
 
-			# instantiates everything, on class for each file
-			for file in result
-				@files.push new Script @, file, @opts, @bare
+			# collects every files into Script instances
+			@files.push new Script @, file, @opts, @bare for file in result
 
-			# compile module for the first time and write it to the filesystem
-			@write()
+			# call the callback
+			after_init()
 
-			# watch for file changes
+			# start watching for file changes
 			@watch() if @opts.argv.w
+
+
 
 	watch:()->
 
@@ -81,6 +61,7 @@ class Module
 
 					# initiate file and adds it to the array
 					if info.type == "file"
+						# toaster/core/script
 						@files.push new Script @, info.path, @opts
 
 					# cli msg
@@ -114,41 +95,39 @@ class Module
 					msg = "#{('Watching ' + info.type + ':').bold.cyan}"
 					log "#{msg} #{info.path.cyan}"
 
-			@write() unless info.action is "watching"
+			# rebuilds modules unless notificiation is 'watching'
+			@toaster.builder.build() unless info.action is "watching"
 
-	compile:(include_vendors = true)->
-		
+
+
+	compile:()->
+
 		# validating syntax
 		try
 			cs.compile file.raw for file in @files
 		
-		# if there's some error, catches and shows it, and abort the compilation
+		# if there's some error
 		catch err
+
+			# catches and shows it, and abort the compilation
 			msg = err.message.replace '"', '\\"'
 			msg = "#{msg.white} at file: " + "#{file.filepath}".bold.red
 			error msg
 			return null
 
-		# otherwise mode ahead, and expands all dependencies wild-cards
+		# otherwise move ahead, and expands all dependencies wild-cards
 		file.expand_dependencies() for file in @files
 
-		# reorder everything
+		# reordering files
 		@reorder()
 
-		# merge everything
-		output = ""
-		output = "#{@get_root_namespaces()}\n#{@pkg_helper}\n" if @package
-		
-		output += (file.raw for file in @files).join "\n"
+		# merging everything
+		output = (file.raw for file in @files).join "\n"
 
-		# .. write it to the output with the root namespaces inside of it
-		namespaces = if @package then @get_root_namespaces() else ""
-		output = output.replace "{root_namespaces}", namespaces
-		
-		# if no error has ocurried, compile the release file
+		# compiling
 		compiled = cs.compile output, {bare: @bare}
 
-		# uglify
+		# uglifying
 		if @minify
 			ast = uglify_parser.parse compiled
 			ast = uglify.ast_mangle ast
@@ -159,105 +138,46 @@ class Module
 		return compiled
 
 
-	get_root_namespaces:()->
 
-		# gets all the root namespaces in src folder
-		root_namespaces = {}
-		for file in @files
-			if file.filefolder != ""
-				pkg = file.namespace.split(".").shift()
+	compile_for_debug:( release_path )->
+		# cleaning previous/existent structure
+		FsUtil.rmdir_rf release_path if path.existsSync release_path
 
-				if @expose?
-					pkg = "#{@expose}.#{pkg} = #{pkg}"
-				
-				root_namespaces[pkg] = "#{pkg} = {}\n"
+		# creating new structre from scratch
+		FsUtil.mkdir_p release_path
 
-		# .. merge them into one single buffer
-		namespaces_buffer = ""
-		namespaces_buffer += k for v, k of root_namespaces
+		# initializing empty array of filepaths
+		files = []
 
-		return namespaces_buffer
+		# loop through all ordered files
+		for file, index in @files
 
-	write:()->
+			# computing releative filepath (replacing .coffee by .js)
+			relative_path = file.filepath.	replace ".coffee", ".js"
 
-		# assigns compiled buffer to variable and abort method if its null
-		return unless (contents = @compile())?
+			# computing absolute filepath
+			absolute_path = "#{release_path}/#{relative_path}"
 
-		# gets all vendors concatenated the right way
-		vendors = @toaster.builder.merge_vendors @vendors
+			# extracts its folder path
+			folder_path = absolute_path.split('/').slice(0,-1).join "/"
 
-		# merge vendors and content
-		contents = "#{vendors}\n#{contents}"
-		
-		# writing file
-		fs.writeFileSync @release, contents if /(\/\w+\.\w+$)/gi.test @release
+			# create container folder if it doesnt exist yet
+			FsUtil.mkdir_p folder_path if !path.existsSync folder_path
 
-		# informing user through cli
-		log "#{'.'.bold.green} #{@release}"
+			# writing file
+			fs.writeFileSync absolute_path, cs.compile file.raw, {bare:0}
 
-		# if debug is enabled and no error has ocurred, then compile
-		# individual files as well
-		if @opts.argv.debug
+			# adds to the files buffer
+			files.push relative_path
 
-			# evaluating the toaster file folder (path)
-			toaster = @release.split("/").slice(0,-1).join('/') + "/toaster"
-			toaster = @release.replace( /(\/\w+\.\w+$)/gi, "" ) + "/toaster"
+		# returns all filepaths
+		return files
 
-			# constructs the toaster/src folder
-			toaster_src = "#{toaster}/#{@name}/src"
-
-			# cleaning before deploying
-			FsUtil.rmdir_rf toaster_src if path.existsSync toaster_src
-
-			# creating new structure
-			FsUtil.mkdir_p toaster_src
-
-			# template for importing others js's
-			tmpl = "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
-
-			# starting buffer with the pklg_helper
-			toaster_buffer = "#{vendors}\n#{@get_root_namespaces()}\n" +
-							 "#{cs.compile @pkg_helper, {bare:1}}\n\n"
-
-			# loop through all ordered files
-			for file, index in @files
-
-				# evaluates its path relative to the src folder
-				relative = file.filepath
-
-				# and replace file extension from .coffee to .js
-				relative = relative.replace ".coffee", ".js"
-
-				# then computes the filepath
-				filepath = "#{toaster_src}/#{relative}"
-
-				# ..and extract its folder path
-				folderpath = filepath.split('/').slice(0,-1).join "/"
-
-				# if the container folder doesnt exist yet
-				if !path.existsSync folderpath
-					# create it
-					FsUtil.mkdir_p folderpath
-
-				# computing relative path to test folder
-				relative = "./toaster/#{@name}/src/#{relative}"
-
-				# writing file
-				fs.writeFileSync filepath, cs.compile file.raw, {bare:1}
-
-				# adding to the buffer
-				toaster_buffer += tmpl.replace( "%SRC%", relative ) + "\n"
-
-			# write toaster loader file w/ all imports (buffer) inside it
-			toaster = "#{toaster}/#{@name}/#{@name}.js"
-
-			fs.writeFileSync toaster, toaster_buffer
-
-		@toaster.builder.build()
 
 
 	missing = {}
 	reorder: (cycling = false) ->
+		# log "Module.reorder"
 
 		# if cycling is true or @missing is null, initializes empty array
 		# for holding missing dependencies

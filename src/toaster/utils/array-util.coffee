@@ -8,6 +8,7 @@ class ArrayUtil
 			for v, k in source
 				for p in by_property
 					return {item: v, index: k} if search == v[p]
+		
 		return null
 	
 	@find_all:(source, search, by_property, regexp, unique)->
