@@ -1,16 +1,14 @@
-#<< letters/*
-#<< repeating/a
-#<< repeating/b
-#<< single/script
-#<< toplevel
+#<< basic/letters/*
+#<< basic/repeating/a
+#<< basic/repeating/b
+#<< basic/single/script
+#<< basic/toplevel
 
 class App
 	constructor:->
 		console.log "App created!"
 		
-		new A
-		new B
-		new TopLevel
+		new basic.TopLevel
 
 		console.log """
 			--------------------------------------------------------------------
@@ -23,11 +21,10 @@ class App
 			--------------------------------------------------------------------
 		"""
 
-		new letters.A
-		new letters.B
+		new basic.letters.A
+		new basic.letters.B
 
-		new repeating.A
-		new repeating.B
-		
+		new basic.repeating.A
+		new basic.repeating.B
 
-new App
+new basic.App
