@@ -1,8 +1,8 @@
 {
-  "author"         : "Anderson Arboleya <me@nybras.com>",
+  "author"         : "Anderson Arboleya <anderson@arboleya.me>",
   "name"           : "coffee-toaster",
   "description"    : "Minimalist dependency management system for coffee-script.",
-  "version"        : "0.3.7",
+  "version"        : "0.5.0",
 
   "repository"     : {
     "type"           : "git",
@@ -13,18 +13,17 @@
     "directories"    : {
     "lib"            : "./lib/"
   },
-  "files"          : [
-    "build"
-  ],
 
   "bin"            : {
     "toaster"        : "./bin/toaster"
   },
 
   "scripts"        : {
-    "test"           : "vows --spec tests/all.js"
+    
   },
   
+  "test"           : "",
+
   "engines"        : {
     "node"           : ">= 0.4.9"
   },
@@ -37,8 +36,5 @@
     "growl"          : "1.2.0"
   },
 
-  "devDependencies": {
-    "vows-bdd"       : "0.1.0",
-    "vows"           :"0.5.11"
-  }
+  "devDependencies": {}
 }
