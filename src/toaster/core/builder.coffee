@@ -128,17 +128,10 @@ class Builder
 				if path.existsSync vendor
 					buffer.push fs.readFileSync vendor, 'utf-8'
 				else
-					log "WARNING!".bold.yellow,
-						"Vendor".white,
-						vendor_name.yellow.bold,
-						"not found at".white,
-						vendor.yellow.bold
+					log "Vendor".white, vendor_name.yellow.bold,
+						"not found at".white, vendor.yellow.bold
 			else
-				log "WARNING!".bold.yellow,
-					"Vendor".yellow,
-					vendor_name.white.bold
-					"not found for module".yellow,
-					@name.white.bold
+				log "Vendor".white, vendor_name.yellow.bold,
 
 		return buffer.join "\n"
 

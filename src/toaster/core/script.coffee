@@ -9,7 +9,6 @@ class Script
 
 
 	constructor: (@module, @realpath, @opts) ->
-		# console.log "Script created!"
 		@getinfo()
 
 
@@ -123,8 +122,7 @@ class Script
 
 			# if nothing is found under the given namespace
 			if found.length <= 0
-				console.log "#{'WARNING!'.bold.yellow} Nothing found".yellow,
-							"#{'inside'.yellow} #{dependency.white}"
+				warn "Nothing found inside #{("'"+dependency).white}'".yellow
 				continue
 			
 			# otherwise rewrites found array with filepath info only

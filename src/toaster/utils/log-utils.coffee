@@ -12,11 +12,11 @@ log = ( msg, send_to_growl = false ) ->
 	console.log msg
 
 debug = ( msg, send_to_growl = false ) ->
-	console.log "#{msg.magenta}"
+	log "#{msg.magenta}"
 
 
 error = ( msg, file, send_to_growl = true, file = null ) ->
-	console.log "ERROR ".bold.red + msg
+	log "ERROR ".bold.red + msg
 
 	if send_to_growl
 
@@ -34,7 +34,7 @@ error = ( msg, file, send_to_growl = true, file = null ) ->
 				image: icon_error
 
 warn = ( msg, send_to_growl = true ) ->
-	console.log "WARNING ".bold.yellow + msg
+	log "WARNING ".bold.yellow + msg
 
 	if send_to_growl
 

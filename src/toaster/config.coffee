@@ -29,10 +29,10 @@ class Config
 			eval code
 			
 		else
-			console.log "ERROR! ".bold.red
-			console.log "\tFile not found: #{filepath.red}"
-			console.log "\tTry running: "+ "toaster -i".green +
-				" or type #{'toaster -h'.green} for more info"
+			error "File not found: ".yelllow + " #{filepath.red}\n".yellow +
+				  "Try running:".yellow + " toaster -i".green +
+				  " or type".yellow + " #{'toaster -h'.green} " +
+				  "for more info".yellow
 
 
 
@@ -45,7 +45,7 @@ class Config
 		unless @root_src?
 			@root_src = path
 		else
-			warn "Can't define #{"two src folders".bold}, pls ".yellow +
+			warn "Can't define #{'two src folders'.bold}, pls ".yellow +
 				 "link (#{'ln -s'.white}#{') what you need.'.yellow}".yellow
 
 

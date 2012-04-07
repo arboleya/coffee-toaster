@@ -13,9 +13,8 @@ class Project extends Question
 
 	create:(folderpath, name, src, release)->
 		if !folderpath || folderpath == true
-			console.log "#{'Error'.bold.red} You need to inform" +
-						"a target path!"
-			return console.log "\ttoaster -n myawesomeapp".green
+			error "You need to inform a target path!"
+			log "\ntoaster -n myawesomeapp".green
 		
 		if folderpath.substr( 0, 1 ) != "/"
 			target = "#{@basepath}/#{folderpath}"
@@ -27,9 +26,9 @@ class Project extends Question
 		
 		default_name = target.split('/').pop()
 
-		console.log "#{'Let\'s toast something fresh! :)'.grey.bold}"
-		console.log ". With this as your basepath: #{target.cyan}"
-		console.log ". Please tell me:"
+		log "#{'Let\'s toast something fresh! :)'.grey.bold}"
+		log ". With this as your basepath: #{target.cyan}"
+		log ". Please tell me:"
 
 		question1 = "\tWhere do you want your src folder? [src] : "
 		question2 = "\tWhat will be the name of your main module? (i.e. app) : "
@@ -53,20 +52,20 @@ class Project extends Question
 		releasedir = releasefile.split("/").slice(0, -1).join "/"
 		
 		if path.existsSync target
-			console.log "#{'Error'.bold.red} Folder exists! #{target}".red
+			log "#{'Error'.bold.red} Folder exists! #{target}".red
 			return
 		
 		fs.mkdirSync target, 0755
-		console.log "#{'Created'.green.bold} #{target}"
+		log "#{'Created'.green.bold} #{target}"
 
 		fs.mkdirSync srcdir, 0755
-		console.log "#{'Created'.green.bold} #{srcdir}"
+		log "#{'Created'.green.bold} #{srcdir}"
 
 		fs.mkdirSync vendorsdir, 0755
-		console.log "#{'Created'.green.bold} #{vendorsdir}"
+		log "#{'Created'.green.bold} #{vendorsdir}"
 		
 		fs.mkdirSync releasedir, 0755
-		console.log "#{'Created'.green.bold} #{releasedir}"
+		log "#{'Created'.green.bold} #{releasedir}"
 		
 		name = name
 		srcdir = srcdir.replace( target, "" ).substr 1
