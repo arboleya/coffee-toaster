@@ -50,7 +50,7 @@ class Config
 
 
 
-	module:(name, params)=>
+	module:(name, params = {})=>
 		params.name = name
 		params.src = pn "#{@basepath}/#{@root_src}/"
 		params.release = pn "#{@basepath}/#{params.release}" if params.release?
