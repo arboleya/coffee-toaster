@@ -51,7 +51,7 @@ class Script
 				# as well as the expose thing
 
 				# PACKAGING=true && EXPOSE=null
-				if @module.packaging && @module.expose is null
+				if @module.packaging && !@module.expose?
 					repl = "$1 __t('#{@namespace}').$2$3"
 
 				# PACKAGING=true && EXPOSE=something
@@ -59,7 +59,7 @@ class Script
 					repl = "$1 __t('#{@namespace}', #{@module.expose}).$2$3"
 
 				# PACKAGING=false && EXPOSE=something
-				else if @module.packaging is false && @module.expose?
+				else if !@module.packaging && @module.expose?
 					repl = "$1 #{@module.expose}.$2$3"
 
 				if repl?
