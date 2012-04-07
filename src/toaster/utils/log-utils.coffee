@@ -1,12 +1,20 @@
+# requirements
 growl = require 'growl'
-
 
 # ICONS 
 icon_warn = '/Users/nybras/Dropbox/Workspace/serpentem/coffee-toaster/images/warning.png'
 icon_error = '/Users/nybras/Dropbox/Workspace/serpentem/coffee-toaster/images/error.png'
 
 
-# LOG METHODS
+
+# LOGGING METHODS
+log = ( msg, send_to_growl = false ) ->
+	console.log msg
+
+debug = ( msg, send_to_growl = false ) ->
+	console.log "#{msg.magenta}"
+
+
 error = ( msg, file, send_to_growl = true, file = null ) ->
 	console.log "ERROR ".bold.red + msg
 
@@ -43,13 +51,13 @@ warn = ( msg, send_to_growl = true ) ->
 				title: 'Coffee Toaster'
 				image: icon_warn
 
-log = ( msg, send_to_growl = false ) ->
-	console.log msg
 
 
 # GROWL QUEUE PRO
+
 msgs = []
 interval = null
+
 start_worker = () ->
 	unless interval?
 		interval = setInterval process_msgs, 150
@@ -59,6 +67,8 @@ stop_worker = () ->
 	if interval?
 		clearInterval interval
 		interval = null
+
+
 
 queue_msg = (msg) ->
 	msgs.push msg
