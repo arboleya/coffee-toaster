@@ -2,9 +2,11 @@
 #<< toaster/generators/config
 
 class Project extends Question
-	
+
 	constructor:(@basepath)->
-	
+
+
+
 	create:(folderpath, name, src, release)->
 		if !folderpath || folderpath == true
 			console.log "#{'Error'.bold.red} You need to inform" +
@@ -33,7 +35,9 @@ class Project extends Question
 				@ask question3, /.*/, (release)=>
 					@scaffold target, name || default_name, src, release
 					process.exit()
-	
+
+
+
 	scaffold:(target, name, src, release)->
 		srcdir = "#{target}/" + ( src || "src" )
 		releasefile = "#{target}/" + ( release || "release/app.js" )
@@ -45,8 +49,10 @@ class Project extends Question
 		
 		fs.mkdirSync target, 0755
 		console.log "#{'Created'.green.bold} #{target}"
+
 		fs.mkdirSync srcdir, 0755
 		console.log "#{'Created'.green.bold} #{srcdir}"
+		
 		fs.mkdirSync releasedir, 0755
 		console.log "#{'Created'.green.bold} #{releasedir}"
 		

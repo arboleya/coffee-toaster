@@ -2,6 +2,7 @@
 
 class Config extends Question
 	
+	# variables
 	tpl: """modules =
 				\tname: '%name'
 				\tsrc: '%src'
@@ -10,7 +11,9 @@ class Config extends Question
 	"""
 	
 	constructor:(@basepath)->
-	
+
+
+
 	create:(folderpath)->
 		if folderpath? and folderpath != true
 			@basepath = "#{@basepath}/#{folderpath}" 
@@ -31,7 +34,9 @@ class Config extends Question
 				@ask question3, /.+/, (release)=>
 					@write name || default_name, src, release
 					process.exit()
-	
+
+
+
 	write:(name, src, release)->
 		path = pn "#{@basepath}/toaster.coffee"
 		toaster = @tpl.replace "%name", name

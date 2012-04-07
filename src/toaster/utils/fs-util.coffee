@@ -8,7 +8,7 @@ class FsUtil
 
 	# static variables
 	@snapshots: {}
-	
+
 	# static methods
 	@rmdir_rf:(folderpath, root=true)->
 		files = fs.readdirSync folderpath
@@ -21,28 +21,36 @@ class FsUtil
 			else
 				fs.unlinkSync file
 		fs.rmdirSync folderpath if root
-	
+
+
+
 	@mkdir_p:(folderpath)->
 		folders = folderpath.split "/"
 		for folder, index in folders
 			continue if folder == ""
 			if !path.existsSync( folder = folders.slice( 0, index + 1 ).join "/" )
 				fs.mkdirSync folder, 0755
-	
+
+
+
 	@find:(folderpath, pattern, fn)->
 		exec "find #{folderpath} -name '#{pattern}'", (error, stdout, stderr)=>
 			buffer = []
 			for item in items = stdout.trim().split "\n"
 				buffer.push item if item != "." && item != ".." && item != ""
 			fn buffer
-	
+
+
+
 	@ls_folders:(basepath, fn)->
 		exec "find -type d", (error, stdout, stderr)=>
 			buffer = []
 			for item in items = stdout.trim().split "\n"
 				buffer.push item if item != "." && item != ".." && item != ""
 			fn buffer
-	
+
+
+
 	@watched = {}
 	@watch_file:(filepath, onchange, dispatch_create)->
 		filepath = pn filepath
@@ -58,7 +66,9 @@ class FsUtil
 			ctime = curr.ctime.valueOf() != prev.ctime.valueOf()
 			if mtime || ctime
 				onchange?( {type: "file", path:filepath, action: "updated"} )
-	
+
+
+
 	@watch_folder:(folderpath, filter_regexp, onchange, dispatch_create)->
 		folderpath = pn folderpath
 		onchange?( {type:"folder", path:folderpath, action:"watching"} )
@@ -118,6 +128,8 @@ class FsUtil
 
 				snapshot = FsUtil.format_ls folderpath, stdout
 				FsUtil.snapshots[folderpath] = snapshot
+
+
 
 	@format_ls:(folderpath, stdout)->
 		list = stdout.toString().trim().split "\n"

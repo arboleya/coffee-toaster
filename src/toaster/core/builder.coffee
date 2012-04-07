@@ -2,11 +2,12 @@
 
 class Builder
 
-	# requires
+	# requirements
 	fs = require 'fs'
 	path = require 'path'
 	cs = require "coffee-script"
 
+	# variables
 	toaster_helper:	 """
 		__t = ( ns, expose )->
 			curr = null
@@ -26,8 +27,8 @@ class Builder
 
 	"""
 
-	# include template for importing others js's
 	include_tmpl: "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
+
 
 
 	constructor:(@toaster, @opts)->
@@ -106,7 +107,6 @@ class Builder
 
 					# write boot-loader file
 					fs.writeFileSync build.debug, contents.join( "\n" )
-
 
 
 

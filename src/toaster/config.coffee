@@ -16,8 +16,6 @@ class Config
 	builds: {}
 
 	constructor: (@toaster) ->
-		# console.log "Config created!"
-
 		# basepath
 		@basepath = @toaster.basepath
 
@@ -35,22 +33,30 @@ class Config
 			console.log "\tFile not found: #{filepath.red}"
 			console.log "\tTry running: "+ "toaster -i".green +
 				" or type #{'toaster -h'.green} for more info"
-	
+
+
 
 	vendor:(name, src)=>
 		@vendors[name] = pn "#{@basepath}/#{src}"
-		@
+
+
 	
-	src:( path, args... )=>
-		@current_src = path
-		@
-	
+	src:( path )=>
+		unless @root_src?
+			@root_src = path
+		else
+			warn "Can't define #{"two src folders".bold}, pls ".yellow +
+				 "link (#{'ln -s'.white}#{') what you need.'.yellow}".yellow
+
+
+
 	module:(name, params)=>
 		params.name = name
-		params.src = pn "#{@basepath}/#{@current_src}/"
+		params.src = pn "#{@basepath}/#{@root_src}/"
 		params.release = pn "#{@basepath}/#{params.release}" if params.release?
 		@modules[name] = params
-		@
+
+
 
 	build:( name, params )=>
 		params.name = name
@@ -58,5 +64,3 @@ class Config
 		params.release = pn "#{@basepath}/#{params.release}"
 		params.debug = pn "#{@basepath}/#{params.debug}"
 		@builds[name] = params
-
-		@
