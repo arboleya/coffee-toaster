@@ -24,8 +24,10 @@ class Toaster
 
 		# version
 		if @cli.argv.v
-			version_path = pn __dirname + "/../build/VERSION"
-			return log fs.readFileSync( version_path, "utf-8" ).replace /\n/, ""
+			filepath = pn __dirname + "/../package.json"
+			contents = fs.readFileSync( filepath, "utf-8" )
+			schema = JSON.parse( contents ).version
+			return log schema
 		
 		# scaffolds basic structure for new projects
 		else if @cli.argv.n
