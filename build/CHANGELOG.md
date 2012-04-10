@@ -1,5 +1,9 @@
 # CoffeeToaster Changelog
 
+## 0.3.8 - 10/04/2012
+ * Fixing inheritance
+ * "Solving" npm install (weird behaviour)
+
 ## 0.3.8 - 10/29/2011
  * Fixing bugs in generators
  * Fixing a bunch of small emergencial bugs
