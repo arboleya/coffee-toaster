@@ -3,19 +3,23 @@ var JQUERY = {};
 var __t;
 
 __t = function(ns, expose) {
-  var curr, index, part, parts, _len;
+  var curr, index, part, parts, _i, _len;
   curr = null;
   parts = [].concat = ns.split(".");
-  for (index = 0, _len = parts.length; index < _len; index++) {
+  for (index = _i = 0, _len = parts.length; _i < _len; index = ++_i) {
     part = parts[index];
     if (curr === null) {
       curr = eval(part);
-      if (expose != null) expose[part] = curr;
+      if (expose != null) {
+        expose[part] = curr;
+      }
       continue;
     } else {
       if (curr[part] == null) {
         curr = curr[part] = {};
-        if (expose != null) expose[part] = curr;
+        if (expose != null) {
+          expose[part] = curr;
+        }
       } else {
         curr = curr[part];
       }
@@ -30,6 +34,8 @@ var basic = window.basic = {};
 
   __t('basic.letters', window).A = (function() {
 
+    A.name = 'A';
+
     function A() {
       console.log("letters/A created!");
     }
@@ -39,6 +45,8 @@ var basic = window.basic = {};
   })();
 
   __t('basic.letters', window).B = (function() {
+
+    B.name = 'B';
 
     function B() {
       console.log("letters/B created!");
@@ -50,6 +58,8 @@ var basic = window.basic = {};
 
   __t('basic.repeating', window).A = (function() {
 
+    A.name = 'A';
+
     function A() {
       console.log("repeating/A created!");
     }
@@ -59,6 +69,8 @@ var basic = window.basic = {};
   })();
 
   __t('basic.repeating', window).B = (function() {
+
+    B.name = 'B';
 
     function B() {
       console.log("repeating/B created!");
@@ -72,6 +84,8 @@ var basic = window.basic = {};
 
   __t('basic', window).TopLevel = (function() {
 
+    TopLevel.name = 'TopLevel';
+
     function TopLevel() {
       console.log("TopLevel created!");
     }
@@ -81,6 +95,8 @@ var basic = window.basic = {};
   })();
 
   __t('basic', window).App = (function() {
+
+    App.name = 'App';
 
     function App() {
       console.log("App created!");

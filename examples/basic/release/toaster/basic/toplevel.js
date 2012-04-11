@@ -2,6 +2,8 @@
 
   __t('basic', window).TopLevel = (function() {
 
+    TopLevel.name = 'TopLevel';
+
     function TopLevel() {
       console.log("TopLevel created!");
     }

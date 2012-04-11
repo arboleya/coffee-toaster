@@ -2,6 +2,8 @@
 
   __t('basic', window).App = (function() {
 
+    App.name = 'App';
+
     function App() {
       console.log("App created!");
       new basic.TopLevel;
