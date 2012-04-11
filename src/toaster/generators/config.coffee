@@ -15,15 +15,15 @@ class Config extends Question
 
 
 # ROOT SRC FOLDER
-src 'src'
+src '%src%'
 
 
 # MODULES
 module '%module%' # module folder name (inside src)
-	vendors: ['_', 'jquery'] # (ordered vendor's array)
+	# vendors: ['id', 'id_b'] # (ordered vendor's array)
 	bare: false # default = false (compile coffeescript with bare option)
 	packaging: true # default = true
-	expose: "window" # default = null (if informed, link all objects inside it)
+	expose: null # default = null (if informed, link all objects inside it)
 	minify: false # default = false (minifies release file only)
 
 # module 'another_module_folder'
@@ -33,7 +33,7 @@ module '%module%' # module folder name (inside src)
 # BUILD ROUTINES
 build "main"
 	modules: ['%module%']
-	release: 'release/app.js'
+	release: '%release%'
 	debug: '%debug%'
 
 # build 'another_build_routine'
@@ -56,7 +56,6 @@ build "main"
 		question2 = "\tWhere do you want your release file? " +
 					"[release/app.js] : "
 		
-		# @ask question1, /.*/, (name)=>
 		@ask question1, /.+/, (src)=>
 			@ask question2, /.+/, (release)=>
 				@write src, "module_folder", release
@@ -66,19 +65,31 @@ build "main"
 	write:(src, module, release)=>
 		filepath = pn "#{@basepath}/toaster.coffee"
 
-		toaster = @tpl.replace "%src%", src
-		toaster = toaster.replace /(%module%)/, module
-		toaster = toaster.replace "%release%", release
-		toaster = toaster.replace "%release%", release.replace ".js", "-debug.js"
+		rgx = /\/?((\w+)(\.*)(\w+$))/
+		filename = rgx.exec( release )[1]
+
+		if filename.indexOf(".") > 0
+			debug = release.replace rgx, "$2-debug$3$4"
+		else
+			debug = "#{release}-debug"
+
+		buffer = @tpl.replace "%src%", src
+		buffer = buffer.replace /(\%module\%)/g, module
+		buffer = buffer.replace "%release%", release
+		buffer = buffer.replace "%debug%", debug
 		
 		if path.existsSync filepath
 			question = "\tDo you want to overwrite the file: #{filepath.yellow}"
 			question += " ? [y/N] : ".white
 			@ask question, /.*?/, (overwrite)=>
-				if overwrite.match /n/i
-					return process.exit()
-		
-		fs.writeFileSync filepath, toaster
+				if overwrite.match /y/i
+					@save filepath, buffer
+					process.exit()
+		else
+			@save filepath, buffer
+			process.exit()
+	
+	save:( filepath, contents)->
+		fs.writeFileSync filepath, contents
 		log "#{'Created'.green.bold} #{filepath}"
-
 		process.exit()
