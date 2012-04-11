@@ -55,16 +55,16 @@ class Project extends Question
 			log "#{'Error'.bold.red} Folder exists! #{target}".red
 			return
 		
-		fs.mkdirSync target, 0755
+		fs.mkdirSync target, '0755'
 		log "#{'Created'.green.bold} #{target}"
 
-		fs.mkdirSync srcdir, 0755
+		fs.mkdirSync srcdir, '0755'
 		log "#{'Created'.green.bold} #{srcdir}"
 
-		fs.mkdirSync vendorsdir, 0755
+		fs.mkdirSync vendorsdir, '0755'
 		log "#{'Created'.green.bold} #{vendorsdir}"
 		
-		fs.mkdirSync releasedir, 0755
+		fs.mkdirSync releasedir, '0755'
 		log "#{'Created'.green.bold} #{releasedir}"
 		
 		name = name

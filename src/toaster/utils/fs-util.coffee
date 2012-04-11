@@ -29,7 +29,7 @@ class FsUtil
 		for folder, index in folders
 			continue if folder == ""
 			if !path.existsSync( folder = folders.slice( 0, index + 1 ).join "/" )
-				fs.mkdirSync folder, 0755
+				fs.mkdirSync folder, '0755'
 
 
 
