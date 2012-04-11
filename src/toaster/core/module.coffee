@@ -51,7 +51,7 @@ class Module
 			type = StringUtil.titleize info.type
 
 			# relative filepath
-			relative_path = info.path.replace "#{@src}/", ""
+			relative_path = info.path.replace "#{@src}/".replace("//", "/"), ""
 
 			# switch over created, deleted, updated and watching
 			switch info.action
