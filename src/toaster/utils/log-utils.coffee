@@ -15,7 +15,7 @@ debug = ( msg, send_to_growl = false ) ->
 	log "#{msg.magenta}"
 
 
-error = ( msg, file, send_to_growl = true, file = null ) ->
+error = ( msg, send_to_growl = true, file = null ) ->
 	log "ERROR ".bold.red + msg
 
 	if send_to_growl
