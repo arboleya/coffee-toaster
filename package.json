@@ -18,12 +18,6 @@
     "toaster"        : "./bin/toaster"
   },
 
-  "scripts"        : {
-    
-  },
-  
-  "test"           : "",
-
   "engines"        : {
     "node"           : ">= 0.4.9"
   },
@@ -34,7 +28,5 @@
     "uglify-js"      : "1.1.1",
     "optimist"       : "0.2.x",
     "growl"          : "1.2.0"
-  },
-
-  "devDependencies": {}
+  }
 }

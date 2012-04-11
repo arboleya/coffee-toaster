@@ -113,10 +113,11 @@ class Builder
 	unify_vendors:( modules )=>
 		unique = []
 		for module in modules
-			unless (mod = @toaster.modules[module])?
-				return log "(unify vendors) MODULE NOT FOUND! -> #{module}"
-			for vendor in mod.vendors
-				unique.push vendor unless ArrayUtil.has unique, vendor
+			if (mod = @toaster.modules[module])?
+				for vendor in mod.vendors
+					unique.push vendor unless ArrayUtil.has unique, vendor
+			else
+				warn "Module ".white + module.bold.yellow + " not found.".white
 		unique
 
 
@@ -128,10 +129,10 @@ class Builder
 				if path.existsSync vendor
 					buffer.push fs.readFileSync vendor, 'utf-8'
 				else
-					log "Vendor ".white + vendor_name.yellow.bold +
+					warn "Vendor ".white + vendor_name.yellow.bold +
 						" not found at ".white + vendor.yellow.bold
 			else
-				log "Vendor ".white + vendor_name.yellow.bold +
+				warn "Vendor ".white + vendor_name.yellow.bold +
 				" not informed in 'toaster.coffee'."
 
 		return buffer.join "\n"
@@ -144,5 +145,5 @@ class Builder
 			if (mod=@toaster.modules[module])?
 				buffer.push mod.compile()
 			else
-				log "(merge modules) MODULE NOT FOUND! => #{module}"
+				warn "Module ".white + module.bold.yellow + " not found.".white
 		buffer.join "\n"
