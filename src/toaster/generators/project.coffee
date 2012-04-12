@@ -32,11 +32,11 @@ class Project extends Question
 		log ". Please tell me:"
 
 		question1 = "\tWhere do you want your src folder? [src] : "
-		question2 = "\tWhat will be the name of your main module? (i.e. app) : "
+		question2 = "\tWhat will be the name of your main module? [app] : "
 		question3 = "\tWhere do you want your release file? [release/app.js] : "
 
 		@ask question1, /.*/, (src)=>
-			@ask question2, /.+/, (module)=>
+			@ask question2, /.*/, (module)=>
 				@ask question3, /.*/, (release)=>
 					src = src || "src"
 					module = module || "app"
