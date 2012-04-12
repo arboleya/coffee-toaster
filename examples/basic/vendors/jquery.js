@@ -1,1 +1,1 @@
-// JQUERY
+var JQUERY = {};

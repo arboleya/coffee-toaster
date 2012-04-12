@@ -1,12 +1,16 @@
-fs = require "fs"
-cs = require "coffee-script"
-
 #<< toaster/utils/array-util
 
 class Script
 
+	# requires
+	fs = require "fs"
+	cs = require "coffee-script"
+
+
+
 	constructor: (@module, @realpath, @opts) ->
 		@getinfo()
+
 
 
 	getinfo:()->
@@ -18,7 +22,7 @@ class Script
 		@baseclasses = []
 
 		# assemble some information about the file
-		@filepath   =  @realpath.replace( @module.src, "" ).substr 1
+		@filepath   = @realpath.replace( @module.src, "" ).substr 1
 		@filename   = /[\w-]+\.[\w-]+/.exec( @filepath )[ 0 ]
 		@filefolder = @filepath.replace( "/#{@filename}", "") + "/"
 		@namespace  = ""
@@ -26,46 +30,57 @@ class Script
 		# if the file is in the top level
 		if @filepath.indexOf("/") is -1
 			@filefolder = ""
-		
+
 		# assemble namespace info about the file
 		@namespace = @filefolder.replace(/\//g, ".").slice 0, -1
-
-		# validate if there is a class inside the file
-		rgx = "(^|=\\s*)(class)+\\s+(\\w+)" +
-			  "(\\s*$|\\s+(extends)\\s+(\\w+)\\s*$)"
+		
+		# filter files that have class declarations inside of it
+		rgx = /^\s*(class)+\s(\w+)(\s+(extends)\s+([\w.]+))?/gm
 		
 		# filter classes that extends another classes
-		rgx_ext = "(^|=\\s*)(class)\\s(\\w+)\\s(extends)\\s(\\w+)\\s*$"
-		
+		rgx_ext = /(^|=\s*)(class)\s(\w+)\s(extends)\s(\\w+)\s*$/gm
+
 		# if there is a class inside the file
-		if @raw.match( new RegExp rgx, "m" )?
+		if @raw.match( rgx )?
 
 			# if the file is not in the root src folder (outside any
 			# folder/package )
 			if @namespace != ""
 				# then modify the class declarations before starting
-				# the parser thing, adding the package the headers
-				# declarations
-				repl = "$1pkg( '#{@namespace}' ).$3 = $2 $3"
-				repl += "$4" if new RegExp(rgx_ext, "m").test @raw
-				@raw = @raw.replace new RegExp( rgx, "gm" ), repl
+				# the parser thing, adding the package headers declarations
+				# as well as the expose thing
+
+				# PACKAGING=true && EXPOSE=null
+				if @module.packaging && !@module.expose?
+					repl = "$1 __t('#{@namespace}').$2$3"
+
+				# PACKAGING=true && EXPOSE=something
+				else if @module.packaging && @module.expose?
+					repl = "$1 __t('#{@namespace}', #{@module.expose}).$2$3"
+
+				# PACKAGING=false && EXPOSE=something
+				else if !@module.packaging && @module.expose?
+					repl = "$1 #{@module.expose}.$2$3"
+
+				if repl?
+					@raw = @raw.replace rgx, repl
 			
 			# assemble some more infos about the file.
 			#		classname: ClassName
 			#		namespace: package.subpackage
 			#		classpath: package.subpackage.ClassName
-			@classname = @raw.match( new RegExp( rgx, "m") )[3]
+			@classname = @raw.match( rgx )[3]
 			
 			# assure namespace is correct
 			if @namespace is ""
 				@classpath = @classname
 			else
 				@classpath = "#{@namespace}.#{@classname}"
-			
+
 			# colletcts the base classes, in case some class in the file
 			# extends something
-			for klass in @raw.match( new RegExp rgx_ext, "gm" ) ? []
-				baseclass = klass.match( new RegExp(rgx_ext, "m"))[5]
+			for klass in @raw.match( rgx_ext ) ? []
+				baseclass = klass.match( rgx_ext )[5]
 				@baseclasses.push baseclass
 		
 		# then if there's other dependencies
@@ -107,8 +122,7 @@ class Script
 
 			# if nothing is found under the given namespace
 			if found.length <= 0
-				console.log "#{'WARNING!'.bold.yellow} Nothing found".yellow,
-							"#{'inside'.yellow} #{dependency.white}"
+				warn "Nothing found inside #{("'"+dependency).white}'".yellow
 				continue
 			
 			# otherwise rewrites found array with filepath info only

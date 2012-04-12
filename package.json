@@ -1,8 +1,8 @@
 {
-  "author"         : "Anderson Arboleya <me@nybras.com>",
+  "author"         : "Anderson Arboleya <anderson@arboleya.me>",
   "name"           : "coffee-toaster",
   "description"    : "Minimalist dependency management system for coffee-script.",
-  "version"        : "0.3.9",
+  "version"        : "0.5.0",
 
   "repository"     : {
     "type"           : "git",
@@ -18,10 +18,6 @@
     "toaster"        : "./bin/toaster"
   },
 
-  "scripts"        : {
-    "test"           : "vows --spec tests/all.js"
-  },
-  
   "engines"        : {
     "node"           : ">= 0.4.9"
   },
@@ -29,11 +25,8 @@
   "dependencies"   : {
     "coffee-script"  : "1.x",
     "colors"         : "0.5.x",
-    "optimist"       :"0.2.x"
-  },
-
-  "devDependencies": {
-    "vows-bdd"       : "0.1.0",
-    "vows"           :"0.5.11"
+    "uglify-js"      : "1.1.1",
+    "optimist"       : "0.2.x",
+    "growl"          : "1.2.0"
   }
 }

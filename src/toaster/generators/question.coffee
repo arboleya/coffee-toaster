@@ -1,4 +1,5 @@
 class Question
+
 	ask:(question, format, fn)->
 			stdin = process.stdin
 			stdout = process.stdout
