@@ -10,8 +10,8 @@ class Config extends Question
 	# variables
 	tpl: """
 # VENDORS
-# vendor 'id', 'vendors/id.js'
-# vendor 'id_b', 'vendors/id_b.js'
+# vendor 'vendor_id', 'vendors/id.js'
+# vendor 'vendor_id_b', 'vendors/id_b.js'
 
 
 # ROOT SRC FOLDER
@@ -32,6 +32,7 @@ module '%module%' # module folder name (inside src)
 
 # BUILD ROUTINES
 build "main"
+	# vendors: ['vendor_id', 'vendor_id_b']
 	modules: ['%module%']
 	release: '%release%'
 	debug: '%debug%'
@@ -65,11 +66,12 @@ build "main"
 	write:(src, module, release)=>
 		filepath = pn "#{@basepath}/toaster.coffee"
 
-		rgx = /\/?((\w+)(\.*)(\w+$))/
-		filename = rgx.exec( release )[1]
+		rgx = /(\/)?((\w+)(\.*)(\w+$))/
+		parts = rgx.exec( release )
+		filename = parts[2]
 
 		if filename.indexOf(".") > 0
-			debug = release.replace rgx, "$2-debug$3$4"
+			debug = release.replace rgx, "$1$3-debug$4$5"
 		else
 			debug = "#{release}-debug"
 

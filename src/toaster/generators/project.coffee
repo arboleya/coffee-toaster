@@ -5,6 +5,7 @@ class Project extends Question
 
 	# requirements
 	path = require "path"
+	pn = path.normalize
 	fs = require "fs"
 
 	constructor:(@basepath)->
@@ -13,8 +14,8 @@ class Project extends Question
 
 	create:(folderpath, name, src, release)->
 		if !folderpath || folderpath == true
-			error "You need to inform a target path!"
-			log "\ntoaster -n myawesomeapp".green
+			return error	"You need to inform a target path!\n" +
+							"\ttoaster -n myawesomeapp".green
 		
 		if folderpath.substr( 0, 1 ) != "/"
 			target = "#{@basepath}/#{folderpath}"
@@ -46,14 +47,14 @@ class Project extends Question
 
 
 	scaffold:(target, src, module, release)=>
-		srcdir = "#{target}/" + ( src || "src" )
-		vendorsdir = "#{target}/vendors"
-		releasefile = "#{target}/" + ( release || "release/app.js" )
+		srcdir = pn "#{target}/#{src}"
+		moduledir = pn "#{srcdir}/#{module}" 
+		vendorsdir = pn "#{target}/vendors"
+		releasefile = pn "#{target}/#{release}"
 		releasedir = releasefile.split("/").slice(0, -1).join "/"
 		
 		if path.existsSync target
-			log "#{'Error'.bold.red} Folder exists! #{target}".red
-			return
+			return error "Folder exists! #{target.red}"
 		
 		fs.mkdirSync target, '0755'
 		log "#{'Created'.green.bold} #{target}"
@@ -61,14 +62,16 @@ class Project extends Question
 		fs.mkdirSync srcdir, '0755'
 		log "#{'Created'.green.bold} #{srcdir}"
 
+		fs.mkdirSync moduledir, '0755'
+		log "#{'Created'.green.bold} #{moduledir}"
+
 		fs.mkdirSync vendorsdir, '0755'
 		log "#{'Created'.green.bold} #{vendorsdir}"
 		
 		fs.mkdirSync releasedir, '0755'
 		log "#{'Created'.green.bold} #{releasedir}"
 		
-		name = name
 		srcdir = srcdir.replace( target, "" ).substr 1
 		releasefile = releasefile.replace( target, "" ).substr 1
 		
-		new Config( target ).write name, srcdir, releasefile
+		new Config( target ).write srcdir, module, releasefile
