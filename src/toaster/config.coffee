@@ -29,7 +29,7 @@ class Config
 			eval code
 			
 		else
-			error "File not found: ".yelllow + " #{filepath.red}\n".yellow +
+			error "File not found: ".yelllow + " #{filepath.red}\n" +
 				  "Try running:".yellow + " toaster -i".green +
 				  " or type".yellow + " #{'toaster -h'.green} " +
 				  "for more info".yellow
@@ -41,9 +41,15 @@ class Config
 
 
 	
-	src:( path )=>
+	src:( dirpath )=>
 		unless @root_src?
-			@root_src = path
+			@root_src = pn "#{@basepath}/#{dirpath}/"
+
+			unless path.existsSync @root_src
+				error	"Source folder doens't exist:\n\t#{@root_src.red}\n" + 
+						"Check your #{'toaster.coffee'.yellow} and try again." +
+						"\n\t" + pn( "#{@basepath}/toaster.coffee" ).yellow
+				return process.exit()
 		else
 			warn "Can't define #{'two src folders'.bold}, pls ".yellow +
 				 "link (#{'ln -s'.white}#{') what you need.'.yellow}".yellow
@@ -52,8 +58,19 @@ class Config
 
 	module:(name, params = {})=>
 		params.name = name
-		params.src = pn "#{@basepath}/#{@root_src}/"
-		params.release = pn "#{@basepath}/#{params.release}" if params.release?
+		params.src = @root_src
+		
+		unless path.existsSync pn "#{@root_src}#{name}"
+			error	"Inexistent path informed for module #{name.red}:\n" + 
+					"\t#{@root_src}#{name}".red + "\n" +
+					"Check your #{'toaster.coffee'.yellow} and try again." +
+					"\n\t" + pn( "#{@basepath}/toaster.coffee" ).yellow
+			return process.exit()
+
+		params.bare = params.bare ? false
+		params.packaging = params.packaging ? true
+		params.expose = if params.expose == undefined ? null else params.expose
+		params.minify = params.minify ? false
 		@modules[name] = params
 
 
