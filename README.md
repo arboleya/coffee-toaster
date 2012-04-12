@@ -408,7 +408,7 @@ This example uses:
 The packaging system is enabled here as well, try different options and do<BR>
 not forget to check the<BR> differences in your javascript release file.
 
-> [Source Code](https://github.com/serpentem/coffee-toaster/tree/master/examples/multi-modules)
+> [Source Code](https://github.com/serpentem/coffee-toaster/tree/master/examples/multimodules)
 
 # Issues
 
