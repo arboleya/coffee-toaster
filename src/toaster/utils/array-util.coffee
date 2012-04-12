@@ -1,4 +1,5 @@
 class ArrayUtil
+
 	@find:(source, search, by_property)->
 		if !by_property
 			for v, k in source
@@ -8,8 +9,11 @@ class ArrayUtil
 			for v, k in source
 				for p in by_property
 					return {item: v, index: k} if search == v[p]
+		
 		return null
-	
+
+
+
 	@find_all:(source, search, by_property, regexp, unique)->
 		_output = []
 		_unique = {}
@@ -46,7 +50,9 @@ class ArrayUtil
 						_output.push item
 		
 		return _output
-	
+
+
+
 	@diff:(a, b, by_property)->
 		diff = []
 		
@@ -61,10 +67,14 @@ class ArrayUtil
 				diff.push {item:item, action:"created"}
 		
 		diff
-	
+
+
+
 	@has:(source, search, by_property)->
 		return ArrayUtil.find( source, search, by_property )?
-	
+
+
+
 	@replace_into:( src, index, items )->
 		items = [].concat items
 		src.splice index, 1

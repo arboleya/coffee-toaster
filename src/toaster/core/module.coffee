@@ -1,61 +1,46 @@
-cs = require "coffee-script"
-
 #<< toaster/utils/*
 #<< toaster/core/script
 
 class Module
 
-	pkg_helper : """
-		pkg = ( ns )->
-			curr = null
-			parts = [].concat = ns.split( "." )
-			for part, index in parts
-				if curr == null
-					curr = eval part
-					continue
-				else
-					unless curr[ part ]?
-						curr = curr[ part ] = {}
-					else
-						curr = curr[ part ]
-			curr
+	# requires
+	fs = require "fs"
+	cs = require "coffee-script"
+	uglify = require("uglify-js").uglify
+	uglify_parser = require("uglify-js").parser
+	path = require "path"
 
-	"""
 
-	# # module requirements to load
-	# 	toaster
-	# 	config
-	# 	opts
 
-	# # module config variables
-	# 	name
-	# 	src
-	# 	vendors
-	# release
-
-	constructor: (@toaster, @config, @opts) ->
-
+	constructor: (@toaster, @config, @opts, callback) ->
 		# expanding config variables
-		@name = @config.name
 		@src = @config.src
-		@vendors = @config.vendors
-		@release = @config.release
+		@name = @config.name
+		@vendors = @config.vendors ? []
+		@bare = @config.bare ? @opts.argv.bare
+		@packaging = @config.packaging ? @opts.argv.packaging
+		@expose = @config.expose ? @opts.argv.expose
+		@minify = @config.minify ? @opts.argv.minify
 
+
+
+	init:( after_init )->
 		# initializes buffer array to keep all tracked files
 		@files = []
 
 		# search for all *.coffee files inside src folder
 		FsUtil.find @src, "*.coffee", (result) =>
 
-			# instantiates everything, on class for each file
-			for file in result
-				@files.push new Script @, file, @opts
+			# collects every files into Script instances
+			@files.push new Script @, file, @opts, @bare for file in result
 
-			# compile module for the first time and write it to the filesystem
-			@write()
+			# call the callback
+			after_init()
 
-			# watch for file changes
+			# start watching for file changes
 			@watch() if @opts.argv.w
+
+
 
 	watch:()->
 
@@ -66,7 +51,7 @@ class Module
 			type = StringUtil.titleize info.type
 
 			# relative filepath
-			relative_path = info.path.replace "#{@src}/", ""
+			relative_path = info.path.replace @src, ""
 
 			# switch over created, deleted, updated and watching
 			switch info.action
@@ -76,11 +61,12 @@ class Module
 
 					# initiate file and adds it to the array
 					if info.type == "file"
+						# toaster/core/script
 						@files.push new Script @, info.path, @opts
 
 					# cli msg
 					msg = "#{('New ' + info.type + ' created:').bold.green}"
-					console.log "#{msg} #{info.path.green}"
+					log "#{msg} #{info.path.green}"
 
 				# when a file is deleted
 				when "deleted"
@@ -91,8 +77,7 @@ class Module
 
 					# cli msg
 					msg = "#{(type + ' deleted, stop watching: ').bold.red}"
-					console.log "#{msg} #{info.path.red}"
-
+					log "#{msg} #{info.path.red}"
 
 				# when a file is updated
 				when "updated"
@@ -102,155 +87,97 @@ class Module
 					file.item.getinfo()
 
 					# cli msg
-					msg = "#{(type + ' changed').bold.yellow}"
-					console.log "#{msg} #{info.path.yellow}"
+					msg = "#{(type + ' changed: ').bold.cyan}"
+					log "#{msg} #{info.path.cyan}"
 
 				# when a file starts being watched
 				when "watching"
 					msg = "#{('Watching ' + info.type + ':').bold.cyan}"
-					console.log "#{msg} #{info.path.cyan}"
+					log "#{msg} #{info.path.cyan}"
 
-			@write() unless info.action is "watching"
+			# rebuilds modules unless notificiation is 'watching'
+			@toaster.builder.build() unless info.action is "watching"
 
-	compile:(include_vendors = true)->
-		
-		# expands all dependencies wild-cards
-		file.expand_dependencies() for file in @files
 
-		# reorder everything
-		@reorder()
 
-		# merge everything
-		output = "#{@get_root_namespaces()}\n#{@pkg_helper}\n"
-		output += (file.raw for file in @files).join "\n"
+	compile:()->
 
-		# .. write it to the output with the root namespaces inside of it
-		output = output.replace "{root_namespaces}", @get_root_namespaces()
-
-		# tries to compile production file
+		# validating syntax
 		try
-			# .. compile with coffee
-			compiled = cs.compile output
-
+			cs.compile file.raw for file in @files
+		
 		# if there's some error
 		catch err
 
-			# get the error msg
-			msg = err.message
-
-			# if it has some line information
-			if /(line\s)([0-9]+)/g.test msg
-
-				# get the line number
-				line = msg.match( /(line\s)([0-9]+)/ )[2]
-
-				# loop through all ordered files
-				for file in ordered
-
-					# checks if the error line corresponds to some line
-					# inside that file. if yes, then replaces the line info
-					# inside the error msg
-					if line >= file.start && line <= file.end
-						line = (line - file.start) + 1
-						msg = msg.replace /line\s[0-9]+/, "line #{line}"
-						msg = StringUtil.ucasef msg
-
+			# catches and shows it, and abort the compilation
+			msg = err.message.replace '"', '\\"'
+			msg = "#{msg.white} at file: " + "#{file.filepath}".bold.red
+			error msg
 			return null
 
+		# otherwise move ahead, and expands all dependencies wild-cards
+		file.expand_dependencies() for file in @files
+
+		# reordering files
+		@reorder()
+
+		# merging everything
+		output = (file.raw for file in @files).join "\n"
+
+		# compiling
+		compiled = cs.compile output, {bare: @bare}
+
+		# uglifying
+		if @minify
+			ast = uglify_parser.parse compiled
+			ast = uglify.ast_mangle ast
+			ast = uglify.ast_squeeze ast
+			compiled = uglify.gen_code ast
+		
 		# returns the compiled output
 		return compiled
 
 
-	get_root_namespaces:()->
 
-		# gets all the root namespaces in src folder
-		root_namespaces = {}
-		for file in @files
-			if file.filefolder != ""
-				pkg = file.namespace.split(".").shift()
-				root_namespaces[pkg] = "#{pkg} = {}\n"
+	compile_for_debug:( release_path )->
+		# cleaning previous/existent structure
+		FsUtil.rmdir_rf release_path if path.existsSync release_path
 
-		# .. merge them into one single buffer
-		namespaces_buffer = ""
-		namespaces_buffer += k for v, k of root_namespaces
+		# creating new structre from scratch
+		FsUtil.mkdir_p release_path
 
-		return namespaces_buffer
+		# initializing empty array of filepaths
+		files = []
 
-	write:()->
+		# loop through all ordered files
+		for file, index in @files
 
-		# assigns compiled buffer to variable and abort method if its null
-		return unless (contents = @compile())?
+			# computing releative filepath (replacing .coffee by .js)
+			relative_path = file.filepath.	replace ".coffee", ".js"
 
-		# gets all vendors concatenated the right way
-		vendors = @toaster.builder.merge_vendors @vendors
+			# computing absolute filepath
+			absolute_path = "#{release_path}/#{relative_path}"
 
-		# writing file
-		fs.writeFileSync @release, "#{vendors}\n#{contents}"
+			# extracts its folder path
+			folder_path = absolute_path.split('/').slice(0,-1).join "/"
 
-		# informing user through cli
-		console.log "#{'.'.bold.green} #{@release}"
+			# create container folder if it doesnt exist yet
+			FsUtil.mkdir_p folder_path if !path.existsSync folder_path
 
-		# if debug is enabled and no error has ocurred, then compile
-		# individual files as well
-		if @opts.argv.debug
+			# writing file
+			fs.writeFileSync absolute_path, cs.compile file.raw, {bare:0}
 
-			# evaluating the toaster file folder (path)
-			toaster = @release.split("/").slice(0,-1).join('/') + "/toaster"
+			# adds to the files buffer
+			files.push relative_path
 
-			# constructs the toaster/src folder
-			toaster_src = "#{toaster}/src"
+		# returns all filepaths
+		return files
 
-			# cleaning before deploying
-			FsUtil.rmdir_rf toaster if path.existsSync toaster
-
-			# creating new structure
-			FsUtil.mkdir_p toaster_src
-
-			# template for importing others js's
-			tmpl = "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
-
-			# starting buffer with the pklg_helper
-			toaster_buffer = "#{vendors}\n#{@get_root_namespaces()}\n" +
-							 "#{@pkg_helper}\n"
-
-			# loop through all ordered files
-			for file, index in @files
-
-				# evaluates its path relative to the src folder
-				relative = file.filepath
-
-				# and replace file extension from .coffee to .js
-				relative = relative.replace ".coffee", ".js"
-
-				# then computes the filepath
-				filepath = "#{toaster_src}/#{relative}"
-
-				# ..and extract its folder path
-				folderpath = filepath.split('/').slice(0,-1).join "/"
-
-				# if the container folder doesnt exist yet
-				if !path.existsSync folderpath
-					# create it
-					FsUtil.mkdir_p folderpath
-
-				# computing relative path to test folder
-				relative = "./toaster/src/#{relative}"
-
-				# writing file
-				fs.writeFileSync filepath, cs.compile file.raw, {bare:1}
-
-				# adding to the buffer
-				toaster_buffer += tmpl.replace( "%SRC%", relative ) + "\n"
-
-			# write toaster loader file w/ all imports (buffer) inside it
-			toaster = "#{toaster}/toaster.js"
-			fs.writeFileSync toaster, toaster_buffer
-
-		@toaster.builder.build()
 
 
 	missing = {}
 	reorder: (cycling = false) ->
+		# log "Module.reorder"
 
 		# if cycling is true or @missing is null, initializes empty array
 		# for holding missing dependencies
@@ -279,32 +206,30 @@ class Module
 				if dependency?
 
 					# if there's some circular dependency loop
-					if ArrayUtil.has(
-						dependency.item.dependencies,
-						file.filepath,
-						"filepath"
-					)
+					if ArrayUtil.has dependency.item.dependencies, file.filepath
+
 						# remove it from the dependencies
 						file.dependencies.splice index, 1
 
 						# then prints a warning msg and continue
-						console.log "WARNING!".bold.yellow,
-							"You have a circular dependcy loop between files",
-							"#{filepath.yellow.bold} and",
-							file.filepath.yellow.bold
+						warn "Circular dependency found between ".yellow +
+						     filepath.grey.bold + " and ".yellow +
+						     file.filepath.grey.bold
+						
 						continue
-					
+
 					# otherwise if no circular dependency is found, reorder
-					# the specific dependency and run reorder recursively until
-					# everything is beautiful
+					# the specific dependency and run reorder recursively
+					# until everything is beautiful
 					else
 						@files.splice index, 0, dependency.item
 						@files.splice dependency.index + 1, 1
 						@reorder true
 						break
-				
+
 				# otherwise if the dependency is not found
 				else if @missing[filepath] != true
+					
 					# then add it to the @missing hash (so it will be ignored
 					# until reordering finishes)
 					@missing[filepath] = true
@@ -315,24 +240,23 @@ class Module
 					file.dependencies.splice index, 1
 
 					# ..and finally prints a warning msg
-					console.log "WARNING!".bold.yellow,
-								"Dependency #{filepath.bold.white}".yellow,
-								"not found for class".yellow,
-								"#{file.classpath.white.bold}."
+					warn "#{'Dependency'.yellow} #{filepath.bold.grey} " +
+						 "#{'not found for file'.yellow} " +
+						 file.filepath.grey.bold
 
-			# tries to validate if all base classes was imported
+			# validate if all base classes was properly imported
 			file_index = ArrayUtil.find @files, file.filepath, "filepath"
 			file_index = file_index.index
 
 			for bc in file.baseclasses
 				found = ArrayUtil.find @files, bc, "classname"
-				not_found = (found.index > file_index) || (found == null)
+				not_found = (found == null) || (found.index > file_index)
 
 				if not_found && !@missing[bc]
 					@missing[bc] = true
-					console.log "#{'WARNING!'.bold} Base class".yellow,
-								bc.bold.white,
-								"not found for class".yellow,
-								file.classname.bold.white,
-								"in file".yellow,
-								file.filepath.yellow
+					warn "Base class ".yellow +
+						 "#{bc} ".bold.grey +
+						 "not found for class ".yellow +
+						 "#{file.classname} ".bold.grey +
+						 "in file ".yellow +
+						 file.filepath.bold.grey

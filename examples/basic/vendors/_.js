@@ -1,1 +1,1 @@
-// UNDERSCORE
+var UNDERSCORE = {};

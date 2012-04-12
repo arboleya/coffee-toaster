@@ -1,64 +1,48 @@
-# ------------------------------------------------------------------------------
-# Requires
-# ------------------------------------------------------------------------------
+exports.run =-> toaster = new Toaster
 
-fs = require "fs"
-path = require "path"
-
-pn = path.normalize
-exec = (require "child_process").exec
-
-colors = require 'colors'
-
-# ------------------------------------------------------------------------------
-# Global Vars
-# ------------------------------------------------------------------------------
-opts = null
-argv = null
-
-
-# ------------------------------------------------------------------------------
-# Exports
-# ------------------------------------------------------------------------------
-exports.run =->
-	toaster = new Toaster
-
-# ------------------------------------------------------------------------------
-# Imports
-# ------------------------------------------------------------------------------
+#<< toaster/utils/*
 #<< toaster/generators/*
-#<< toaster/core/*
-#<< toaster/parser
 #<< toaster/config
+#<< toaster/cli
 
 class Toaster
-	modules: {}
 
+	# requirements
+	fs = require "fs"
+	path = require "path"
+	pn = path.normalize
+	exec = (require "child_process").exec
+	colors = require 'colors'
+
+	# variables
+	modules: {}
+	
 	constructor:->
 
-		@parser = new Parser
-		@builder = new Builder @
-
-		if @parser.argv.h
-			return console.log @parser.opts.help()
-
 		@basepath = path.resolve "."
+		@cli = new Cli
 
-		if @parser.argv.v
-			path = pn __dirname + "/../build/VERSION"
-			console.log fs.readFileSync path, "utf-8"
+		# version
+		if @cli.argv.v
+			filepath = pn __dirname + "/../package.json"
+			contents = fs.readFileSync( filepath, "utf-8" )
+			schema = JSON.parse( contents ).version
+			return log schema
 		
-		else if @parser.argv.n
-			new Project( @basepath ).create @parser.argv.n
-		
-		else if @parser.argv.i
-			new toaster.generators.Config( @basepath ).create @parser.argv.i
-		
+		# scaffolds basic structure for new projects
+		else if @cli.argv.n
+			new Project( @basepath ).create @cli.argv.n
+
+		# initializes a toaster file template into an existent project
+		else if @cli.argv.i
+			new toaster.generators.Config( @basepath ).create @cli.argv.i
+
+		# watch
+		else if @cli.argv.w
+			@config = new toaster.Config @
+			@builder = new Builder @, @cli
+			return
+
+		# help
 		else
-			@config = new toaster.Config @basepath
-			@init_modules()
-
-
-	init_modules:->
-		for k, v of @config.modules
-			@modules[v.name] = new Module @, v, @parser.opts
+			return log @cli.opts.help()
