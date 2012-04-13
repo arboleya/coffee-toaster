@@ -31,22 +31,25 @@ class Project extends Question
 		log ". With this as your basepath: #{target.cyan}"
 		log ". Please tell me:"
 
-		question1 = "\tWhere do you want your src folder? [src] : "
-		question2 = "\tWhat will be the name of your main module? [app] : "
-		question3 = "\tWhere do you want your release file? [release/app.js] : "
+		q1 = "\tWhere do you want your src folder? [src] : "
+		q2 = "\tWhat will be the name of your main module? [app] : "
+		q3 = "\tWhere do you want your release file? [www/app.js] : "
+		q4 = "\tStarting from your webroot ('/'), what's the folderpath to \n"+
+			 "\treach your release file? (i.e. javascript) (optional) : "
+		
+		@ask q1.magenta, /.*/, (src)=>
+			@ask q2.cyan, /.*/, (module)=>
+				@ask q3.magenta, /.*/, (release)=>
+					@ask q4.cyan, /.*/, (webroot)=>
+						src = src || "src"
+						module = module || "app"
+						release = release || "www/app.js"
+						@scaffold target, src, module, release, webroot
+						process.exit()
 
-		@ask question1, /.*/, (src)=>
-			@ask question2, /.*/, (module)=>
-				@ask question3, /.*/, (release)=>
-					src = src || "src"
-					module = module || "app"
-					release = release || "release/app.js"
-					@scaffold target, src, module, release
-					process.exit()
 
 
-
-	scaffold:(target, src, module, release)=>
+	scaffold:(target, src, module, release, webroot)=>
 		srcdir = pn "#{target}/#{src}"
 		moduledir = pn "#{srcdir}/#{module}" 
 		vendorsdir = pn "#{target}/vendors"
@@ -74,4 +77,4 @@ class Project extends Question
 		srcdir = srcdir.replace( target, "" ).substr 1
 		releasefile = releasefile.replace( target, "" ).substr 1
 		
-		new Config( target ).write srcdir, module, releasefile
+		new Config( target ).write srcdir, module, releasefile, webroot

@@ -34,6 +34,7 @@ module '%module%' # module folder name (inside src)
 build "main"
 	# vendors: ['vendor_id', 'vendor_id_b']
 	modules: ['%module%']
+	webroot: "%webroot%"
 	release: '%release%'
 	debug: '%debug%'
 
@@ -53,17 +54,21 @@ build "main"
 		log ". With this as your basepath: #{@basepath.cyan}"
 		log ". Please, tell me:"
 
-		question1 = "\tWhere's your src folder? [src]: "
-		question2 = "\tWhere do you want your release file? " +
-					"[release/app.js] : "
-		
-		@ask question1, /.+/, (src)=>
-			@ask question2, /.+/, (release)=>
-				@write src, "module_folder", release
+		q1 = "\tWhere's your src folder? (i.e. src): "
+		q2 = "\tWhat's the name of your main module? (i.e. app) : "
+		q3 = "\tWhere do you want your release file? (i.e. www/app.js) : "
+		q4 = "\tStarting from your webroot ('/'), what's the folderpath to \n"+
+			 "\treach your release file? (i.e. javascript) (optional) : "
+
+		@ask q1.magenta, /.+/, (src)=>
+			@ask q2.cyan, /.+/, (module)=>
+				@ask q3.magenta, /.+/, (release)=>
+					@ask q4.cyan, /.*/, (webroot)=>
+						@write src, module, release, webroot
 
 
 
-	write:(src, module, release)=>
+	write:(src, module, release, webroot)=>
 		filepath = pn "#{@basepath}/toaster.coffee"
 
 		rgx = /(\/)?((\w+)(\.*)(\w+$))/
@@ -79,6 +84,7 @@ build "main"
 		buffer = buffer.replace /(\%module\%)/g, module
 		buffer = buffer.replace "%release%", release
 		buffer = buffer.replace "%debug%", debug
+		buffer = buffer.replace "%webroot%", webroot
 		
 		if path.existsSync filepath
 			question = "\tDo you want to overwrite the file: #{filepath.yellow}"
@@ -91,7 +97,7 @@ build "main"
 			@save filepath, buffer
 			process.exit()
 	
-	save:( filepath, contents)->
+	save:(filepath, contents)->
 		fs.writeFileSync filepath, contents
 		log "#{'Created'.green.bold} #{filepath}"
 		process.exit()

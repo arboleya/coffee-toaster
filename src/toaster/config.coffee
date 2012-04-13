@@ -78,6 +78,7 @@ class Config
 	build:( name, params )=>
 		params.name = name
 		params.vendors = params.vendors ? []
+		params.webroot = params.webroot ? ""
 		params.release = pn "#{@basepath}/#{params.release}"
 		params.debug = pn "#{@basepath}/#{params.debug}"
 		@builds[name] = params

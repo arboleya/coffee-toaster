@@ -99,7 +99,8 @@ class Builder
 				# saving boot loader
 				if @opts.argv.d
 					for f, i in files
-						tmpl = @include_tmpl.replace "%SRC%", "./toaster/#{f}"
+						include = "#{build.webroot}/toaster/#{f}"
+						tmpl = @include_tmpl.replace "%SRC%", include
 						files[i] = tmpl
 
 					# prepare boot loader contents
