@@ -2,7 +2,7 @@ exports.run =-> toaster = new Toaster
 
 #<< toaster/utils/*
 #<< toaster/generators/*
-#<< toaster/config
+#<< toaster/toast
 #<< toaster/cli
 
 class Toaster
@@ -26,8 +26,8 @@ class Toaster
 		if @cli.argv.v
 			filepath = pn __dirname + "/../package.json"
 			contents = fs.readFileSync( filepath, "utf-8" )
-			schema = JSON.parse( contents ).version
-			return log schema
+			schema = JSON.parse( contents )
+			return log schema.version
 		
 		# scaffolds basic structure for new projects
 		else if @cli.argv.n
@@ -39,8 +39,8 @@ class Toaster
 
 		# watch
 		else if @cli.argv.w
-			@config = new toaster.Config @
-			@builder = new Builder @, @cli
+			@config = new toaster.Toast @
+			@builder = new Builder @, @config, @cli
 			return
 
 		# help

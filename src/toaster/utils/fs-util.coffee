@@ -43,10 +43,11 @@ class FsUtil
 
 
 	@ls_folders:(basepath, fn)->
-		exec "find -type d", (error, stdout, stderr)=>
+		basepath = basepath.slice 0, -1 if basepath.slice -1 == "/"
+		exec "find #{basepath} -maxdepth 1 -type d", (error, stdout, stderr)=>
 			buffer = []
 			for item in items = stdout.trim().split "\n"
-				buffer.push item if item != "." && item != ".." && item != ""
+				buffer.push item if item != basepath
 			fn buffer
 
 
