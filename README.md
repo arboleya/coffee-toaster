@@ -1,6 +1,6 @@
 ![Coffee Toaster](http://github.com/serpentem/coffee-toaster/blob/0.5.0/images/toaster.png?raw=true)
 
-Version 0.5.0
+Version 0.5.5
 
 CoffeeToaster is a dependency manager and build system for CoffeeScript.
 
@@ -12,10 +12,10 @@ A smart 'require' powered by wild-cards is also provided, together with a<BR>
 powerful build system that concatenates everything and outputs a single<BR>
 javascript release file that can be even minified if you like.
 
-The build system was developed to offer vendors support as well as merging<BR>
-routines for multiple modules, with specific ordering options. If you are<BR>
-adept of the extends directive in CoffeeScript, Toaster will even check if<BR>
-you have required base classes for the classes that extends another.
+The build system was developed to offer vendors support, with specific<BR>
+ordering options. If you are adept of the extends directive in CoffeeScript,<BR>
+Toaster will even check if you have required base classes for the classes<BR>
+that extends another.
 
 The CLI program informs you about everything that is happening when a new<BR>
 file is created, deleted or modified. You can even drag'n'drop a folder with<BR>
@@ -26,6 +26,10 @@ If you are building for the browser you can use the debug option to compile<BR>
 everything individually -- plus, node targeted support is on the way. In <BR>
 debug mode you'll be gifted with a boot-loader that will load every file in<BR>
 the proper order according your needs.
+
+I should also mention that it's not some kind of AMD or CJS implementation,<BR>
+as you may be thinking. It's much more like a new point of view based on my<BR>
+specific needs and personal taste, which I didn't come up with a fancy name yet.
 
 Keep on reading this README, and please do not hesitate to open a feature<BR>
 request or a bug report.<BR>
@@ -38,12 +42,11 @@ https://groups.google.com/group/coffee-toaster
 # Features
 
 * Inheritance support across multiples files for the lazy
- * You can require any file whenever your want to.
+ * You can require any file whenever your want to
 * Vendors management
-* Multiple modules support in the same environment
-* Micro build routines across all modules and vendors
 * Packaging System & Namespaces
- * Automagic packaging system that uses folders as namespaces, 
+ * Automagic packaging system that uses folders as namespaces
+* Micro build routines to help you customize and release your peace of code
 * Exports aliases
  * Lets you set a top package to list all your modules
 * Broken and circular-loop dependencies validation
@@ -56,7 +59,7 @@ https://groups.google.com/group/coffee-toaster
 * Debug Mode
  * In order to provide an easy debugging routine once inside the browser,<BR>
  all files will be compiled individually into its respectives '.js' versions<BR>
- and a smart boot-loader (toaster.js) is provided to load every file<BR>
+ and a smart boot-loader (your-debug-file.js) is provided to load every file<BR>
  orderly. Just include this boot-loader in your html file and voilà
 * Minify support
  * Aiming to be practical, the output can be even minified (using uglify-js)
@@ -80,40 +83,48 @@ customize it as you like.
 
 You will be asked for some things:
 
-1. **src** - Relative folderpath to your source folder.
+1. **source folder** - Relative folderpath to your source folder.
   * i.e.: src
-1. **main module** - Name of your main module folder (shoud be inside src).
-  * i.e.: app
-1. **release** - Release filepath for your main build routine.
-  * i.e.: release/app.js
+1. **release file** - Path to your release file.
+  * i.e.: www/js/app.js
+1. **http folder** - The folderpath to reach your debug file through http,<BR>
+in case it is  not inside your root directory. Imagine that the 'www' is<BR>
+your root folder, so you'd just need to inform 'js' as the http folder.
+  * i.e.: js
+
+Your release file will not be affected by the 'http folder' property.
 
 Considering all the default values, you'll end up with a structure as such:
 
-	mynewapp/
-	├── release
+	myawsomeapp/
 	├── src
-	│   └── app
-	├── toaster.coffee
-	└── vendors
+	├── vendors
+	├── www
+	    └── js
+	└── toaster.coffee
+
+	4 directories, 1 file
 
 The toaster.coffee file will have this content:
 
 ````ruby
-	# ROOT SRC FOLDER
-	src 'src'
 
-	# MODULES
-	module 'app'
+	# => SRC FOLDER
+		toast 'src'
+			# => VENDORS (optional)
+			# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
 
-	# BUILD ROUTINES
-	build "main"
-		modules: ['app']
-		release: 'release/app.js'
-		debug: 'release/app-debug.js'
+			# => OPTIONS (optional, default values listed)
+			# bare: false
+			# packaging: true
+			# expose: ''
+			# minify: false
+
+			# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
+			httpfolder: 'js'
+			release: 'www/js/app.js'
+			debug: 'www/js/app-debug.js'
 ````
-
-Configure everything following the inline help and you'll end up with a<BR>
-working project.
 
 ## Toasting an existing project
 
@@ -126,10 +137,10 @@ Or:
 
 	toaster -i existing-project
 
-Some of the same information (src, release) will be required -- answer<BR>
-everything according to your project's structure.
+Some of the same information (src, release and http folder) will be required,<BR>
+answer everything according to your project's structure.
 
-A 'toaster.coffee' file will be created inside it.
+A 'toaster.coffee' file will be created inside of it.
 
 ## When the magic happens
 
@@ -143,7 +154,7 @@ Or:
 
 	toaster -w existing-project
 
-Your release file will be saved according to your needs.
+Your release file will be saved according your configuration.
 
 # Debug Mode
 
@@ -160,57 +171,61 @@ Javascript within.
 
 Bellow is a representative directory structure:
 
-	├── release
-	│   ├── app-debug.js
-	│   ├── app.js
-	│   ├── index.html
-	│   └── toaster
-	│       └── basic
-	│           ├── app.js
-	│           ├── letters
-	│           │   ├── a.js
-	│           │   └── b.js
-	│           ├── repeating
-	│           │   ├── a.js
-	│           │   └── b.js
-	│           ├── single
-	│           │   └── script.js
-	│           └── toplevel.js
+	usage/
+	├── vendors
 	├── src
-	│   └── basic
-	│       ├── app.coffee
-	│       ├── letters
-	│       │   ├── a.coffee
-	│       │   └── b.coffee
-	│       ├── repeating
-	│       │   ├── a.coffee
-	│       │   └── b.coffee
-	│       ├── single
-	│       │   └── script.coffee
-	│       └── toplevel.coffee
-	├── toaster.coffee
-	└── vendors
-	    ├── _.js
-	    └── jquery.js
-
+	│   ├── app
+	│   │   └── app.coffee
+	│   ├── artists
+	│   │   ├── progressive
+	│   │   │   ├── kingcrimson.coffee
+	│   │   │   ├── themarsvolta.coffee
+	│   │   │   └── tool.coffee
+	│   │   └── triphop
+	│   │       ├── lovage.coffee
+	│   │       ├── massiveattack.coffee
+	│   │       └── portishead.coffee
+	│   └── genres
+	│       ├── progressive.coffee
+	│       └── triphop.coffee
+	├── www
+	│   ├── index.html
+	│   └── js
+	│       ├── app.js
+	│       ├── app-debug.js
+	│       └── toaster
+	│           ├── app
+	│           │   └── app.js
+	│           ├── artists
+	│           │   ├── progressive
+	│           │   │   ├── kingcrimson.js
+	│           │   │   ├── themarsvolta.js
+	│           │   │   └── tool.js
+	│           │   └── triphop
+	│           │       ├── lovage.js
+	│           │       ├── massiveattack.js
+	│           │       └── portishead.js
+	│           └── genres
+	│               ├── progressive.js
+	│               └── triphop.js
+	└── toaster.coffee
 
 The debug file you've chosen is the boot-loader responsible to load all your<BR>
 files into the right order.
 
 So in your .html you'll have two options:
 
-**1)** Include your release file (release/app.js)
+**1)** Include your release file.
 
 ````html
-	<script src="app.js"></script>
+	<script src="js/app.js"></script>
 ````
  
-**2)** Include the toaster boot-loader (release/toaster/toaster.js)
+**2)** Include the toaster boot-loader (your debug mode).
 
 ````html
-	<script src="app-debug.js"></script>
+	<script src="js/app-debug.js"></script>
 ````
-
 
 # How does everything work?
 
@@ -218,33 +233,131 @@ CoffeeToaster will create a file called 'toaster.coffee' in your app main folder
 
 ## Config File (toaster.coffee)
 
-This file contains information on the modules you have in your app, i.e:
+This file contains information of your app, i.e:
 
 ````ruby
 
-	src 'src'
-	
-	module 'basic'
-		vendors: ['_', 'jquery']
-		bare: false
-		packaging: true
-		expose: 'window'
-		minify: false
+	# => SRC FOLDER
+		toast 'src'
+			# => VENDORS (optional)
+			# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
+
+			# => OPTIONS (optional, default values listed)
+			# bare: false
+			# packaging: true
+			# expose: ''
+			# minify: false
+
+			# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
+			httpfolder: 'js'
+			release: 'www/js/app.js'
+			debug: 'www/js/app-debug.js'
 ````
+
+### Vendors
+
+You can define vendors such as:
+
+````ruby
+
+	vendors: ['vendors/x.js', 'vendors/y.js', ... ]
+````
+
+It's an ordered array of all your vendor's paths. These files must be purely<BR>
+javascript, preferably minified ones -- Toaster will not compile or minify<BR>
+them, only concatenate everything.
+
+### Bare
+
+If true, compile your CS files without the top-level function safety wrapper:
+
+````javascript
+
+	(function() {
+	  # bunch of code
+	}).call(this);
+````
+
+So you will end up with just 'bunch of code':
+
+
+````javascript
+
+	# bunch of code
+````
+
+### Packaging
+
+If true, use all your folders as namespaces to your class definitions.
+
+If you have class 'Lovage' declared inside the "artists/triphop" folder, you<BR>
+can access it through 'artists.triphop.Lovage'.
+
+````javascript
+
+	# usual way
+	new Lovage
+	
+	# with packaging=true
+	new artists.triphop.Lovage
+````
+
+### Expose
+
+If informed, list all you packages of classes in the given scope. If you use<BR>
+'window' as your expose scope, your classes will be available also in the<BR>
+window object -- or whatever scope you inform.
+
+````javascript
+	
+	new window.artists.triphop.Lovage
+````
+
+### Minify
+
+If true, minify your release file -- debug files are never minified.
+
+### HTTP Folder
+
+The folder path to reach your debug file through http, in case it is not<BR>
+inside your root directory. Imagine that the 'www' is your root folder, and<BR>
+you have a 'js' folder inside of it with your 'debug.js' file inside of it.
+
+Following this case you'd just need to inform 'js' as your http folder.
+
+So the declarations inside the debug boot loader will follow this location<BR>
+in order to import your scripts in debug mode, prepending your http folder<BR>
+to all file paths.
+
+Your release file will not be affected by this property.
+
+### Release
+
+The file path to your release file.
+
+### Debug
+
+The file path to your debug file.
+
+## Conlusion
 
 So when you call 'toaster -w' in this directory, this config is loaded and<BR>
 every file and folder inside 'src' folder will be watched.
 
 If debug is enabled (option -d), files will be also compiled individually<BR>
-for a sane debugging routine, inside the browser.
+for a sane debugging routine inside the browser, in the same directory you<BR>
+have your debug file.
 
 Every time something changes, CoffeeToaster re-compiles all of your<BR>
 application by:
 
 * collecting all .coffee files and processing everything, adding package<BR>
-declarations to class definitions, based on the folder they are located
+declarations to class definitions based on the folder they are located
 * re-ordering everything, always defining files and classes before<BR>
 they're needed
+* merge all yours vendors in the given order
+* declare root namespaces
+* merge everything
 
 Hold it! How the hell does it know when my files or classes are needed?
 
@@ -252,150 +365,23 @@ Hold it! How the hell does it know when my files or classes are needed?
 
 The import directive is known by:
 
- * #<< mvc/views/user_view
- * #<< utils/*
+ * #<< app/views/user_view
+ * #<< app/utils/*
 
-By putting '#<< package/name/View' in your CoffeeScript file, you're telling<BR>
-CoffeeToaster that there's a dependency.
+By putting '#<< app/views/user_view' in your CoffeeScript file, you're<BR>
+telling CoffeeToaster that there's a dependency.
 
-Wild cards '#<< utils/*' are also accepted as a handy option.
-
-## Vendors
-
-You can define vendors such as:
-
-````ruby
-
-	vendor 'jquery', 'vendors/jquery.js'
-	vendor '_', 'vendors/_.js'
-````
-
-Basically you name it and inform where it is, and the file must be purely<BR>
-in javascript, preferably minified ones -- Toaster will not compile or<BR>
-minify them, only concatenate everything.
-
-
-## Multi Modules
-
-You can have as many modules as you want such as:
-
-````ruby
-
-	src 'src'
-	
-	module 'foo'
-		vendors: ['_', 'jquery']
-
-	module 'boo'
-		vendors: ['towerjs', 'dojo']
-````
-
-In order to concatenate multiple modules, you will need to use build routines.
-
-## Build Routines
-
-Build routines are simple specifications where you tell Toaster how to build<BR>
-your library. You can have as many modules and vendors as you want.
-
-````ruby
-
-	build "main"
-		modules: ['module1', 'module2', ...N]
-		release: './release/app.js'
-		debug: './release/app-debug.js'
-````
-
-Note that the array order you choose when informing the modules for your<BR>
-build will be preserved.
-
-## Minify Support
-
-To minify you release file all you need to do is turn on the minify<BR>
-property in the 'toaster.coffee' file for your desired module.
-
-````ruby
-	
-	module 'foo'
-		vendors: ['_', 'jquery']
-		minify: true
-````
+Wild cards '#<< app/utils/*' are also accepted as a handy option.
 
 # Examples
 
-You'll certainly find some useful resources in the two examples provided.<BR>
-Examine them and you'll understand how things works more instinctively.
+You'll certainly find some useful resources in the usage example provided.<BR>
+Examine it and you'll understand how things works more instinctively.
 
-Install coffee-toaster, clone the examples and try different config options<BR>
-always looking for the differences in your javascript release file.
+Install coffee-toaster, clone the usage example and try different config<BR>
+options, always looking for the differences in your javascript release file.
 
-## Basic Example
-
-This example uses:
-
-* One single module
-* Two vendors
-
-There are files and classes with the same name to show the packaging system.
-
-The packaging system will address every class definition to a namespace,that<BR>
-is computed automatically according to the path where your physical file is.
-
-Imagine that you have a class "Foo" inside a "my/path/foo.coffee" file. This<BR>
-class will be addressed to the namespace "my.path", so you can instantiate it:
-
-````ruby
-
-	# usual way
-	new Foo
-	
-	# unique way using the packaging system
-	new my.path.Foo
-```
-
-### Config file 
-
-The config file explained (exemplified):
-
-```ruby
-
-	# VENDORS
-	vendor 'jquery', 'vendors/jquery.js'
-	vendor '_', 'vendors/_.js'
-
-
-	# ROOT SRC FOLDER
-	src 'src'
-
-
-	# MODULES
-	module 'basic' # module folder (inside src)
-		vendors: ['_', 'jquery'] # (ordered vendor's array)
-		bare: false # default = false (compile coffeescript with bare option)
-		packaging: true # default = true
-		expose: "window" # default = null (if informed, link all objects inside it)
-		minify: false # default = false (minifies release file only)
-
-
-	# BUILD ROUTINES
-	build "main"
-		modules: ['basic']
-		release: './release/app.js'
-		debug: './release/app-debug.js'
-```
-
-> [Source Code](https://github.com/serpentem/coffee-toaster/tree/master/examples/basic)
-
-## Multi-Modules Example
-
-This example uses:
-
-* Two modules
-* Two build-configs with different merging options to show possibilities
-
-The packaging system is enabled here as well, try different options and do<BR>
-not forget to check the<BR> differences in your javascript release file.
-
-> [Source Code](https://github.com/serpentem/coffee-toaster/tree/master/examples/multimodules)
+> [Source Code](https://github.com/serpentem/coffee-toaster/tree/master/usage)
 
 # Issues
 
@@ -409,6 +395,13 @@ be answered sooner than later.<BR>
 https://groups.google.com/group/coffee-toaster
 
 # Changelog
+
+## 0.5.5 - 04/19/2012
+ * Config file was re-written to be more practical
+ * Build routines removed in favor of simplicity
+ * Multi-modules option is default now, without configuring anything
+ * HTTP Folder property added to 'toaster.coffee' config file
+ * Scaffolding routines improved according the design changes
 
 ## 0.5.0 - 04/12/2012
  * Packaging system completely revamped

@@ -43,7 +43,7 @@ class Builder
 		@expose = @config.expose ? @opts.argv.expose
 		@minify = @config.minify ? @opts.argv.minify
 
-		@webroot = @config.webroot ? ''
+		@httpfolder = @config.httpfolder ? ''
 		@release = @config.release
 		@debug = @config.debug
 
@@ -104,7 +104,7 @@ class Builder
 				# saving boot loader
 				if @opts.argv.d
 					for f, i in files
-						include = "#{@webroot}/toaster/#{f}"
+						include = "#{@httpfolder}/toaster/#{f}"
 						tmpl = @include_tmpl.replace "%SRC%", include
 						files[i] = tmpl
 

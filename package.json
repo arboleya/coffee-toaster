@@ -1,8 +1,8 @@
 {
   "author"         : "Anderson Arboleya <anderson@arboleya.me>",
   "name"           : "coffee-toaster",
-  "description"    : "Minimalist dependency management system for coffee-script.",
-  "version"        : "0.5.0",
+  "description"    : "Dependency manager and build system for CoffeeScript.",
+  "version"        : "0.5.5",
 
   "repository"     : {
     "type"           : "git",

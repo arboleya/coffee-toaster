@@ -51,7 +51,7 @@ class Toast
 		@expose = if params.expose == undefined ? null else params.expose
 		@minify = params.minify ? false
 
-		# RELEASE / DEBUG
-		@webroot = params.webroot ? ""
+		# HTTP FOLDER / RELEASE / DEBUG
+		@httpfolder = params.httpfolder ? ""
 		@release = pn "#{@basepath}/#{params.release}"
 		@debug = pn "#{@basepath}/#{params.debug}"

@@ -9,7 +9,7 @@ toast 'src'
 	# expose: ''
 	# minify: false
 
-	# => WEBROOT (optional), RELEASE / DEBUG (required)
-	webroot: 'js'
+	# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
+	httpfolder: 'js'
 	release: 'www/js/app.js'
 	debug: 'www/js/app-debug.js'
