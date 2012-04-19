@@ -20,8 +20,8 @@ toast '%src%'
 	# expose: ''
 	# minify: false
 
-	# => WEBROOT (optional), RELEASE / DEBUG (required)
-	webroot: '%webroot%'
+	# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
+	httpfolder: '%httpfolder%'
 	release: '%release%'
 	debug: '%debug%'
 	"""
@@ -45,12 +45,12 @@ toast '%src%'
 
 		@ask q1.magenta, /.+/, (src)=>
 			@ask q2.magenta, /.+/, (release)=>
-				@ask q3.cyan, /.*/, (webroot)=>
-					@write src, release, webroot
+				@ask q3.cyan, /.*/, (httpfolder)=>
+					@write src, release, httpfolder
 
 
 
-	write:(src, release, webroot)=>
+	write:(src, release, httpfolder)=>
 		filepath = pn "#{@basepath}/toaster.coffee"
 
 		rgx = /(\/)?((\w+)(\.*)(\w+$))/
@@ -65,7 +65,7 @@ toast '%src%'
 		buffer = @tpl.replace "%src%", src
 		buffer = buffer.replace "%release%", release
 		buffer = buffer.replace "%debug%", debug
-		buffer = buffer.replace "%webroot%", webroot
+		buffer = buffer.replace "%httpfolder%", httpfolder
 
 		if path.existsSync filepath
 			question = "\tDo you want to overwrite the file: #{filepath.yellow}"

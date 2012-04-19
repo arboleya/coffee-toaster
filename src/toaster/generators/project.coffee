@@ -36,19 +36,19 @@ class Project extends Question
 
 		@ask q1.magenta, /.*/, (src = null)=>
 			@ask q2.magenta, /.*/, (release = null)=>
-				@ask q3.cyan, /.*/, (webroot = null)=>
+				@ask q3.cyan, /.*/, (httpfolder = null)=>
 					$src = src || "src"
 					$release = release || "www/js/app.js"
-					if src is '' and release is '' and webroot is ''
-						$webroot = 'js'
+					if src is '' and release is '' and httpfolder is ''
+						$httpfolder = 'js'
 					else
-						$webroot = webroot || ""
-					@scaffold target, $src, $release, $webroot
+						$httpfolder = httpfolder || ""
+					@scaffold target, $src, $release, $httpfolder
 					process.exit()
 
 
 
-	scaffold:(target, src, release, webroot)=>
+	scaffold:(target, src, release, httpfolder)=>
 		srcdir = pn "#{target}/#{src}"
 		vendorsdir = pn "#{target}/vendors"
 		releasefile = pn "#{target}/#{release}"
@@ -62,4 +62,4 @@ class Project extends Question
 		srcdir = srcdir.replace( target, "" ).substr 1
 		releasefile = releasefile.replace( target, "" ).substr 1
 
-		new Config( target ).write srcdir, releasefile, webroot
+		new Config( target ).write srcdir, releasefile, httpfolder
