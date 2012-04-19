@@ -9,37 +9,21 @@ class Config extends Question
 
 	# variables
 	tpl: """
-# VENDORS
-# vendor 'vendor_id', 'vendors/id.js'
-# vendor 'vendor_id_b', 'vendors/id_b.js'
+# => SRC FOLDER
+toast '%src%'
+	# => VENDORS (optional)
+	# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
 
+	# => OPTIONS (optional, default values listed)
+	# bare: false
+	# packaging: true
+	# expose: ''
+	# minify: false
 
-# ROOT SRC FOLDER
-src '%src%'
-
-
-# MODULES
-module '%module%' # module folder name (inside src)
-	# vendors: ['id', 'id_b'] # (ordered vendor's array)
-	bare: false # default = false (compile coffeescript with bare option)
-	packaging: true # default = true
-	expose: null # default = null (if informed, link all objects inside it)
-	minify: false # default = false (minifies release file only)
-
-# module 'another_module_folder'
-# 	(...)
-
-
-# BUILD ROUTINES
-build "main"
-	# vendors: ['vendor_id', 'vendor_id_b']
-	modules: ['%module%']
-	webroot: "%webroot%"
+	# => WEBROOT (optional), RELEASE / DEBUG (required)
+	webroot: '%webroot%'
 	release: '%release%'
 	debug: '%debug%'
-
-# build 'another_build_routine'
-# 	(...)
 	"""
 	
 	constructor:(@basepath)->
@@ -55,20 +39,18 @@ build "main"
 		log ". Please, tell me:"
 
 		q1 = "\tWhere's your src folder? (i.e. src): "
-		q2 = "\tWhat's the name of your main module? (i.e. app) : "
-		q3 = "\tWhere do you want your release file? (i.e. www/app.js) : "
-		q4 = "\tStarting from your webroot ('/'), what's the folderpath to \n"+
-			 "\treach your release file? (i.e. javascript) (optional) : "
+		q2 = "\tWhere do you want your release file? (i.e. www/js/app.js) : "
+		q3 = "\tStarting from your webroot '/', what's the folderpath to "+
+			 "reach your release file? (i.e. js) (optional) : "
 
 		@ask q1.magenta, /.+/, (src)=>
-			@ask q2.cyan, /.+/, (module)=>
-				@ask q3.magenta, /.+/, (release)=>
-					@ask q4.cyan, /.*/, (webroot)=>
-						@write src, module, release, webroot
+			@ask q2.magenta, /.+/, (release)=>
+				@ask q3.cyan, /.*/, (webroot)=>
+					@write src, release, webroot
 
 
 
-	write:(src, module, release, webroot)=>
+	write:(src, release, webroot)=>
 		filepath = pn "#{@basepath}/toaster.coffee"
 
 		rgx = /(\/)?((\w+)(\.*)(\w+$))/
@@ -81,11 +63,10 @@ build "main"
 			debug = "#{release}-debug"
 
 		buffer = @tpl.replace "%src%", src
-		buffer = buffer.replace /(\%module\%)/g, module
 		buffer = buffer.replace "%release%", release
 		buffer = buffer.replace "%debug%", debug
 		buffer = buffer.replace "%webroot%", webroot
-		
+
 		if path.existsSync filepath
 			question = "\tDo you want to overwrite the file: #{filepath.yellow}"
 			question += " ? [y/N] : ".white

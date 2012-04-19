@@ -26,10 +26,21 @@ class FsUtil
 
 	@mkdir_p:(folderpath)->
 		folders = folderpath.split "/"
+
 		for folder, index in folders
+
+			folder = folders.slice( 0, index + 1 ).join "/"
 			continue if folder == ""
-			if !path.existsSync( folder = folders.slice( 0, index + 1 ).join "/" )
+			exists = path.existsSync folder
+
+
+			if exists and index is folders.length - 1
+				throw new Error error( "Folder exists: #{folder.red}" )
+				return false
+			else if !exists
 				fs.mkdirSync folder, '0755'
+
+		return true
 
 
 

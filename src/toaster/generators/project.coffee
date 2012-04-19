@@ -24,57 +24,42 @@ class Project extends Question
 		
 		if name? && src? && release?
 			return @scaffold target, name, src, release
-		
-		default_name = target.split('/').pop()
 
 		log "#{'Let\'s toast something fresh! :)'.grey.bold}"
 		log ". With this as your basepath: #{target.cyan}"
 		log ". Please tell me:"
 
 		q1 = "\tWhere do you want your src folder? [src] : "
-		q2 = "\tWhat will be the name of your main module? [app] : "
-		q3 = "\tWhere do you want your release file? [www/app.js] : "
-		q4 = "\tStarting from your webroot ('/'), what's the folderpath to \n"+
-			 "\treach your release file? (i.e. javascript) (optional) : "
-		
-		@ask q1.magenta, /.*/, (src)=>
-			@ask q2.cyan, /.*/, (module)=>
-				@ask q3.magenta, /.*/, (release)=>
-					@ask q4.cyan, /.*/, (webroot)=>
-						src = src || "src"
-						module = module || "app"
-						release = release || "www/app.js"
-						@scaffold target, src, module, release, webroot
-						process.exit()
+		q2 = "\tWhere do you want your release file? [www/js/app.js] : "
+		q3 = "\tStarting from your webroot '/', what's the folderpath to "+
+			 "reach your release file? (i.e. javascript) (optional) : "
+
+		@ask q1.magenta, /.*/, (src = null)=>
+			@ask q2.magenta, /.*/, (release = null)=>
+				@ask q3.cyan, /.*/, (webroot = null)=>
+					$src = src || "src"
+					$release = release || "www/js/app.js"
+					if src is '' and release is '' and webroot is ''
+						$webroot = 'js'
+					else
+						$webroot = webroot || ""
+					@scaffold target, $src, $release, $webroot
+					process.exit()
 
 
 
-	scaffold:(target, src, module, release, webroot)=>
+	scaffold:(target, src, release, webroot)=>
 		srcdir = pn "#{target}/#{src}"
-		moduledir = pn "#{srcdir}/#{module}" 
 		vendorsdir = pn "#{target}/vendors"
 		releasefile = pn "#{target}/#{release}"
 		releasedir = releasefile.split("/").slice(0, -1).join "/"
 		
-		if path.existsSync target
-			return error "Folder exists! #{target.red}"
-		
-		fs.mkdirSync target, '0755'
-		log "#{'Created'.green.bold} #{target}"
+		log "#{'Created'.green.bold} #{target}" if FsUtil.mkdir_p target
+		log "#{'Created'.green.bold} #{srcdir}" if FsUtil.mkdir_p srcdir
+		log "#{'Created'.green.bold} #{vendorsdir}" if FsUtil.mkdir_p vendorsdir
+		log "#{'Created'.green.bold} #{releasedir}" if FsUtil.mkdir_p releasedir
 
-		fs.mkdirSync srcdir, '0755'
-		log "#{'Created'.green.bold} #{srcdir}"
-
-		fs.mkdirSync moduledir, '0755'
-		log "#{'Created'.green.bold} #{moduledir}"
-
-		fs.mkdirSync vendorsdir, '0755'
-		log "#{'Created'.green.bold} #{vendorsdir}"
-		
-		fs.mkdirSync releasedir, '0755'
-		log "#{'Created'.green.bold} #{releasedir}"
-		
 		srcdir = srcdir.replace( target, "" ).substr 1
 		releasefile = releasefile.replace( target, "" ).substr 1
-		
-		new Config( target ).write srcdir, module, releasefile, webroot
+
+		new Config( target ).write srcdir, releasefile, webroot

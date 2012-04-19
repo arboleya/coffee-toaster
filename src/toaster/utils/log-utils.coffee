@@ -10,13 +10,15 @@ icon_error = '/Users/nybras/Dropbox/Workspace/serpentem/coffee-toaster/images/er
 # LOGGING METHODS
 log = ( msg, send_to_growl = false ) ->
 	console.log msg
+	return msg
 
 debug = ( msg, send_to_growl = false ) ->
-	log "#{msg.magenta}"
+	msg = log "#{msg.magenta}"
+	return msg
 
 
 error = ( msg, send_to_growl = true, file = null ) ->
-	log "ERROR ".bold.red + msg
+	msg = log "ERROR ".bold.red + msg
 
 	if send_to_growl
 
@@ -32,9 +34,11 @@ error = ( msg, send_to_growl = true, file = null ) ->
 			opts:
 				title: 'Coffee Toaster'
 				image: icon_error
+	
+	return msg
 
 warn = ( msg, send_to_growl = true ) ->
-	log "WARNING ".bold.yellow + msg
+	msg = log "WARNING ".bold.yellow + msg
 
 	if send_to_growl
 
@@ -50,6 +54,8 @@ warn = ( msg, send_to_growl = true ) ->
 			opts:
 				title: 'Coffee Toaster'
 				image: icon_warn
+	
+	return msg
 
 
 
