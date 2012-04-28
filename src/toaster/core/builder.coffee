@@ -42,6 +42,7 @@ class Builder
 		@packaging = @config.packaging ? @opts.argv.packaging
 		@expose = @config.expose ? @opts.argv.expose
 		@minify = @config.minify ? @opts.argv.minify
+		@exclude = @config.exclude ? @opts.argv.exclude
 
 		@httpfolder = @config.httpfolder ? ''
 		@release = @config.release
@@ -59,7 +60,11 @@ class Builder
 		FsUtil.find @src, "*.coffee", (result) =>
 
 			# collects every files into Script instances
-			@files.push new Script @, file, @opts, @bare for file in result
+			for file in result
+				include = true
+				include &= !(new RegExp( item ).test file) for item in @exclude
+
+				@files.push new Script @, file, @opts, @bare if include
 
 			# builds for the first time
 			@build =>
@@ -67,7 +72,7 @@ class Builder
 				@watch() if @opts.argv.w
 
 
-	
+
 	build:( fn )=>
 		# get all root namespaces
 		FsUtil.ls_folders @src, ( folders )=>
@@ -242,7 +247,14 @@ class Builder
 			FsUtil.mkdir_p folder_path if !path.existsSync folder_path
 
 			# writing file
-			fs.writeFileSync absolute_path, cs.compile file.raw, {bare:0}
+			try
+				fs.writeFileSync absolute_path, cs.compile file.raw, {bare:0}
+			catch err
+				msg = err.message.replace '"', '\\"'
+				console.log "MSG:::: " + msg
+				msg = "#{msg.white} at file: " + "#{file.filepath}".bold.red
+				error msg
+				continue
 
 			# adds to the files buffer
 			files.push relative_path

@@ -8,7 +8,7 @@ class Script
 
 
 
-	constructor: (@module, @realpath, @opts) ->
+	constructor: (@builder, @realpath, @opts) ->
 		@getinfo()
 
 
@@ -22,7 +22,7 @@ class Script
 		@baseclasses = []
 
 		# assemble some information about the file
-		@filepath   = @realpath.replace( @module.src, "" ).substr 1
+		@filepath   = @realpath.replace( @builder.src, "" ).substr 1
 		@filename   = /[\w-]+\.[\w-]+/.exec( @filepath )[ 0 ]
 		@filefolder = @filepath.replace( "/#{@filename}", "") + "/"
 		@namespace  = ""
@@ -51,16 +51,16 @@ class Script
 				# as well as the expose thing
 
 				# PACKAGING=true && EXPOSE=null
-				if @module.packaging && !@module.expose?
+				if @builder.packaging && !@builder.expose?
 					repl = "$1 __t('#{@namespace}').$2$3"
 
 				# PACKAGING=true && EXPOSE=something
-				else if @module.packaging && @module.expose?
-					repl = "$1 __t('#{@namespace}', #{@module.expose}).$2$3"
+				else if @builder.packaging && @builder.expose?
+					repl = "$1 __t('#{@namespace}', #{@builder.expose}).$2$3"
 
 				# PACKAGING=false && EXPOSE=something
-				else if !@module.packaging && @module.expose?
-					repl = "$1 #{@module.expose}.$2$3"
+				else if !@builder.packaging && @builder.expose?
+					repl = "$1 #{@builder.expose}.$2$3"
 
 				if repl?
 					@raw = @raw.replace rgx, repl
@@ -100,8 +100,8 @@ class Script
 
 	expand_dependencies:()->
 
-		# referencies the module's files array
-		files = @module.files
+		# referencies the builder's files array
+		files = @builder.files
 
 		# resets the dependencies array
 		@dependencies = []
@@ -126,4 +126,8 @@ class Script
 				continue
 			
 			# otherwise rewrites found array with filepath info only
-			@dependencies.push expanded.item.filepath for expanded in found
+			for expanded in found
+				if expanded.item.filepath isnt @filepath
+					@dependencies.push expanded.item.filepath
+
+		@dependencies

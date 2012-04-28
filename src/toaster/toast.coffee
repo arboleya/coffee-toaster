@@ -46,6 +46,7 @@ class Toast
 		@vendors = params.vendors ? []
 
 		# OPTIONS
+		@exclude = params.exclude ? []
 		@bare = params.bare ? false
 		@packaging = params.packaging ? true
 		@expose = if params.expose == undefined ? null else params.expose
