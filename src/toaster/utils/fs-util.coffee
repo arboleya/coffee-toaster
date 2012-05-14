@@ -54,7 +54,7 @@ class FsUtil
 
 
 	@ls_folders:(basepath, fn)->
-		basepath = basepath.slice 0, -1 if basepath.slice -1 == "/"
+		basepath = basepath.slice( 0, -1 ) if basepath.slice( -1 ) == "/"
 		exec "find #{basepath} -maxdepth 1 -type d", (error, stdout, stderr)=>
 			buffer = []
 			for item in items = stdout.trim().split "\n"
