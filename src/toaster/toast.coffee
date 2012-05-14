@@ -35,7 +35,7 @@ class Toast
 		# configuration object shared between builders
 		config =
 				# RUNNING BUILDERS
-				running_builders: 0
+				is_building: false
 
 				# BASEPATH
 				basepath: @basepath
@@ -81,5 +81,4 @@ class Toast
 						"\n\t" + pn( "#{@basepath}/toaster.coffee" ).yellow
 				return process.exit()
 
-			config.running_builders++
-			new Builder @toaster, @toaster.cli, config
+		new Builder @toaster, @toaster.cli, config

@@ -45,7 +45,7 @@ class FsUtil
 
 
 	@find:(folderpath, pattern, fn)->
-		exec "find #{folderpath} -name '#{pattern}'", (error, stdout, stderr)=>
+		exec "find -L #{folderpath} -name '#{pattern}'", (error, stdout, stderr)=>
 			buffer = []
 			for item in items = stdout.trim().split "\n"
 				buffer.push item if item != "." && item != ".." && item != ""

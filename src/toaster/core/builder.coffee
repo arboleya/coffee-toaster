@@ -46,9 +46,8 @@ class Builder
 		@debug = @config.debug
 
 		@init =>
-			if --@config.running_builders is 0
-				@build =>
-					@watch() if @cli.argv.w
+			@build =>
+				@watch() if @cli.argv.w
 
 	init:( after_init )->
 		# initializes buffer array to keep all tracked files-
@@ -69,6 +68,7 @@ class Builder
 
 					include = true
 					for item in @exclude
+
 						include &= !(new RegExp( item ).test file)
 
 					if include
