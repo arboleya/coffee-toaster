@@ -9,9 +9,6 @@ class Builder
 	uglify = require("uglify-js").uglify
 	uglify_parser = require("uglify-js").parser
 
-	# variables
-	_is_building: false
-
 	_toaster_helper: """
 		__t = ( ns, expose )->
 			curr = null
@@ -35,29 +32,30 @@ class Builder
 
 
 
-	constructor:(@toaster, @toast, @cli)->
-		@vendors = @toast.vendors ? []
+	constructor:(@configer, @cli, @config)->
+		@vendors = @config.vendors ? []
 
-		@bare = @toast.bare ? @cli.argv.bare
-		@packaging = @toast.packaging ? @cli.argv.packaging
-		@expose = @toast.expose ? @cli.argv.expose
-		@minify = @toast.minify ? @cli.argv.minify
-		@exclude = [].concat( @toast.exclude ? @cli.argv.exclude)
+		@bare = @config.bare ? @cli.argv.bare
+		@packaging = @config.packaging ? @cli.argv.packaging
+		@expose = @config.expose ? @cli.argv.expose
+		@minify = @config.minify ? @cli.argv.minify
+		@exclude = [].concat( @config.exclude ? @cli.argv.exclude)
 
-		@httpfolder = @toast.httpfolder ? ''
-		@release = @toast.release
-		@debug = @toast.debug
+		@httpfolder = @config.httpfolder ? ''
+		@release = @config.release
+		@debug = @config.debug
 
 		@init =>
-			@build =>
-				@watch() if @cli.argv.w
+			if --@config.running_builders is 0
+				@build =>
+					@watch() if @cli.argv.w
 
 	init:( after_init )->
 		# initializes buffer array to keep all tracked files-
-		@files = @toaster.files
+		@files = @config.files
 
-		folder_num = @toast.src_folders.length
-		for folder in @toast.src_folders
+		folder_num = @config.src_folders.length
+		for folder in @config.src_folders
 
 			# search for all *.coffee files inside src folder
 			FsUtil.find folder.path, "*.coffee", FnUtil.proxy (folder, result)=>
@@ -83,8 +81,8 @@ class Builder
 
 
 	build:( after_build )=>
-		return if @_is_building is true
-		@_is_building = true
+		return if @config.is_building is true
+		@config.is_building = true
 
 		@build_namespaces ( namespaces )=>
 
@@ -126,7 +124,7 @@ class Builder
 				# write boot-loader file
 				fs.writeFileSync @debug, contents.join( "\n" )
 
-			@_is_building = false
+			@config.is_building = false
 			after_build?()
 
 	# get all root namespaces
@@ -134,7 +132,7 @@ class Builder
 		pending = 0
 		namespaces = ""
 
-		for folder in @toast.src_folders
+		for folder in @config.src_folders
 			if folder.alias?
 				namespaces += @build_namespaces_declaration folder.alias
 			else
@@ -159,7 +157,7 @@ class Builder
 
 	watch:()->
 		# loops through all source folders
-		for src in @toast.src_folders
+		for src in @config.src_folders
 
 			# and watch them entirely
 			FsUtil.watch_folder src.path, /.coffee$/, FnUtil.proxy (src, info)=>
