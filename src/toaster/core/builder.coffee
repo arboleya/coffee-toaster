@@ -10,7 +10,9 @@ class Builder
 	uglify_parser = require("uglify-js").parser
 
 	# variables
-	toaster_helper: """
+	_is_building: false
+
+	_toaster_helper: """
 		__t = ( ns, expose )->
 			curr = null
 			parts = [].concat = ns.split "."
@@ -29,154 +31,196 @@ class Builder
 
 	"""
 
-	include_tmpl: "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
+	_include_tmpl: "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
 
 
 
-	constructor:(@toaster, @config, @opts)->
-		@src = @config.src
+	constructor:(@toaster, @toast, @cli)->
+		@vendors = @toast.vendors ? []
 
-		@vendors = @config.vendors ? []
+		@bare = @toast.bare ? @cli.argv.bare
+		@packaging = @toast.packaging ? @cli.argv.packaging
+		@expose = @toast.expose ? @cli.argv.expose
+		@minify = @toast.minify ? @cli.argv.minify
+		@exclude = [].concat( @toast.exclude ? @cli.argv.exclude)
 
-		@bare = @config.bare ? @opts.argv.bare
-		@packaging = @config.packaging ? @opts.argv.packaging
-		@expose = @config.expose ? @opts.argv.expose
-		@minify = @config.minify ? @opts.argv.minify
-		@exclude = @config.exclude ? @opts.argv.exclude
+		@httpfolder = @toast.httpfolder ? ''
+		@release = @toast.release
+		@debug = @toast.debug
 
-		@httpfolder = @config.httpfolder ? ''
-		@release = @config.release
-		@debug = @config.debug
-
-		@init()
-
-
-
-	init:()->
-		# initializes buffer array to keep all tracked files-
-		@files = []
-
-		# search for all *.coffee files inside src folder
-		FsUtil.find @src, "*.coffee", (result) =>
-
-			# collects every files into Script instances
-			for file in result
-				include = true
-				include &= !(new RegExp( item ).test file) for item in @exclude
-
-				@files.push new Script @, file, @opts, @bare if include
-
-			# builds for the first time
+		@init =>
 			@build =>
-				# ...and start watching for file changes
-				@watch() if @opts.argv.w
+				@watch() if @cli.argv.w
+
+	init:( after_init )->
+		# initializes buffer array to keep all tracked files-
+		@files = @toaster.files
+
+		folder_num = @toast.src_folders.length
+		for folder in @toast.src_folders
+
+			# search for all *.coffee files inside src folder
+			FsUtil.find folder.path, "*.coffee", FnUtil.proxy (folder, result)=>
+
+				# folder path and alias
+				fpath = folder.path
+				falias = folder.alias
+
+				# collects every files into Script instances
+				for file in result
+
+					include = true
+					for item in @exclude
+						include &= !(new RegExp( item ).test file)
+
+					if include
+						s = new Script @, fpath, file, falias, @cli, @bare
+						@files.push s
+
+				after_init?() if --folder_num is 0
+
+			, folder
 
 
+	build:( after_build )=>
+		return if @_is_building is true
+		@_is_building = true
 
-	build:( fn )=>
-		# get all root namespaces
-		FsUtil.ls_folders @src, ( folders )=>
-
-			# prepare namespaces declarations (plus exposes)
-			namespaces = ""
-			for folder in folders
-				folder = folder.match /([^\/]+)$/mg
-				declaration = ""
-				declaration += "var #{folder} = " if @packaging
-				declaration += "#{@expose}.#{@folder} = " if @expose?
-				declaration += "{};" if declaration.length
-				namespaces += "#{declaration}\n"
+		@build_namespaces ( namespaces )=>
 
 			# prepare helper
-			helper = cs.compile @toaster_helper, {bare:true}
+			helper = cs.compile @_toaster_helper, {bare:true}
 
 			# prepare vendors
 			vendors = @merge_vendors()
 
 			# prepare release contents
-			contents = [ vendors, helper, namespaces, @compile() ]
-			
+			contents = [ vendors, helper, namespaces, @compile() ].join '\n'
+
+			# uglifying
+			if @minify
+				ast = uglify_parser.parse contents
+				ast = uglify.ast_mangle ast
+				ast = uglify.ast_squeeze ast
+				contents = uglify.gen_code ast
+
 			# write release file
-			fs.writeFileSync @release, contents.join( "\n" )
+			fs.writeFileSync @release, contents
 
 			# notify user through cli
 			log "#{'+'.bold.green} #{@release}"
 
 			# compiling for debug
-			if @opts.argv.d
+			if @cli.argv.d
 				files = @compile_for_debug()
 
 				# saving boot loader
-				if @opts.argv.d
-					for f, i in files
-						include = "#{@httpfolder}/toaster/#{f}"
-						tmpl = @include_tmpl.replace "%SRC%", include
-						files[i] = tmpl
+				for f, i in files
+					include = "#{@httpfolder}/toaster/#{f}"
+					tmpl = @_include_tmpl.replace "%SRC%", include
+					files[i] = tmpl
 
-					# prepare boot loader contents
-					contents = [ vendors, helper, namespaces, files.join "\n" ]
+				# prepare boot loader contents
+				contents = [ vendors, helper, namespaces, files.join "\n" ]
 
-					# write boot-loader file
-					fs.writeFileSync @debug, contents.join( "\n" )
-			
-			fn?()
+				# write boot-loader file
+				fs.writeFileSync @debug, contents.join( "\n" )
 
+			@_is_building = false
+			after_build?()
+
+	# get all root namespaces
+	build_namespaces:( after_build_namespaces )->
+		pending = 0
+		namespaces = ""
+
+		for folder in @toast.src_folders
+			if folder.alias?
+				namespaces += @build_namespaces_declaration folder.alias
+			else
+				pending++
+				FsUtil.ls_folders folder.path, ( subfolders )=>
+
+					for subfolder in subfolders
+						name = subfolder.match /[^\/]+$/m
+						namespaces += @build_namespaces_declaration name
+
+					after_build_namespaces namespaces if --pending is 0
+
+		after_build_namespaces namespaces if pending is 0
+
+
+	build_namespaces_declaration:( name )=>
+		declaration = ""
+		declaration += "var #{name} = " if @packaging
+		declaration += "#{@expose}.#{name} = " if @expose?
+		declaration += "{};\n" if declaration.length
 
 
 	watch:()->
-		# watch entire source folder
-		FsUtil.watch_folder @src, /.coffee$/, (info) =>
+		# loops through all source folders
+		for src in @toast.src_folders
 
-			# Titleize the type for use in the log messages bellow
-			type = StringUtil.titleize info.type
+			# and watch them entirely
+			FsUtil.watch_folder src.path, /.coffee$/, FnUtil.proxy (src, info)=>
 
-			# relative filepath
-			relative_path = info.path.replace @src, ""
+				# folder path and alias
+				ipath = info.path
+				fpath = src.path
+				falias = src.alias
 
-			# switch over created, deleted, updated and watching
-			switch info.action
+				# Titleize the type for use in the log messages bellow
+				type = StringUtil.titleize info.type
+				# relative filepath
+				relative_path = info.path.replace @src, ""
 
-				# when a new file is created
-				when "created"
+				# switch over created, deleted, updated and watching
+				switch info.action
 
-					# initiate file and adds it to the array
-					if info.type == "file"
-						# toaster/core/script
-						@files.push new Script @, info.path, @opts
+					# when a new file is created
+					when "created"
 
-					# cli msg
-					msg = "#{('New ' + info.type + ' created:').bold.green}"
-					log "#{msg} #{info.path.green}"
+						# initiate file and adds it to the array
+						if info.type == "file"
+							# toaster/core/script
+							s = new Script @, fpath, ipath, falias, @cli, @bare
+							# @files.push new Script @, info.path, @cli
 
-				# when a file is deleted
-				when "deleted"
+						# cli msg
+						msg = "#{('New ' + info.type + ' created:').bold.green}"
+						log "#{msg} #{info.path.green}"
 
-					# removes files from array
-					file = ArrayUtil.find @files, relative_path, "filepath"
-					@files.splice file.index, 1
+					# when a file is deleted
+					when "deleted"
 
-					# cli msg
-					msg = "#{(type + ' deleted, stop watching: ').bold.red}"
-					log "#{msg} #{info.path.red}"
+						# removes files from array
+						file = ArrayUtil.find @files, relative_path, "filepath"
+						@files.splice file.index, 1
 
-				# when a file is updated
-				when "updated"
+						# cli msg
+						msg = "#{(type + ' deleted, stop watching: ').bold.red}"
+						log "#{msg} #{info.path.red}"
 
-					# updates file information
-					file = ArrayUtil.find @files, relative_path, "filepath"
-					file.item.getinfo()
+					# when a file is updated
+					when "updated"
 
-					# cli msg
-					msg = "#{(type + ' changed: ').bold.cyan}"
-					log "#{msg} #{info.path.cyan}"
+						# updates file information
+						file = ArrayUtil.find @files, relative_path, "filepath"
+						file.item.getinfo()
 
-				# when a file starts being watched
-				when "watching"
-					msg = "#{('Watching ' + info.type + ':').bold.cyan}"
-					log "#{msg} #{info.path.cyan}"
+						# cli msg
+						msg = "#{(type + ' changed: ').bold.cyan}"
+						log "#{msg} #{info.path.cyan}"
 
-			# rebuilds modules unless notificiation is 'watching'
-			@build() unless info.action is "watching"
+					# when a file starts being watched
+					when "watching"
+						msg = "#{('Watching ' + info.type + ':').bold.cyan}"
+						# log "#{msg} #{info.path.cyan}"
+
+				# rebuilds modules unless notificiation is 'watching'
+				@build() unless info.action is "watching"
+
+			, src
 
 
 
@@ -204,17 +248,7 @@ class Builder
 		output = (file.raw for file in @files).join "\n"
 
 		# compiling
-		compiled = cs.compile output, {bare: @bare}
-
-		# uglifying
-		if @minify
-			ast = uglify_parser.parse compiled
-			ast = uglify.ast_mangle ast
-			ast = uglify.ast_squeeze ast
-			compiled = uglify.gen_code ast
-		
-		# returns the compiled output
-		return compiled
+		cs.compile output, {bare: @bare}
 
 
 
@@ -248,7 +282,7 @@ class Builder
 
 			# writing file
 			try
-				fs.writeFileSync absolute_path, cs.compile file.raw, {bare:0}
+				fs.writeFileSync absolute_path, cs.compile file.raw, {bare:@bare}
 			catch err
 				msg = err.message.replace '"', '\\"'
 				console.log "MSG:::: " + msg

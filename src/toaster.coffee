@@ -14,9 +14,9 @@ class Toaster
 	exec = (require "child_process").exec
 	colors = require 'colors'
 
-	# variables
-	modules: {}
-	
+	# files array shared across all Builder instances
+	files: []
+
 	constructor:->
 
 		@basepath = path.resolve "."
@@ -39,9 +39,8 @@ class Toaster
 
 		# watch
 		else if @cli.argv.w
-			@config = new toaster.Toast @
-			@builder = new Builder @, @config, @cli
-			return
+			@toast = new toaster.Toast @
+			@builder = new Builder @, @toast, @cli
 
 		# help
 		else

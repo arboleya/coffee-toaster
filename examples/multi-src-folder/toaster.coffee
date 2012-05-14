@@ -1,5 +1,11 @@
-# => SRC FOLDER
-toast 'src'
+toast
+	
+	# => SRC FOLDERS
+	folders:
+		'src/app': 'app'
+		'src/artists': 'artists'
+		'src/genres': 'genres'
+
 	# => VENDORS (optional)
 	# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
 

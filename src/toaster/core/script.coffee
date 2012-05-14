@@ -4,11 +4,13 @@ class Script
 
 	# requires
 	fs = require "fs"
+	path = require 'path'
+	pn = path.normalize
 	cs = require "coffee-script"
 
 
 
-	constructor: (@builder, @realpath, @opts) ->
+	constructor: (@builder, @folderpath, @realpath, @alias, @opts) ->
 		@getinfo()
 
 
@@ -22,10 +24,15 @@ class Script
 		@baseclasses = []
 
 		# assemble some information about the file
-		@filepath   = @realpath.replace( @builder.src, "" ).substr 1
-		@filename   = /[\w-]+\.[\w-]+/.exec( @filepath )[ 0 ]
+		@filepath = @realpath.replace( @folderpath, "" ).substr 1
+		@filepath = pn "#{@alias}/#{@filepath}" if @alias?
+		@filename = /[\w-]+\.[\w-]+/.exec( @filepath )[ 0 ]
 		@filefolder = @filepath.replace( "/#{@filename}", "") + "/"
-		@namespace  = ""
+		@namespace = ""
+
+		# console.log "---"
+		# console.log @realpath
+		# console.log @filepath
 
 		# if the file is in the top level
 		if @filepath.indexOf("/") is -1
