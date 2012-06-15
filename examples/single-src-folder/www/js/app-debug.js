@@ -31,6 +31,7 @@ var app = {};
 var artists = {};
 var genres = {};
 
+
 document.write('<scri'+'pt src="js/toaster/artists/triphop/lovage.js"></scr'+'ipt>')
 document.write('<scri'+'pt src="js/toaster/artists/triphop/massiveattack.js"></scr'+'ipt>')
 document.write('<scri'+'pt src="js/toaster/artists/triphop/portishead.js"></scr'+'ipt>')

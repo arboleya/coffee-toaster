@@ -31,6 +31,7 @@ var app = {};
 var artists = {};
 var genres = {};
 
+
 (function() {
 
   __t('artists.triphop').Lovage = (function() {
@@ -152,3 +153,4 @@ var genres = {};
   new app.App;
 
 }).call(this);
+
