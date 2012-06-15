@@ -11,30 +11,29 @@ class Toast
 	# variables
 	builders: []
 
-	constructor: (@toaster, config, @after_toast) ->
+	constructor: (@toaster, config = null) ->
 		# basepath
 		@basepath = @toaster.basepath
 
-		# mounting full basepath
-		filepath = pn "#{@basepath}/toaster.coffee"
-		contents = config if config?
+		unless config is null
+			@toast item for item in [].concat( config )
+		else
+			filepath = pn "#{@basepath}/toaster.coffee"
+			if path.existsSync( filepath )
 
-		if path.existsSync( filepath ) || contents?
-
-			if config is false || config is undefined
 				contents = fs.readFileSync( filepath, "utf-8" )
 
-			fix_scope = /(^[\s\t]?)(toast)+(\()/mg
-			code = cs.compile contents, {bare:1}
-			code = code.replace fix_scope, "$1this.$2$3"
-			eval code
+				fix_scope = /(^[\s\t]?)(toast)+(\()/mg
+				code = cs.compile contents, {bare:1}
+				code = code.replace fix_scope, "$1this.$2$3"
 
-		else if @config?
-
-			error "File not found: ".yellow + " #{filepath.red}\n" +
+				eval code
+			else
+				error "File not found: ".yellow + " #{filepath.red}\n" +
 				  "Try running:".yellow + " toaster -i".green +
 				  " or type".yellow + " #{'toaster -h'.green} " +
 				  "for more info".yellow
+
 	
 	toast:( srcpath, params = {} )=>
 		if srcpath instanceof Object

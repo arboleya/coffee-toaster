@@ -15,7 +15,8 @@ exports.Toaster = class Toaster
 	exec = (require "child_process").exec
 	colors = require 'colors'
 
-	constructor:( basedir, config, options, skip_initial_build = false )->
+	constructor:( basedir, options = null, skip_initial_build = false )->
+
 		@basepath = basedir || path.resolve "."
 		@cli = new Cli options
 
@@ -40,6 +41,7 @@ exports.Toaster = class Toaster
 
 		# watch
 		else if @cli.argv.w
+			config = if options and options.config then options.config else null
 			@toast = new toaster.Toast @, config
 			@build() unless skip_initial_build
 
