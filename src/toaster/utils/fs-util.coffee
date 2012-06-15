@@ -5,8 +5,7 @@ exports.FsUtil = class FsUtil
 	fs = require "fs"
 	pn = (require "path").normalize
 
-	# static variables
-	@snapshots: {}
+
 
 	# static methods
 	@rmdir_rf:(folderpath, root=true)->
@@ -57,6 +56,7 @@ exports.FsUtil = class FsUtil
 		return found
 
 
+
 	@ls_folders:( folderpath )->
 		found = []
 		files = fs.readdirSync folderpath
@@ -67,7 +67,9 @@ exports.FsUtil = class FsUtil
 		
 		return found
 
-	@ls:( folderpath )->
+
+
+	@take_snapshot:( folderpath )->
 		found = []
 		files = fs.readdirSync folderpath
 
@@ -82,7 +84,8 @@ exports.FsUtil = class FsUtil
 		
 		return found
 
-	@watched = {}
+
+
 	@watch_file:(filepath, onchange, dispatch_create)->
 		filepath = pn filepath
 
@@ -91,81 +94,151 @@ exports.FsUtil = class FsUtil
 		
 		onchange?( type:"file", path:filepath, action:"watching" )
 		
-		@watched[filepath] = true
+		FsUtil.watched[filepath] = true
+		fs.unwatchFile filepath
 		fs.watchFile filepath, {interval : 250}, (curr,prev)=>
 			mtime = curr.mtime.valueOf() != prev.mtime.valueOf()
 			ctime = curr.ctime.valueOf() != prev.ctime.valueOf()
 			if mtime || ctime
 				onchange?( {type: "file", path:filepath, action: "updated"} )
 
+
+
+	@snapshots: {}
+	@watchers: {}
+	@watched: {}
+
+
+
 	@watch_folder:(folderpath, filter_regexp, onchange, dispatch_create)->
+		# initialize listeners array
+		FsUtil.watchers[folderpath] = FsUtil.watchers[folderpath] || []
+		watchers = FsUtil.watchers[folderpath]
 
 		folderpath = pn folderpath
 		onchange?( type:"folder", path:folderpath, action:"watching" )
 
-		FsUtil.snapshots[folderpath] = FsUtil.ls folderpath
+		# take snapshot
+		FsUtil.snapshots[folderpath] = FsUtil.take_snapshot folderpath
+
+		# loop all items
+		# ----------------------------------------------------------------------
 		for item in FsUtil.snapshots[folderpath]
+
+			# watch subfolders
+			# ------------------------------------------------------------------
 			if item.type == "folder"
-				FsUtil.watch_folder item.path, filter_regexp, onchange
-			else
-				if filter_regexp == null || filter_regexp.test item.path
-					if dispatch_create
-						onchange {
-							type:item.type,
-							path:item.path
-							action: "created"
-						}
-					
-					FsUtil.watch_file item.path, onchange
+				if dispatch_create
+					onchange
+						type:item.type
+						path:item.path
+						action: "created"
+
+				FsUtil.watch_folder item.path, filter_regexp, onchange, dispatch_create
+
+			# watch files
+			# ------------------------------------------------------------------
+			else if filter_regexp == null || filter_regexp.test item.path
+				if dispatch_create
+					onchange type:item.type, path:item.path, action: "created"
+				FsUtil.watch_file item.path, onchange
+
+		# add watcher to watchers/listeners array
+		watchers.push {
+			folderpath: folderpath
+			filter: filter_regexp
+			onchange: onchange
+			dispatch_create: dispatch_create
+		}
+
+		# watch folder if its not being watched already
+		unless FsUtil.watched[folderpath]
+			FsUtil.watched[folderpath] = true
+			on_folder_change = FnUtil.proxy FsUtil._on_folder_change, folderpath
+			fs.watchFile folderpath, {interval : 250}, on_folder_change
+
+
+
+	@_on_folder_change:( folderpath, curr, prev)=>
+
+		# abort if the folder doest not exist
+		return unless path.existsSync folderpath
+
+		# get previous and current folder snapshot to compare
+		a = FsUtil.snapshots[folderpath]
+		b = FsUtil.snapshots[folderpath] = FsUtil.take_snapshot folderpath
+
+		# differs the two snapshots states
+		diff = ArrayUtil.diff a, b, "path"
 		
-		fs.watchFile folderpath, {interval : 250}, (curr,prev)=>
+		# if there's no diff, abort the execution
+		return  unless diff.length
 
-			a = FsUtil.snapshots[folderpath]
-			b = FsUtil.ls folderpath
-			a ||= b
+		# saving watchers reference
+		watchers = FsUtil.watchers[folderpath]
 
-			diff = ArrayUtil.diff a, b, "path"
+		# loop all diff itens
+		# ----------------------------------------------------------------------
+		for item in diff
+
+			info = item.item
+			info.action = item.action
 			
-			for item in diff
-				info = item.item
-				info.action = item.action
+			# item created
+			# ------------------------------------------------------------------
+			if info.action == "created"
 				
-				if info.action == "created"
-					if info.type == "file"
-						if filter_regexp?
-							unless filter_regexp.test info.path
-								continue
-						
-						onchange?( info )	
-						FsUtil.watch_file info.path, onchange
+				# item is file
+				# --------------------------------------------------------------
+				if info.type == "file"
 					
-					else if info.type == "folder"
-						
-						onchange?( info )
-						FsUtil.watch_folder	info.path,
-											filter_regexp,
-											onchange,
+					# looping all watchers (listeners)
+					for watcher in watchers
+
+						# dispatch item if it passes the filter regexp
+						if watcher.filter.test info.path
+							watcher.onchange?( info )
+							FsUtil.watch_file info.path, watcher.onchange
+
+				# item is folder
+				# --------------------------------------------------------------
+				else if info.type == "folder"
+					for watcher in watchers
+						watcher.onchange?( info )
+						FsUtil.watch_folder info.path,
+											watcher.filter,
+											watcher.onchange,
 											true
 
-				else if info.action == "deleted"
-					if @watched[info.path] is true
-						@watched[info.path]
-						onchange?( info )
-						fs.unwatchFile item.path
+			# item deleted
+			# ------------------------------------------------------------------
+			else if info.action == "deleted"
 
-			snapshot = FsUtil.ls folderpath
-			FsUtil.snapshots[folderpath] = snapshot
+				# item is file
+				# --------------------------------------------------------------
+				if info.type == "file"
 
+					# looping all watchers (listeners)
+					for watcher in watchers
 
+						# dispatch item if it passes the filter regexp
+						if watcher.filter.test info.path
+							watcher.onchange?( info )
 
-	@format_ls:(folderpath, stdout)->
-		list = stdout.toString().trim().split "\n"
-		for item, index in list
-			if item == "\n" || item == ""
-				list.splice index, 1
-			else
-				stats = fs.lstatSync "#{folderpath}/#{item}"
-				list[index] =
-					type: if stats.isDirectory() then "folder" else "file"
-					path: "#{folderpath}/#{item}"
-		list
+					# unwatch file
+					fs.unwatchFile info.path
+					FsUtil.watched[info.path] = false
+
+				# item is folder
+				# --------------------------------------------------------------
+				else if info.type == "folder"
+
+					# notifies all watchers about the folder removal
+					for watcher in watchers
+						watcher.onchange?( info )
+
+					# removes watched flag fpr everything bellow the folder
+					for item, exists of FsUtil.watched
+
+						if exists && new RegExp("^#{info.path}").test( item )
+							FsUtil.watched[item] = false

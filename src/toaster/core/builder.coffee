@@ -170,6 +170,12 @@ class Builder
 			# and watch them entirely
 			FsUtil.watch_folder src.path, /.coffee$/, FnUtil.proxy (src, info)=>
 
+				# skip all watching notifications
+				return if info.action == "watching" 
+
+				# skipe all folder creation
+				return if info.type == "folder" and info.action == "created"
+
 				# folder path and alias
 				ipath = info.path
 				fpath = src.path
@@ -196,7 +202,7 @@ class Builder
 							# @files.push new Script @, info.path, @cli
 
 						# cli msg
-						msg = "#{('New ' + info.type + ' created:').bold.green}"
+						msg = "#{('New ' + info.type + ' created').bold.cyan}"
 						log "#{msg} #{info.path.green}"
 
 					# when a file is deleted
@@ -204,10 +210,12 @@ class Builder
 
 						# removes files from array
 						file = ArrayUtil.find @files, relative_path, "filepath"
+						return if file is null
+
 						@files.splice file.index, 1
 
 						# cli msg
-						msg = "#{(type + ' deleted, stop watching: ').bold.red}"
+						msg = "#{(type + ' deleted, stop watching').bold.red}"
 						log "#{msg} #{info.path.red}"
 
 					# when a file is updated
@@ -218,17 +226,16 @@ class Builder
 						file.item.getinfo()
 
 						# cli msg
-						msg = "#{(type + ' changed: ').bold.cyan}"
+						msg = "#{(type + ' changed').bold.cyan}"
 						log "#{msg} #{info.path.cyan}"
 
 					# when a file starts being watched
-					when "watching"
-						msg = "#{('Watching ' + info.type + ':').bold.cyan}"
+					# when "watching"
+					# 	msg = "#{('Watching ' + info.type + ':').bold.cyan}"
 						# log "#{msg} #{info.path.cyan}"
 
 				# rebuilds modules unless notificiation is 'watching'
-				unless info.action is "watching"
-					@build()
+				@build()
 
 				after_watch?()
 			, src
