@@ -1,11 +1,12 @@
-exports.run =-> toaster = new Toaster
+exports.run=()-> new Toaster
 
 #<< toaster/utils/*
 #<< toaster/generators/*
 #<< toaster/toast
 #<< toaster/cli
 
-class Toaster
+exports.toaster = toaster
+exports.Toaster = class Toaster
 
 	# requirements
 	fs = require "fs"
@@ -14,10 +15,13 @@ class Toaster
 	exec = (require "child_process").exec
 	colors = require 'colors'
 
-	constructor:->
+	constructor:( basedir, config, options, skip_initial_build = false )->
+		@basepath = basedir || path.resolve "."
+		@cli = new Cli options
 
-		@basepath = path.resolve "."
-		@cli = new Cli
+		if options?
+			for k, v of options
+				@cli.argv[k] = v
 
 		# version
 		if @cli.argv.v
@@ -36,8 +40,13 @@ class Toaster
 
 		# watch
 		else if @cli.argv.w
-			@toast = new toaster.Toast @
-		
+			@toast = new toaster.Toast @, config
+			@build() unless skip_initial_build
+
 		# help
 		else
 			return log @cli.opts.help()
+
+	build:( header_code = "", footer_code = "" )->
+		for builder in @toast.builders
+			builder.build header_code, footer_code

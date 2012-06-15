@@ -10,7 +10,8 @@
   },
 
   "main"           : "./lib/toaster",
-    "directories"    : {
+  
+  "directories"    : {
     "lib"            : "./lib/"
   },
 

@@ -77,7 +77,7 @@ class Script
 			#		namespace: package.subpackage
 			#		classpath: package.subpackage.ClassName
 			@classname = @raw.match( rgx )[3]
-			
+
 			# assure namespace is correct
 			if @namespace is ""
 				@classpath = @classname
@@ -89,7 +89,7 @@ class Script
 			for klass in @raw.match( rgx_ext ) ? []
 				baseclass = klass.match( rgx_ext )[5]
 				@baseclasses.push baseclass
-		
+
 		# then if there's other dependencies
 		if /(#<<\s)(.*)/g.test @raw
 

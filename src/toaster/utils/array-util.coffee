@@ -53,7 +53,7 @@ class ArrayUtil
 
 
 
-	@diff:(a, b, by_property)->
+	@diff:(a = [], b = [], by_property)->
 		diff = []
 		
 		for item in a

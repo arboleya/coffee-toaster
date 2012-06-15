@@ -32,7 +32,7 @@ class Builder
 
 
 
-	constructor:(@configer, @cli, @config)->
+	constructor:(@toaster, @cli, @config)->
 		@vendors = @config.vendors ? []
 
 		@bare = @config.bare ? @cli.argv.bare
@@ -45,107 +45,113 @@ class Builder
 		@release = @config.release
 		@debug = @config.debug
 
-		@init =>
-			@build =>
-				@watch() if @cli.argv.w
+		@init()
+		@watch() if @cli.argv.w
 
-	init:( after_init )->
-		# initializes buffer array to keep all tracked files-
+	init:()->
+		# initializes buffer array to keep all tracked files
 		@files = @config.files
-
-		folder_num = @config.src_folders.length
 		for folder in @config.src_folders
 
 			# search for all *.coffee files inside src folder
-			FsUtil.find folder.path, "*.coffee", FnUtil.proxy (folder, result)=>
+			# FsUtil.find folder.path, /.coffee/, FnUtil.proxy (folder, result)=>
+			result = FsUtil.find folder.path, /.coffee/
 
-				# folder path and alias
-				fpath = folder.path
-				falias = folder.alias
+			# folder path and alias
+			fpath = folder.path
+			falias = folder.alias
 
-				# collects every files into Script instances
-				for file in result
+			# collects every files into Script instances
+			for file in result
 
-					include = true
-					for item in @exclude
+				include = true
+				for item in @exclude
 
-						include &= !(new RegExp( item ).test file)
+					include &= !(new RegExp( item ).test file)
 
-					if include
-						s = new Script @, fpath, file, falias, @cli, @bare
-						@files.push s
-
-				after_init?() if --folder_num is 0
-
-			, folder
+				if include
+					s = new Script @, fpath, file, falias, @cli, @bare
+					@files.push s
 
 
-	build:( after_build )=>
-		return if @config.is_building is true
-		@config.is_building = true
+	build:( header_code = "", footer_code = "" )=>
+		# namespaces
+		namespaces = @build_namespaces()
 
-		@build_namespaces ( namespaces )=>
+		# prepare helper
+		helper = cs.compile @_toaster_helper, {bare:true}
 
-			# prepare helper
-			helper = cs.compile @_toaster_helper, {bare:true}
+		# prepare vendors
+		vendors = @merge_vendors()
 
-			# prepare vendors
-			vendors = @merge_vendors()
+		# prepare release contents
+		contents = [
+			vendors,
+			helper,
+			namespaces,
+			header_code,
+			@compile(),
+			footer_code
+		].join '\n'
 
-			# prepare release contents
-			contents = [ vendors, helper, namespaces, @compile() ].join '\n'
+		# uglifying
+		if @minify
+			ast = uglify_parser.parse contents
+			ast = uglify.ast_mangle ast
+			ast = uglify.ast_squeeze ast
+			contents = uglify.gen_code ast
 
-			# uglifying
-			if @minify
-				ast = uglify_parser.parse contents
-				ast = uglify.ast_mangle ast
-				ast = uglify.ast_squeeze ast
-				contents = uglify.gen_code ast
+		# write release file
+		fs.writeFileSync @release, contents
 
-			# write release file
-			fs.writeFileSync @release, contents
+		# notify user through cli
+		now = new Date()
+		now = "#{now.getHours()}:#{now.getMinutes()}:#{now.getSeconds()}"
+		log "#{'Compiled'.bold} #{@release} @ #{now}".green
+
+		# compiling for debug
+		if @cli.argv.d && @debug?
+			files = @compile_for_debug()
+
+			# saving boot loader
+			for f, i in files
+				include = "#{@httpfolder}/toaster/#{f}"
+				tmpl = @_include_tmpl.replace "%SRC%", include
+				files[i] = tmpl
+
+			# prepare boot loader contents
+			contents = [
+				vendors,
+				helper,
+				namespaces,
+				header_code,
+				files.join "\n",
+				footer_code
+			]
+
+			# write boot-loader file
+			fs.writeFileSync @debug, contents.join( "\n" )
 
 			# notify user through cli
-			log "#{'+'.bold.green} #{@release}"
-
-			# compiling for debug
-			if @cli.argv.d
-				files = @compile_for_debug()
-
-				# saving boot loader
-				for f, i in files
-					include = "#{@httpfolder}/toaster/#{f}"
-					tmpl = @_include_tmpl.replace "%SRC%", include
-					files[i] = tmpl
-
-				# prepare boot loader contents
-				contents = [ vendors, helper, namespaces, files.join "\n" ]
-
-				# write boot-loader file
-				fs.writeFileSync @debug, contents.join( "\n" )
-
-			@config.is_building = false
-			after_build?()
+			now = new Date()
+			now = "#{now.getHours()}:#{now.getMinutes()}:#{now.getSeconds()}"
+			log "#{'Compiled'.bold} #{@debug} @ #{now}".green
 
 	# get all root namespaces
 	build_namespaces:( after_build_namespaces )->
-		pending = 0
 		namespaces = ""
 
 		for folder in @config.src_folders
 			if folder.alias?
 				namespaces += @build_namespaces_declaration folder.alias
 			else
-				pending++
-				FsUtil.ls_folders folder.path, ( subfolders )=>
+				subfolders = FsUtil.ls_folders folder.path
 
-					for subfolder in subfolders
-						name = subfolder.match /[^\/]+$/m
-						namespaces += @build_namespaces_declaration name
+				for subfolder in subfolders
+					name = subfolder.match /[^\/]+$/m
+					namespaces += @build_namespaces_declaration name
 
-					after_build_namespaces namespaces if --pending is 0
-
-		after_build_namespaces namespaces if pending is 0
+		return namespaces
 
 
 	build_namespaces_declaration:( name )=>
@@ -154,8 +160,10 @@ class Builder
 		declaration += "#{@expose}.#{name} = " if @expose?
 		declaration += "{};\n" if declaration.length
 
+		return declaration
 
-	watch:()->
+
+	watch:( after_watch )->
 		# loops through all source folders
 		for src in @config.src_folders
 
@@ -165,12 +173,15 @@ class Builder
 				# folder path and alias
 				ipath = info.path
 				fpath = src.path
-				falias = src.alias
+				falias = src.alias || ""
 
 				# Titleize the type for use in the log messages bellow
 				type = StringUtil.titleize info.type
+
 				# relative filepath
-				relative_path = info.path.replace @src, ""
+				relative_path = info.path.replace "#{fpath}/", "#{falias}/"
+				if relative_path.substr( 0, 1 ) == "/"
+					relative_path = relative_path.substr 1
 
 				# switch over created, deleted, updated and watching
 				switch info.action
@@ -216,25 +227,27 @@ class Builder
 						# log "#{msg} #{info.path.cyan}"
 
 				# rebuilds modules unless notificiation is 'watching'
-				@build() unless info.action is "watching"
+				unless info.action is "watching"
+					@build()
 
+				after_watch?()
 			, src
 
 
 
 	compile:()->
 		# validating syntax
-		try
-			cs.compile file.raw for file in @files
-		
-		# if there's some error
-		catch err
+		for file in @files
+			try
+				cs.compile file.raw
+			# if there's some error
+			catch err
 
-			# catches and shows it, and abort the compilation
-			msg = err.message.replace '"', '\\"'
-			msg = "#{msg.white} at file: " + "#{file.filepath}".bold.red
-			error msg
-			return null
+				# catches and shows it, and abort the compilation
+				msg = err.message.replace '"', '\\"'
+				msg = "#{msg.white} at file: " + "#{file.filepath}".bold.red
+				error msg
+				return null
 
 		# otherwise move ahead, and expands all dependencies wild-cards
 		file.expand_dependencies() for file in @files
@@ -246,9 +259,7 @@ class Builder
 		output = (file.raw for file in @files).join "\n"
 
 		# compiling
-		cs.compile output, {bare: @bare}
-
-
+		output = cs.compile output, {bare: @bare}
 
 	compile_for_debug:()->
 		release_path = @release.split("/").slice(0, -1).join "/"

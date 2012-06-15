@@ -1,10 +1,9 @@
-class FsUtil
+exports.FsUtil = class FsUtil
 	
 	# requires
 	path = 	require "path"
 	fs = require "fs"
 	pn = (require "path").normalize
-	exec = (require "child_process").exec
 
 	# static variables
 	@snapshots: {}
@@ -29,11 +28,9 @@ class FsUtil
 
 		for folder, index in folders
 
-			folder = folders.slice( 0, index + 1 ).join "/"
-			continue if folder == ""
+			continue if (folder = folders.slice( 0, index + 1 ).join "/") == ""
+
 			exists = path.existsSync folder
-
-
 			if exists and index is folders.length - 1
 				throw new Error error( "Folder exists: #{folder.red}" )
 				return false
@@ -44,33 +41,55 @@ class FsUtil
 
 
 
-	@find:(folderpath, pattern, fn)->
-		exec "find -L #{folderpath} -name '#{pattern}'", (error, stdout, stderr)=>
-			buffer = []
-			for item in items = stdout.trim().split "\n"
-				buffer.push item if item != "." && item != ".." && item != ""
-			fn buffer
+	@find:( folderpath, pattern )->
+
+		found = []
+		files = fs.readdirSync folderpath
+
+		for file in files
+
+			filepath = "#{folderpath}/#{file}"
+			if fs.lstatSync( filepath ).isDirectory()
+				found = found.concat FsUtil.find( filepath, pattern )
+			else
+				found.push filepath if filepath.match pattern
+
+		return found
 
 
+	@ls_folders:( folderpath )->
+		found = []
+		files = fs.readdirSync folderpath
 
-	@ls_folders:(basepath, fn)->
-		basepath = basepath.slice( 0, -1 ) if basepath.slice( -1 ) == "/"
-		exec "find #{basepath} -maxdepth 1 -type d", (error, stdout, stderr)=>
-			buffer = []
-			for item in items = stdout.trim().split "\n"
-				buffer.push item if item != basepath
-			fn buffer
+		for file in files
+			filepath = "#{folderpath}/#{file}"
+			found.push filepath if fs.lstatSync( filepath ).isDirectory()
+		
+		return found
 
+	@ls:( folderpath )->
+		found = []
+		files = fs.readdirSync folderpath
 
+		for file in files
+			filepath = "#{folderpath}/#{file}"
+			if fs.lstatSync( filepath ).isDirectory()
+				type = "folder"
+			else
+				type = "file"
+
+			found.push type: type, path: filepath
+		
+		return found
 
 	@watched = {}
 	@watch_file:(filepath, onchange, dispatch_create)->
 		filepath = pn filepath
 
 		if dispatch_create
-			onchange?( {type:"file", path:filepath, action:"created"} )
+			onchange?( type:"file", path:filepath, action:"created" )
 		
-		onchange?( {type:"file", path:filepath, action:"watching"} )
+		onchange?( type:"file", path:filepath, action:"watching" )
 		
 		@watched[filepath] = true
 		fs.watchFile filepath, {interval : 250}, (curr,prev)=>
@@ -79,67 +98,63 @@ class FsUtil
 			if mtime || ctime
 				onchange?( {type: "file", path:filepath, action: "updated"} )
 
-
-
 	@watch_folder:(folderpath, filter_regexp, onchange, dispatch_create)->
-		folderpath = pn folderpath
-		onchange?( {type:"folder", path:folderpath, action:"watching"} )
-		
-		exec "ls #{folderpath}", (error, stdout, stderr)=>
-			
-			FsUtil.snapshots[folderpath] = FsUtil.format_ls folderpath, stdout
 
-			for item in FsUtil.snapshots[folderpath]
-				if item.type == "folder"
-					FsUtil.watch_folder item.path, filter_regexp, onchange
-				else
-					if filter_regexp == null || filter_regexp.test item.path
-						if dispatch_create
-							onchange {
-								type:item.type,
-								path:item.path
-								action: "created"
-							}
-						
-						FsUtil.watch_file item.path, onchange
+		folderpath = pn folderpath
+		onchange?( type:"folder", path:folderpath, action:"watching" )
+
+		FsUtil.snapshots[folderpath] = FsUtil.ls folderpath
+		for item in FsUtil.snapshots[folderpath]
+			if item.type == "folder"
+				FsUtil.watch_folder item.path, filter_regexp, onchange
+			else
+				if filter_regexp == null || filter_regexp.test item.path
+					if dispatch_create
+						onchange {
+							type:item.type,
+							path:item.path
+							action: "created"
+						}
+					
+					FsUtil.watch_file item.path, onchange
 		
 		fs.watchFile folderpath, {interval : 250}, (curr,prev)=>
 
-			exec "ls #{folderpath}", (error, stdout, stderr)=>
+			a = FsUtil.snapshots[folderpath]
+			b = FsUtil.ls folderpath
+			a ||= b
+
+			diff = ArrayUtil.diff a, b, "path"
+			
+			for item in diff
+				info = item.item
+				info.action = item.action
 				
-				a = FsUtil.snapshots[folderpath]
-				b = FsUtil.format_ls( folderpath, stdout )
-				diff = ArrayUtil.diff a, b, "path"
-				
-				for item in diff
-					info = item.item
-					info.action = item.action
-					
-					if info.action == "created"
-						if info.type == "file"
-							if filter_regexp?
-								unless filter_regexp.test info.path
-									continue
-							
-							onchange?( info )	
-							FsUtil.watch_file info.path, onchange
+				if info.action == "created"
+					if info.type == "file"
+						if filter_regexp?
+							unless filter_regexp.test info.path
+								continue
 						
-						else if info.type == "folder"
-							
-							onchange?( info )
-							FsUtil.watch_folder	info.path,
-												filter_regexp,
-												onchange,
-												true
+						onchange?( info )	
+						FsUtil.watch_file info.path, onchange
+					
+					else if info.type == "folder"
+						
+						onchange?( info )
+						FsUtil.watch_folder	info.path,
+											filter_regexp,
+											onchange,
+											true
 
-					else if info.action == "deleted"
-						if @watched[info.path] is true
-							@watched[info.path]
-							onchange?( info )
-							fs.unwatchFile item.path
+				else if info.action == "deleted"
+					if @watched[info.path] is true
+						@watched[info.path]
+						onchange?( info )
+						fs.unwatchFile item.path
 
-				snapshot = FsUtil.format_ls folderpath, stdout
-				FsUtil.snapshots[folderpath] = snapshot
+			snapshot = FsUtil.ls folderpath
+			FsUtil.snapshots[folderpath] = snapshot
 
 
 

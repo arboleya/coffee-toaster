@@ -8,31 +8,42 @@ class Toast
 	colors = require 'colors'
 	cs = require "coffee-script"
 
-	constructor: (@toaster) ->
+	# variables
+	builders: []
+
+	constructor: (@toaster, config, @after_toast) ->
 		# basepath
 		@basepath = @toaster.basepath
 
 		# mounting full basepath
 		filepath = pn "#{@basepath}/toaster.coffee"
-		
-		if path.existsSync filepath
+		contents = config if config?
+
+		if path.existsSync( filepath ) || contents?
+
+			if config is false || config is undefined
+				contents = fs.readFileSync( filepath, "utf-8" )
+
 			fix_scope = /(^[\s\t]?)(toast)+(\()/mg
-			code = cs.compile fs.readFileSync( filepath, "utf-8" ), {bare:1}
+			code = cs.compile contents, {bare:1}
 			code = code.replace fix_scope, "$1this.$2$3"
 			eval code
 
-		else
-			error "File not found: ".yelllow + " #{filepath.red}\n" +
+		else if @config?
+
+			error "File not found: ".yellow + " #{filepath.red}\n" +
 				  "Try running:".yellow + " toaster -i".green +
 				  " or type".yellow + " #{'toaster -h'.green} " +
 				  "for more info".yellow
 	
 	toast:( srcpath, params = {} )=>
-
 		if srcpath instanceof Object
 			params = srcpath
-		
+		else if srcpath.substr( 0, 1 ) != "/"
+			srcpath = "#{@toaster.basepath}/#{srcpath}"
+
 		# configuration object shared between builders
+		debug = if params.debug then pn "#{@basepath}/#{params.debug}" else null
 		config =
 				# RUNNING BUILDERS
 				is_building: false
@@ -53,13 +64,13 @@ class Toast
 				exclude: params.exclude ? []
 				bare: params.bare ? false
 				packaging: params.packaging ? true
-				expose: if params.expose == undefined ? null else params.expose
+				expose: params.expose ? null
 				minify: params.minify ? false
 
 				# HTTP FOLDER / RELEASE / DEBUG
 				httpfolder: params.httpfolder ? ""
 				release: pn "#{@basepath}/#{params.release}"
-				debug: pn "#{@basepath}/#{params.debug}"
+				debug: debug
 
 		unless srcpath instanceof Object
 			config.src_folders.push {
@@ -74,11 +85,10 @@ class Toast
 				config.src_folders.push {path: folder, alias: alias}
 
 		for item in config.src_folders
-
 			unless path.existsSync item.path
 				error	"Source folder doens't exist:\n\t#{item.path.red}\n" + 
 						"Check your #{'toaster.coffee'.yellow} and try again." +
 						"\n\t" + pn( "#{@basepath}/toaster.coffee" ).yellow
 				return process.exit()
 
-		new Builder @toaster, @toaster.cli, config
+		@builders.push new Builder @toaster, @toaster.cli, config
