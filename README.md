@@ -110,20 +110,24 @@ The toaster.coffee file will have this content:
 ````ruby
 
 	# => SRC FOLDER
-		toast 'src'
-			# => VENDORS (optional)
-			# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
+	toast 'src'
 
-			# => OPTIONS (optional, default values listed)
-			# bare: false
-			# packaging: true
-			# expose: ''
-			# minify: false
+		# EXCLUDED FOLDERS
+		# exclude: ['folder/to/exclude', 'another/folder/to/exclude', ... ]
 
-			# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
-			httpfolder: 'js'
-			release: 'www/js/app.js'
-			debug: 'www/js/app-debug.js'
+		# => VENDORS and EXCLUDED FOLDERS (optional)
+		# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
+
+		# => OPTIONS (optional, default values listed)
+		# bare: false
+		# packaging: true
+		# expose: ''
+		# minify: false
+
+		# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
+		httpfolder: 'js'
+		release: 'www/js/app.js'
+		debug: 'www/js/app-debug.js'
 ````
 
 ## Toasting an existing project
@@ -238,21 +242,65 @@ This file contains information of your app, i.e:
 ````ruby
 
 	# => SRC FOLDER
-		toast 'src'
-			# => VENDORS (optional)
-			# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
+	toast 'src'
 
-			# => OPTIONS (optional, default values listed)
-			# bare: false
-			# packaging: true
-			# expose: ''
-			# minify: false
+		# EXCLUDED FOLDERS
+		# exclude: ['folder/to/exclude', 'another/folder/to/exclude', ... ]
 
-			# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
-			httpfolder: 'js'
-			release: 'www/js/app.js'
-			debug: 'www/js/app-debug.js'
+		# => VENDORS and EXCLUDED FOLDERS (optional)
+		# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
+
+		# => OPTIONS (optional, default values listed)
+		# bare: false
+		# packaging: true
+		# expose: ''
+		# minify: false
+
+		# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
+		httpfolder: 'js'
+		release: 'www/js/app.js'
+		debug: 'www/js/app-debug.js'
 ````
+
+You can have a multi src folders as well, i.e:
+
+````ruby
+
+	toast
+		# SRC FOLDERS
+		folders:
+			"src/app": "app"
+			"src/theoricus": "theoricus"
+		
+		# EXCLUDED FOLDERS
+		# exclude: ['folder/to/exclude', 'another/folder/to/exclude', ... ]
+
+		# => VENDORS and EXCLUDED FOLDERS (optional)
+		# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
+
+		# => OPTIONS (optional, default values listed)
+		# bare: false
+		# packaging: true
+		# expose: ''
+		# minify: false
+
+		# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
+		httpfolder: 'js'
+		release: 'www/js/app.js'
+		debug: 'www/js/app-debug.js'
+````
+
+### Folders
+
+An array of objects containing setup information about the folders.
+
+When using multi-folders, you can specify this option to map everything as<BR>
+you need. The hash-key is the path of your folder, and the hash-value is the<BR>
+alias you want to prepend to all files under that.
+
+### Exclude
+
+Let's you excplicity exclude some folders from Toaster search/process mechanism.
 
 ### Vendors
 
@@ -373,6 +421,28 @@ telling CoffeeToaster that there's a dependency.
 
 Wild cards '#<< app/utils/*' are also accepted as a handy option.
 
+# Advanced options
+
+You can pass your own config file for toaster instead of the default one<BR>
+'toaster.coffee', with the '-f' or '--config-file' option:
+
+````javascript
+
+	toaster -wdf mycustomconfig.coffee
+````
+
+Or even pass even the whole configuration as a JSON string, with the '-j' or<BR>
+'--config' option:
+
+````javascript
+
+	toaster -wdj '{"folders":{"src":""},"expose":"window","release":"app.js","debug":"app-debug.js"}'
+````
+
+
+
+
+
 # Examples
 
 You'll certainly find some useful resources in the examples provided.<BR>
@@ -393,13 +463,12 @@ compiling tasks or even buid some framework on top of it.
 See the API example for further information.
  > [API example](https://github.com/serpentem/coffee-toaster/tree/master/examples/introspection)<BR>
 
-````javascript
+````ruby
 
 	Toaster = require("coffee-toaster").Toaster
 	
 	toasting = new Toaster basedir, options, skip_initial_build
 	toasting.build header_code_injection, footer_code_injection
-
 ````
 
 
