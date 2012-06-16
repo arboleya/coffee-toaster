@@ -89,18 +89,24 @@ exports.FsUtil = class FsUtil
 	@watch_file:(filepath, onchange, dispatch_create)->
 		filepath = pn filepath
 
+		FsUtil.unwatch_file filepath
+
 		if dispatch_create
 			onchange?( type:"file", path:filepath, action:"created" )
 		
 		onchange?( type:"file", path:filepath, action:"watching" )
-		
-		FsUtil.watched[filepath] = true
-		fs.unwatchFile filepath
+
 		fs.watchFile filepath, {interval : 250}, (curr,prev)=>
 			mtime = curr.mtime.valueOf() != prev.mtime.valueOf()
 			ctime = curr.ctime.valueOf() != prev.ctime.valueOf()
 			if mtime || ctime
 				onchange?( {type: "file", path:filepath, action: "updated"} )
+
+
+	@unwatch_file:( filepath, onchange )->
+		FsUtil.watched[filepath] = false
+		fs.unwatchFile filepath
+
 
 
 
@@ -111,9 +117,12 @@ exports.FsUtil = class FsUtil
 
 
 	@watch_folder:(folderpath, filter_regexp, onchange, dispatch_create)->
+
 		# initialize listeners array
-		FsUtil.watchers[folderpath] = FsUtil.watchers[folderpath] || []
-		watchers = FsUtil.watchers[folderpath]
+		if FsUtil.watchers[folderpath]
+			watchers = FsUtil.watchers[folderpath]
+		else
+			watchers = FsUtil.watchers[folderpath] = []
 
 		folderpath = pn folderpath
 		onchange?( type:"folder", path:folderpath, action:"watching" )
@@ -134,7 +143,10 @@ exports.FsUtil = class FsUtil
 						path:item.path
 						action: "created"
 
-				FsUtil.watch_folder item.path, filter_regexp, onchange, dispatch_create
+				FsUtil.watch_folder item.path,
+									filter_regexp,
+									onchange,
+									dispatch_create
 
 			# watch files
 			# ------------------------------------------------------------------
@@ -142,6 +154,7 @@ exports.FsUtil = class FsUtil
 				if dispatch_create
 					onchange type:item.type, path:item.path, action: "created"
 				FsUtil.watch_file item.path, onchange
+
 
 		# add watcher to watchers/listeners array
 		watchers.push {
@@ -155,11 +168,14 @@ exports.FsUtil = class FsUtil
 		unless FsUtil.watched[folderpath]
 			FsUtil.watched[folderpath] = true
 			on_folder_change = FnUtil.proxy FsUtil._on_folder_change, folderpath
+
+			fs.unwatchFile folderpath
 			fs.watchFile folderpath, {interval : 250}, on_folder_change
 
 
 
 	@_on_folder_change:( folderpath, curr, prev)=>
+		# console.log "FOLDER CHANGE!"
 
 		# abort if the folder doest not exist
 		return unless path.existsSync folderpath
@@ -180,6 +196,8 @@ exports.FsUtil = class FsUtil
 		# loop all diff itens
 		# ----------------------------------------------------------------------
 		for item in diff
+			# console.log ".........."
+			# console.log "ITEM..."
 
 			info = item.item
 			info.action = item.action
@@ -192,11 +210,13 @@ exports.FsUtil = class FsUtil
 				# --------------------------------------------------------------
 				if info.type == "file"
 					
+					# console.log "FILE CREATED!"
 					# looping all watchers (listeners)
 					for watcher in watchers
 
 						# dispatch item if it passes the filter regexp
 						if watcher.filter.test info.path
+							# console.log "ON CHANGE!"
 							watcher.onchange?( info )
 							FsUtil.watch_file info.path, watcher.onchange
 
@@ -226,6 +246,7 @@ exports.FsUtil = class FsUtil
 							watcher.onchange?( info )
 
 					# unwatch file
+					# FsUtil.unwatch_file( path )
 					fs.unwatchFile info.path
 					FsUtil.watched[info.path] = false
 
@@ -237,8 +258,25 @@ exports.FsUtil = class FsUtil
 					for watcher in watchers
 						watcher.onchange?( info )
 
-					# removes watched flag fpr everything bellow the folder
-					for item, exists of FsUtil.watched
+					FsUtil.unwatch_folder info.path
 
-						if exists && new RegExp("^#{info.path}").test( item )
-							FsUtil.watched[item] = false
+
+
+	@unwatch_folder:( folderpath, onchange )->
+
+		# loop through all watchers
+		for watcher_path, list of FsUtil.watchers
+
+			# if it matches the folder path resets all its listeners
+			if new RegExp("^#{folderpath}").test( watcher_path )
+				FsUtil.watchers[watcher_path] = null
+
+		# loop through all watched items
+		for item, exists of FsUtil.watched
+
+			# if its still being watched and matches the regexp
+			if exists && new RegExp("^#{folderpath}").test( item )
+				
+				# unwatch item
+				FsUtil.watched[item] = false
+				fs.unwatchFile item
