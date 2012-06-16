@@ -1,0 +1,14 @@
+{
+  "author"         : "Anderson Arboleya <anderson@arboleya.me>",
+  "name"           : "Introspection Compiler",
+  "description"    : "Any compiler that wants to use CoffeeToaster.",
+  "version"        : "0.0.1",
+
+  "engines"        : {
+    "node"           : ">= 0.4.9"
+  },
+  
+  "dependencies"   : {
+    "coffee-toaster"  : "0.6",
+  }
+}
