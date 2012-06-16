@@ -1,9 +1,11 @@
 # => SRC FOLDER
 toast 'src'
 
-	# => VENDORS and EXCLUDED folders (optional)
+	# EXCLUDED FOLDERS (optional)
+	# exclude: ['folder/to/exclude', 'another/folder/to/exclude', ... ]
+
+	# => VENDORS (optional)
 	# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
-	# exclude: ['my/folder/to/exclude', 'my/folder/to/exclude']
 
 	# => OPTIONS (optional, default values listed)
 	# bare: false

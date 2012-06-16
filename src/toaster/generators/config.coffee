@@ -11,9 +11,12 @@ class Config extends Question
 	tpl: """
 # => SRC FOLDER
 toast '%src%'
-	# => VENDORS and EXCLUDED FOLDERS (optional)
-	# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
+
+	# EXCLUDED FOLDERS (optional)
 	# exclude: ['folder/to/exclude', 'another/folder/to/exclude', ... ]
+
+	# => VENDORS (optional)
+	# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
 
 	# => OPTIONS (optional, default values listed)
 	# bare: false
@@ -25,7 +28,7 @@ toast '%src%'
 	httpfolder: '%httpfolder%'
 	release: '%release%'
 	debug: '%debug%'
-	"""
+"""
 	
 	constructor:(@basepath)->
 
