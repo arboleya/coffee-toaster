@@ -375,13 +375,33 @@ Wild cards '#<< app/utils/*' are also accepted as a handy option.
 
 # Examples
 
-You'll certainly find some useful resources in the usage example provided.<BR>
+You'll certainly find some useful resources in the examples provided.<BR>
 Examine it and you'll understand how things works more instinctively.
 
 Install coffee-toaster, clone the usage example and try different config<BR>
 options, always looking for the differences in your javascript release file.
 
-> [Source Code](https://github.com/serpentem/coffee-toaster/tree/master/usage)
+ > [Single folder example](https://github.com/serpentem/coffee-toaster/tree/master/examples/single-folder)<BR>
+ > [Multi folder example](https://github.com/serpentem/coffee-toaster/tree/master/examples/multi-folder)<BR>
+ > [API example](https://github.com/serpentem/coffee-toaster/tree/master/examples/introspection)<BR>
+
+# API
+
+You can use Toaster through API as well, in case you want to power up your<BR>
+compiling tasks or even buid some framework on top of it.
+
+See the API example for further information.
+ > [API example](https://github.com/serpentem/coffee-toaster/tree/master/examples/introspection)<BR>
+
+````javascript
+
+	Toaster = require("coffee-toaster").Toaster
+	
+	toasting = new Toaster basedir, options, skip_initial_build
+	toasting.build header_code_injection, footer_code_injection
+
+````
+
 
 # Issues
 
@@ -395,6 +415,13 @@ be answered sooner than later.<BR>
 https://groups.google.com/group/coffee-toaster
 
 # Changelog
+
+## 0.6 - 06/16/2012
+ * Improving and fixing a bunch of things
+ * Completely refactoring fs-util to improve it's usage and avoid memory-leak
+ * Organizing single-folder and multi-folder examples
+ * Standardizing API for javascript usage
+ * Adding 'introspection' example with many javascript uses
 
 ## 0.5.5 - 04/19/2012
  * Config file was re-written to be more practical
