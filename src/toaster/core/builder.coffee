@@ -9,6 +9,13 @@ class Builder
 	uglify = require("uglify-js").uglify
 	uglify_parser = require("uglify-js").parser
 
+	FnUtil = toaster.utils.FnUtil
+	FsUtil = toaster.utils.FsUtil
+	ArrayUtil = toaster.utils.ArrayUtil
+	StringUtil = toaster.utils.StringUtil
+
+
+
 	_toaster_helper: """
 		__t = ( ns )->
 			curr = null
@@ -51,7 +58,6 @@ class Builder
 		for folder in @config.src_folders
 
 			# search for all *.coffee files inside src folder
-			# FsUtil.find folder.path, /.coffee/, FnUtil.proxy (folder, result)=>
 			result = FsUtil.find folder.path, /.coffee/
 
 			# folder path and alias
@@ -67,7 +73,8 @@ class Builder
 					include &= !(new RegExp( item ).test file)
 
 				if include
-					s = new Script @, fpath, file, falias, @cli, @bare
+					s = new toaster.core.Script @, fpath, file,
+												falias, @cli, @bare
 					@files.push s
 
 

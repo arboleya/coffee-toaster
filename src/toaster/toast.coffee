@@ -94,4 +94,4 @@ class Toast
 						"\n\t" + pn( "#{@basepath}/toaster.coffee" ).yellow
 				return process.exit()
 
-		@builders.push new Builder @toaster, @toaster.cli, config
+		@builders.push new toaster.core.Builder @toaster, @toaster.cli, config

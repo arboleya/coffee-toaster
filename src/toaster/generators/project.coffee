@@ -1,7 +1,7 @@
 #<< toaster/generators/question
 #<< toaster/generators/config
 
-class Project extends Question
+class Project extends toaster.generators.Question
 
 	# requirements
 	path = require "path"
@@ -62,4 +62,6 @@ class Project extends Question
 		srcdir = srcdir.replace( target, "" ).substr 1
 		releasefile = releasefile.replace( target, "" ).substr 1
 
-		new Config( target ).write srcdir, releasefile, httpfolder
+		new toaster.generators.Config( target ).write	srcdir,
+														releasefile,
+														httpfolder

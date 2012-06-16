@@ -1,4 +1,4 @@
-exports.StringUtil = class StringUtil
+StringUtil = class StringUtil
 
 	@titleize:(str)->
 		words = str.match /[a-z]+/gi

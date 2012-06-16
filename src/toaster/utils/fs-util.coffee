@@ -1,4 +1,6 @@
-exports.FsUtil = class FsUtil
+#<< toaster/utils/fn-util
+
+class FsUtil
 	
 	# requires
 	path = 	require "path"
@@ -6,6 +8,7 @@ exports.FsUtil = class FsUtil
 	pn = (require "path").normalize
 
 
+	FnUtil = toaster.utils.FnUtil
 
 	# static methods
 	@rmdir_rf:(folderpath, root=true)->
@@ -175,7 +178,8 @@ exports.FsUtil = class FsUtil
 
 
 	@_on_folder_change:( folderpath, curr, prev)=>
-		# console.log "FOLDER CHANGE!"
+		console.log "FsUtil: "
+		console.log FsUtil
 
 		# abort if the folder doest not exist
 		return unless path.existsSync folderpath

@@ -8,7 +8,7 @@ class Script
 	pn = path.normalize
 	cs = require "coffee-script"
 
-
+	ArrayUtil = toaster.utils.ArrayUtil
 
 	constructor: (@builder, @folderpath, @realpath, @alias, @opts) ->
 		@getinfo()

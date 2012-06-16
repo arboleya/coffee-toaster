@@ -1,7 +1,5 @@
 exports.run=()-> new Toaster
 
-#<< toaster/utils/*
-#<< toaster/generators/*
 #<< toaster/toast
 #<< toaster/cli
 
@@ -18,7 +16,7 @@ exports.Toaster = class Toaster
 	constructor:( basedir, options = null, skip_initial_build = false )->
 
 		@basepath = basedir || path.resolve "."
-		@cli = new Cli options
+		@cli = new toaster.Cli options
 
 		if options?
 			for k, v of options
