@@ -1,5 +1,5 @@
 toast
-	
+
 	# => SRC FOLDERS
 	folders:
 		'src/app': 'app'
