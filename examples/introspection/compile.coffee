@@ -1,6 +1,6 @@
 Toaster = require( "coffee-toaster" ).Toaster
 
-# PASSSING CONFIG FILE (same as the single-folder example)
+# # PASSSING CONFIG FILE (same as the single-folder example)
 # new Toaster __dirname, {w:true, d:true, "config-file": "config.single.coffee"}
 
 # # PASSSING CONFIG FILE (same as the multi-folder example)
