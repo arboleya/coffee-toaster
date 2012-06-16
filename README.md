@@ -1,6 +1,6 @@
 ![Coffee Toaster](http://github.com/serpentem/coffee-toaster/blob/0.5.0/images/toaster.png?raw=true)
 
-Version 0.5.5
+Version 0.6.0
 
 CoffeeToaster is a dependency manager and build system for CoffeeScript.
 
@@ -485,7 +485,8 @@ https://groups.google.com/group/coffee-toaster
 
 # Changelog
 
-## 0.6 - 06/16/2012
+## 0.6.0 - 06/16/2012
+ * Adding 'exclude' property to config file
  * Improving and fixing a bunch of things
  * Completely refactoring fs-util to improve it's usage and avoid memory-leak
  * Organizing single-folder and multi-folder examples
