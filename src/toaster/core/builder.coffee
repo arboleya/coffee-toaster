@@ -167,7 +167,7 @@ class Builder
 		return declaration
 
 
-	watch:( after_watch )->
+	watch:()->
 		# loops through all source folders
 		for src in @config.src_folders
 
