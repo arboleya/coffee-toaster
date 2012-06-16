@@ -7,7 +7,7 @@ toast 'src'
 	# => OPTIONS (optional, default values listed)
 	# bare: false
 	# packaging: true
-	# expose: ''
+	expose: 'window'
 	# minify: false
 
 	# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
