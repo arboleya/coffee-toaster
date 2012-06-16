@@ -6,8 +6,9 @@ toast
 		'src/artists': 'artists'
 		'src/genres': 'genres'
 
-	# => VENDORS (optional)
+	# => VENDORS and EXCLUDED folders (optional)
 	# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
+	# exclude: ['my/folder/to/exclude', 'my/folder/to/exclude']
 
 	# => OPTIONS (optional, default values listed)
 	# bare: false
