@@ -1,7 +1,7 @@
 
 var __t;
 
-__t = function(ns, expose) {
+__t = function(ns) {
   var curr, index, part, parts, _i, _len;
   curr = null;
   parts = [].concat = ns.split(".");
@@ -9,16 +9,10 @@ __t = function(ns, expose) {
     part = parts[index];
     if (curr === null) {
       curr = eval(part);
-      if (expose != null) {
-        expose[part] = curr;
-      }
       continue;
     } else {
       if (curr[part] == null) {
         curr = curr[part] = {};
-        if (expose != null) {
-          expose[part] = curr;
-        }
       } else {
         curr = curr[part];
       }
@@ -27,9 +21,9 @@ __t = function(ns, expose) {
   return curr;
 };
 
-var app = {};
-var artists = {};
-var genres = {};
+var app = window.app = {};
+var artists = window.artists = {};
+var genres = window.genres = {};
 
 
 (function() {
