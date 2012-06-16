@@ -17,6 +17,7 @@ class Toast
 		@basepath = @toaster.basepath
 
 		if (config = @toaster.cli.argv["config"])?
+			config = JSON.parse( config ) unless config instanceof Object
 			@toast item for item in [].concat( config )
 		else
 			config_file = @toaster.cli.argv["config-file"]
