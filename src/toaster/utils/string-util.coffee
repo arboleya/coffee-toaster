@@ -1,4 +1,4 @@
-StringUtil = class StringUtil
+class StringUtil
 
 	@titleize:(str)->
 		words = str.match /[a-z]+/gi
