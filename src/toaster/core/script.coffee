@@ -30,10 +30,6 @@ class Script
 		@filefolder = @filepath.replace( "/#{@filename}", "") + "/"
 		@namespace = ""
 
-		# console.log "---"
-		# console.log @realpath
-		# console.log @filepath
-
 		# if the file is in the top level
 		if @filepath.indexOf("/") is -1
 			@filefolder = ""
@@ -50,39 +46,25 @@ class Script
 		# if there is a class inside the file
 		if @raw.match( rgx )?
 
+			@classpath = @classname
+
 			# if the file is not in the root src folder (outside any
-			# folder/package )
-			if @namespace != ""
+			# folder/package ) and packaging is enabled
+			if @namespace != "" and @builder.packaging
+
 				# then modify the class declarations before starting
 				# the parser thing, adding the package headers declarations
 				# as well as the expose thing
 
-				# PACKAGING=true && EXPOSE=null
-				if @builder.packaging && !@builder.expose?
-					repl = "$1 __t('#{@namespace}').$2$3"
+				repl = "$1 __t('#{@namespace}').$2$3"
+				@raw = @raw.replace rgx, repl
+				@classpath = "#{@namespace}.#{@classname}"
 
-				# PACKAGING=true && EXPOSE=something
-				else if @builder.packaging && @builder.expose?
-					repl = "$1 __t('#{@namespace}', #{@builder.expose}).$2$3"
-
-				# PACKAGING=false && EXPOSE=something
-				else if !@builder.packaging && @builder.expose?
-					repl = "$1 #{@builder.expose}.$2$3"
-
-				if repl?
-					@raw = @raw.replace rgx, repl
-			
 			# assemble some more infos about the file.
 			#		classname: ClassName
 			#		namespace: package.subpackage
 			#		classpath: package.subpackage.ClassName
 			@classname = @raw.match( rgx )[3]
-
-			# assure namespace is correct
-			if @namespace is ""
-				@classpath = @classname
-			else
-				@classpath = "#{@namespace}.#{@classname}"
 
 			# colletcts the base classes, in case some class in the file
 			# extends something

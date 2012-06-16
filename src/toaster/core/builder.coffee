@@ -10,22 +10,19 @@ class Builder
 	uglify_parser = require("uglify-js").parser
 
 	_toaster_helper: """
-		__t = ( ns, expose )->
+		__t = ( ns )->
 			curr = null
 			parts = [].concat = ns.split "."
 			for part, index in parts
 				if curr == null
 					curr = eval part
-					expose[part] = curr if expose?
 					continue
 				else
 					unless curr[ part ]?
 						curr = curr[ part ] = {}
-						expose[part] = curr if expose?
 					else
 						curr = curr[ part ]
 			curr
-
 	"""
 
 	_include_tmpl: "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
