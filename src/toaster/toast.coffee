@@ -11,14 +11,17 @@ class Toast
 	# variables
 	builders: []
 
-	constructor: (@toaster, config = null) ->
+	constructor: (@toaster) ->
+
 		# basepath
 		@basepath = @toaster.basepath
 
-		unless config is null
+		if (config = @toaster.cli.argv["config"])?
 			@toast item for item in [].concat( config )
 		else
-			filepath = pn "#{@basepath}/toaster.coffee"
+			config_file = @toaster.cli.argv["config-file"]
+			filepath = config_file || pn "#{@basepath}/toaster.coffee"
+
 			if path.existsSync( filepath )
 
 				contents = fs.readFileSync( filepath, "utf-8" )

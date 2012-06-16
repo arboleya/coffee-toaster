@@ -42,7 +42,7 @@ exports.Toaster = class Toaster
 		# watch
 		else if @cli.argv.w
 			config = if options and options.config then options.config else null
-			@toast = new toaster.Toast @, config
+			@toast = new toaster.Toast @
 			@build() unless skip_initial_build
 
 		# help
