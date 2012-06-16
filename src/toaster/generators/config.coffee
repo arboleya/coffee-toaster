@@ -11,8 +11,9 @@ class Config extends Question
 	tpl: """
 # => SRC FOLDER
 toast '%src%'
-	# => VENDORS (optional)
+	# => VENDORS and EXCLUDED FOLDERS (optional)
 	# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
+	# exclude: ['folder/to/exclude', 'another/folder/to/exclude', ... ]
 
 	# => OPTIONS (optional, default values listed)
 	# bare: false

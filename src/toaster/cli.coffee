@@ -34,25 +34,13 @@ class Cli
 			.default('d', false )
 			.describe('d', 'Debug mode (compile js files individually)')
 
-			.alias('b', 'bare')
-			.boolean( 'b' )
-			.default('b', false )
-			.describe('b', 'Compile files with "coffee --bare" (no js wrapper)')
+			.alias('j', 'config')
+			.string( 'j' )
+			.describe('j', "Config file formatted as a json-string.")
 
-			.alias('e', 'expose')
-			.string('e')
-			.default('e', null )
-			.describe('e', 'Specify a macro scope to expose everything (CJS exports).')
-
-			.alias('p', 'package')
-			.boolean( 'p' )
-			.default('p', false )
-			.describe('p', 'Enables/disables the packaging system')
-
-			.alias('m', 'minify')
-			.boolean( 'm' )
-			.default('m', false )
-			.describe('m', 'Minify release code using uglify.')
+			.alias( 'f', 'config-file' )
+			.string( 'f' )
+			.describe('f', "Path to a different config file.")
 
 			.alias('v', 'version')
 			.describe('v', '')

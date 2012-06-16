@@ -32,11 +32,11 @@ class Builder
 	constructor:(@toaster, @cli, @config)->
 		@vendors = @config.vendors ? []
 
-		@bare = @config.bare ? @cli.argv.bare
-		@packaging = @config.packaging ? @cli.argv.packaging
-		@expose = @config.expose ? @cli.argv.expose
-		@minify = @config.minify ? @cli.argv.minify
-		@exclude = [].concat( @config.exclude ? @cli.argv.exclude)
+		@bare = @config.bare
+		@packaging = @config.packaging
+		@expose = @config.expose
+		@minify = @config.minify
+		@exclude = [].concat( @config.exclude )
 
 		@httpfolder = @config.httpfolder ? ''
 		@release = @config.release
