@@ -1,5 +1,4 @@
-modules =
-	name: 'Coffee Toaster'
-	src: 'src'
-	release: 'lib/toaster.js'
+toast 'src'
 	expose: 'exports'
+	release: 'lib/toaster.js'
+	debug: 'lib/toaster-debug.js'
