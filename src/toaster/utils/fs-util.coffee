@@ -7,8 +7,8 @@ class FsUtil
 	fs = require "fs"
 	pn = (require "path").normalize
 
-
 	FnUtil = toaster.utils.FnUtil
+	ArrayUtil = toaster.utils.ArrayUtil
 
 	# static methods
 	@rmdir_rf:(folderpath, root=true)->
@@ -178,9 +178,6 @@ class FsUtil
 
 
 	@_on_folder_change:( folderpath, curr, prev)=>
-		console.log "FsUtil: "
-		console.log FsUtil
-
 		# abort if the folder doest not exist
 		return unless path.existsSync folderpath
 
