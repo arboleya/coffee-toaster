@@ -1,6 +1,6 @@
 ![Coffee Toaster](http://github.com/serpentem/coffee-toaster/blob/0.5.0/images/toaster.png?raw=true)
 
-Version 0.6.0
+Version 0.6.1
 
 CoffeeToaster is a dependency manager and build system for CoffeeScript.
 
@@ -484,6 +484,10 @@ be answered sooner than later.<BR>
 https://groups.google.com/group/coffee-toaster
 
 # Changelog
+
+## 0.6.1 - 06/16/2012
+ * Adjusting everything for self-toasting at version 0.6.0
+ * Fixing example package.json file that was broken npm installation
 
 ## 0.6.0 - 06/16/2012
  * Adding 'exclude' property to config file
