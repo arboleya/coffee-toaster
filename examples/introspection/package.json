@@ -9,6 +9,6 @@
   },
   
   "dependencies"   : {
-    "coffee-toaster"  : "0.6",
+    "coffee-toaster"  : "0.6"
   }
 }
