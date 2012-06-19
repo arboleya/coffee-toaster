@@ -485,6 +485,10 @@ https://groups.google.com/group/coffee-toaster
 
 # Changelog
 
+## 0.6.1 - 06/16/2012
+ * Adjusting everything for self-toasting at version 0.6.0
+ * Fixing example package.json file that was broken npm installation
+
 ## 0.6.0 - 06/16/2012
  * Adding 'exclude' property to config file
  * Improving and fixing a bunch of things
