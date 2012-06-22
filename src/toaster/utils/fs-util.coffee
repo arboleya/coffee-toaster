@@ -41,16 +41,20 @@ class FsUtil
 
 
 
-	@find:( folderpath, pattern )->
+	@find:( folderpath, pattern, include_dirs = false )->
 
 		found = []
 		files = fs.readdirSync folderpath
 
 		for file in files
 
-			filepath = "#{folderpath}/#{file}"
+			filepath = pn "#{folderpath}/#{file}"
 			if fs.lstatSync( filepath ).isDirectory()
-				found = found.concat FsUtil.find( filepath, pattern )
+				if include_dirs and filepath.match pattern
+					found = found.concat filepath
+
+				found_under = FsUtil.find filepath, pattern, include_dirs
+				found = found.concat found_under
 			else
 				found.push filepath if filepath.match pattern
 
