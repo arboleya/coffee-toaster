@@ -1,4 +1,5 @@
 #<< toaster/utils/*
+#<< toaster/core/script
 
 class Builder
 
@@ -9,6 +10,7 @@ class Builder
 	uglify = require("uglify-js").uglify
 	uglify_parser = require("uglify-js").parser
 
+	Script = toaster.core.Script
 	FnUtil = toaster.utils.FnUtil
 	FsUtil = toaster.utils.FsUtil
 	ArrayUtil = toaster.utils.ArrayUtil
@@ -73,8 +75,7 @@ class Builder
 					include &= !(new RegExp( item ).test file)
 
 				if include
-					s = new toaster.core.Script @, fpath, file,
-												falias, @cli, @bare
+					s = new Script @, fpath, file, falias, @cli
 					@files.push s
 
 
@@ -83,20 +84,23 @@ class Builder
 		namespaces = @build_namespaces()
 
 		# prepare helper
-		helper = cs.compile @_toaster_helper, {bare:true}
+		if @packaging
+			helper = cs.compile @_toaster_helper, {bare:true}
+		else
+			helper = ""
 
 		# prepare vendors
 		vendors = @merge_vendors()
 
 		# prepare release contents
-		contents = [
-			vendors,
-			helper,
-			namespaces,
-			header_code,
-			@compile(),
-			footer_code
-		].join '\n'
+		contents = []
+		contents.push vendors if vendors is not ""
+		contents.push helper if @packaging
+		contents.push namespaces if @packaging
+		contents.push header_code if header_code is not ""
+		contents.push @compile()
+		contents.push footer_code if header_code is not ""
+		contents = contents.join '\n'
 
 		# uglifying
 		if @minify
@@ -124,17 +128,17 @@ class Builder
 				files[i] = tmpl
 
 			# prepare boot loader contents
-			contents = [
-				vendors,
-				helper,
-				namespaces,
-				header_code,
-				files.join "\n",
-				footer_code
-			]
+			contents = []
+			contents.push vendors if vendors is not ""
+			contents.push helper if @packaging
+			contents.push namespaces if @packaging
+			contents.push header_code if header_code is not ""
+			contents.push (files.join "\n")
+			contents.push footer_code if header_code is not ""
+			contents = contents.join '\n'
 
 			# write boot-loader file
-			fs.writeFileSync @debug, contents.join( "\n" )
+			fs.writeFileSync @debug, contents
 
 			# notify user through cli
 			now = new Date()
@@ -202,8 +206,8 @@ class Builder
 						# initiate file and adds it to the array
 						if info.type == "file"
 							# toaster/core/script
-							s = new Script @, fpath, ipath, falias, @cli, @bare
-							# @files.push new Script @, info.path, @cli
+							s = new Script @, fpath, ipath, falias, @cli
+							@files.push s
 
 						# cli msg
 						msg = "#{('New ' + info.type + ' created').bold.cyan}"
