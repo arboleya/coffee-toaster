@@ -1,6 +1,6 @@
 ![Coffee Toaster](http://github.com/serpentem/coffee-toaster/blob/0.5.0/images/toaster.png?raw=true)
 
-Version 0.6.1
+Version 0.6.2
 
 CoffeeToaster is a dependency manager and build system for CoffeeScript.
 

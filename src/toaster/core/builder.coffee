@@ -39,7 +39,7 @@ class Builder
 
 
 	constructor:(@toaster, @cli, @config)->
-		@vendors = @config.vendors ? []
+		@vendors = @config.vendors
 
 		@bare = @config.bare
 		@packaging = @config.packaging
@@ -47,7 +47,7 @@ class Builder
 		@minify = @config.minify
 		@exclude = [].concat( @config.exclude )
 
-		@httpfolder = @config.httpfolder ? ''
+		@httpfolder = @config.httpfolder
 		@release = @config.release
 		@debug = @config.debug
 
@@ -94,12 +94,12 @@ class Builder
 
 		# prepare release contents
 		contents = []
-		contents.push vendors if vendors is not ""
+		contents.push vendors if vendors isnt ""
 		contents.push helper if @packaging
 		contents.push namespaces if @packaging
-		contents.push header_code if header_code is not ""
+		contents.push header_code if header_code isnt ""
 		contents.push @compile()
-		contents.push footer_code if header_code is not ""
+		contents.push footer_code if header_code isnt ""
 		contents = contents.join '\n'
 
 		# uglifying
@@ -129,12 +129,12 @@ class Builder
 
 			# prepare boot loader contents
 			contents = []
-			contents.push vendors if vendors is not ""
+			contents.push vendors if vendors isnt ""
 			contents.push helper if @packaging
 			contents.push namespaces if @packaging
-			contents.push header_code if header_code is not ""
+			contents.push header_code if header_code isnt ""
 			contents.push (files.join "\n")
-			contents.push footer_code if header_code is not ""
+			contents.push footer_code if header_code isnt ""
 			contents = contents.join '\n'
 
 			# write boot-loader file
