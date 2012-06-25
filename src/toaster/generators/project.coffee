@@ -8,6 +8,10 @@ class Project extends toaster.generators.Question
 	pn = path.normalize
 	fs = require "fs"
 
+
+	FsUtil = toaster.utils.FsUtil
+
+
 	constructor:(@basepath)->
 
 

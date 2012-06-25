@@ -31,7 +31,7 @@ exports.Toaster = class Toaster
 		
 		# scaffolds basic structure for new projects
 		else if @cli.argv.n
-			new Project( @basepath ).create @cli.argv.n
+			new toaster.generators.Project( @basepath ).create @cli.argv.n
 
 		# initializes a toaster file template into an existent project
 		else if @cli.argv.i
