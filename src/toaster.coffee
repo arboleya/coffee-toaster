@@ -25,8 +25,8 @@ exports.Toaster = class Toaster
 		# version
 		if @cli.argv.v
 			filepath = pn __dirname + "/../package.json"
-			contents = fs.readFileSync( filepath, "utf-8" )
-			schema = JSON.parse( contents )
+			contents = fs.readFileSync filepath, "utf-8"
+			schema = JSON.parse contents
 			return log schema.version
 		
 		# scaffolds basic structure for new projects
@@ -37,8 +37,8 @@ exports.Toaster = class Toaster
 		else if @cli.argv.i
 			new toaster.generators.Config( @basepath ).create @cli.argv.i
 
-		# watch
-		else if @cli.argv.w
+		# start watching'n'compiling project
+		else if @cli.argv.w || @cli.argv.c
 			config = if options and options.config then options.config else null
 			@toast = new toaster.Toast @
 			@build() unless skip_initial_build
