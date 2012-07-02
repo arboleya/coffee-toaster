@@ -22,7 +22,7 @@ toast '%src%'
 	# bare: false
 	# packaging: true
 	# expose: ''
-	# minify: false
+	# minify: true
 
 	# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
 	httpfolder: '%httpfolder%'

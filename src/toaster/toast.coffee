@@ -68,7 +68,7 @@ class Toast
 				bare: params.bare ? false
 				packaging: params.packaging ? true
 				expose: params.expose ? null
-				minify: params.minify ? false
+				minify: params.minify ? true
 
 				# HTTP FOLDER / RELEASE / DEBUG
 				httpfolder: params.httpfolder ? ""
