@@ -5,7 +5,7 @@ class Cli
 
 	constructor:->
 		usage = "#{'CoffeeToaster'.bold}\n"
-		usage += "  Minimalist dependency management for CoffeeScript\n\n".grey
+		usage += "  Minimalist build system for CoffeeScript\n\n".grey
 		
 		usage += "#{'Usage:'}\n"
 		usage += "  toaster [#{'options'.green}] [#{'path'.green}]\n\n"
