@@ -1,0 +1,111 @@
+# requirements
+# ------------------------------------------------------------------------------
+fs = require 'fs'
+path = require 'path'
+vows = require "vows"
+assert = require "assert"
+spawn = (require 'child_process').spawn
+
+{FsUtil} = (require __dirname + "/../lib/toaster").toaster.utils
+
+
+# takes a snapshot of the entire folder tree and file contents
+# ------------------------------------------------------------------------------
+snapshot = ( folderpath, buffer = {} )->
+	for file in (files = fs.readdirSync folderpath)
+
+		filepath = "#{folderpath}/#{file}"
+		alias = filepath.replace "#{folderpath}/", ''
+
+		if fs.lstatSync( filepath ).isDirectory()
+			buffer[ alias ] = 'folder'
+			snapshot filepath, buffer
+		else
+			buffer[ alias ] = fs.readFileSync( filepath ).toString()
+
+	return buffer
+
+
+
+# spawnning toaster (shorcut)
+# ------------------------------------------------------------------------------
+spawn_toaster = (args, options) ->
+	spawn __dirname + '/../bin/toaster', args, options || {cwd: __dirname}
+
+
+
+# tests
+# ------------------------------------------------------------------------------
+vows.describe('Project')
+.addBatch( 'A new project':
+
+	# testing default values
+	# --------------------------------------------------------------------------
+	'created with default values':
+		topic: ->
+			# cleaning first
+			if path.existsSync (folder = __dirname + "/tmp/new_default_project")
+				FsUtil.rmdir_rf folder
+
+			toaster = spawn_toaster ['-n', 'tmp/new_default_project']
+			toaster.stdout.on 'data', (data)-> toaster.stdin.write '\n'
+			toaster.stderr.on 'data', (data)=>
+				console.log data.toString()
+				@callback null, null
+
+			toaster.on 'exit', (code)=>
+				model = snapshot "#{__dirname}/templates/new_default_project"
+				created = snapshot "#{__dirname}/tmp/new_default_project"
+				@callback model, created
+
+			undefined
+
+		'should match the default template':( model, created )->
+			assert.isObject model
+			assert.isObject created
+			for alias, contents of model
+				a = created[ alias ]
+				b = contents
+				assert.equal a, b
+
+	# testing custom values
+	# --------------------------------------------------------------------------
+	'created with custom values':
+		topic: ->
+
+			# cleaning first
+			if path.existsSync (folder = __dirname + "/tmp/new_custom_project")
+				FsUtil.rmdir_rf folder
+
+			toaster = spawn_toaster ['-n', 'tmp/new_custom_project']
+			toaster.stdout.on 'data', (data)->
+
+				question = data.toString()
+				if question.indexOf( "Path to your src folder" ) >= 0
+					toaster.stdin.write 'custom_src'
+
+				else if question.indexOf( "Path to your release file" ) >= 0
+					toaster.stdin.write 'custom_www/custom_js/custom_app.js'
+
+				else if question.indexOf( "" ) >= 0
+					toaster.stdin.write 'custom_js'				
+
+			toaster.stderr.on 'data', (data)->
+				console.log data.toString()
+				@callback null, null
+
+			toaster.on 'exit', (code)=>
+				model = snapshot "#{__dirname}/templates/new_custom_project"
+				created = snapshot "#{__dirname}/tmp/new_custom_project"
+				@callback model, created
+
+			undefined
+
+		'should match the custom template':( model, created )->
+			assert.isObject model
+			assert.isObject created
+			for alias, contents of model
+				a = created[ alias ]
+				b = contents
+				assert.equal a, b
+).export module

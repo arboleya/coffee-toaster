@@ -1,3 +1,4 @@
 node_modules
 lib/toaster
 lib/toaster-debug.js
+test/tmp
