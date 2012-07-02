@@ -19,6 +19,10 @@
     "toaster"        : "./bin/toaster"
   },
 
+  "scripts"        : {
+    "test"           : "vows spec/*.coffee --spec"
+  },
+
   "engines"        : {
     "node"           : ">= 0.4.9"
   },
@@ -28,6 +32,7 @@
     "colors"         : "0.5.x",
     "uglify-js"      : "1.1.1",
     "optimist"       : "0.2.x",
-    "growl"          : "1.2.0"
+    "growl"          : "1.2.0",
+    "vows"           : "0.6.3"
   }
 }
