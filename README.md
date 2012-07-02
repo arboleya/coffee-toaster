@@ -441,10 +441,6 @@ Or even pass even the whole configuration as a JSON string, with the '-j' or<BR>
 	toaster -wdj '{"folders":{"src":""},"expose":"window","release":"app.js","debug":"app-debug.js"}'
 ````
 
-
-
-
-
 # Examples
 
 You'll certainly find some useful resources in the examples provided.<BR>
@@ -471,6 +467,39 @@ See the API example for further information.
 	
 	toasting = new Toaster basedir, options, skip_initial_build
 	toasting.build header_code_injection, footer_code_injection
+````
+
+# Note for developers
+
+## To set up:
+
+````bash
+	$ git clone git://github.com/serpentem/coffee-toaster.git coffee-toaster
+	$ cd coffee-toaster
+	$ git submodules update --init
+	$ npm link
+
+````
+
+## To test:
+
+````bash
+	$ npm test
+
+````
+
+## To build:
+
+````bash
+	$ npm build
+
+````
+
+## Watch/build mode:
+
+````bash
+	$ npm watch
+
 ````
 
 
