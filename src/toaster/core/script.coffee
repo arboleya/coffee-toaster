@@ -38,7 +38,7 @@ class Script
 		@namespace = @filefolder.replace(/\//g, ".").slice 0, -1
 		
 		# filter files that have class declarations inside of it
-		rgx = /^\s*(class)+\s(\w+)(\s+(extends)\s+([\w.]+))?/gm
+		rgx = /^(\s*)(class)+\s(\w+)(\s+(extends)\s+([\w.]+))?/gm
 		
 		# filter classes that extends another classes
 		rgx_ext = /(^|=\s*)(class)\s(\w+)\s(extends)\s(\\w+)\s*$/gm
@@ -56,7 +56,7 @@ class Script
 				# the parser thing, adding the package headers declarations
 				# as well as the expose thing
 
-				repl = "$1 __t('#{@namespace}').$2$3"
+				repl = "$1$2 __t('#{@namespace}').$3$4"
 				@raw = @raw.replace rgx, repl
 				@classpath = "#{@namespace}.#{@classname}"
 
