@@ -484,6 +484,9 @@ be answered sooner than later.<BR>
 https://groups.google.com/group/coffee-toaster
 
 # Changelog
+## 0.6.2 - 06/25/2012
+ * Fixing last upgrade in self-toasting system
+ * Adjusting everything for self-toasting at version 0.6.2
 
 ## 0.6.1 - 06/16/2012
  * Adjusting everything for self-toasting at version 0.6.0
