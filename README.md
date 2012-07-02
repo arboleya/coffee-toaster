@@ -471,31 +471,31 @@ See the API example for further information.
 
 # Note for developers
 
-## Setting everything up:
+## Setting everything up
 
 ````bash
-	$ git clone git://github.com/serpentem/coffee-toaster.git coffee-toaster
-	$ cd coffee-toaster
-	$ git submodules update --init
-	$ npm link
+	git clone git://github.com/serpentem/coffee-toaster.git coffee-toaster
+	cd coffee-toaster
+	git submodule update --init
+	npm link
 ````
 
 ## Testing
 
 ````bash
-	$ npm test
+	npm test
 ````
 
 ## Building
 
 ````bash
-	$ npm build
+	npm build
 ````
 
 ## Watch/build mode
 
 ````bash
-	$ npm watch
+	npm watch
 ````
 
 # Issues
