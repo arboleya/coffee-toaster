@@ -29,14 +29,10 @@ class Project extends toaster.generators.Question
 		if name? && src? && release?
 			return @scaffold target, name, src, release
 
-		log "#{'Let\'s toast something fresh! :)'.grey.bold}"
-		log ". With this as your basepath: #{target.cyan}"
-		log ". Please tell me:"
-
-		q1 = "\tWhere do you want your src folder? [src] : "
-		q2 = "\tWhere do you want your release file? [www/js/app.js] : "
-		q3 = "\tStarting from your webroot '/', what's the folderpath to "+
-			 "reach your release file? (i.e. javascript) (optional) : "
+		q1 = "Path to your src folder? [src] : "
+		q2 = "Path to your release file? [www/js/app.js] : "
+		q3 = "Starting from your webroot '/', what's the folderpath to "+
+			 "reach your release file? (i.e. js) (optional) : "
 
 		@ask q1.magenta, /.*/, (src = null)=>
 			@ask q2.magenta, /.*/, (release = null)=>
@@ -57,7 +53,7 @@ class Project extends toaster.generators.Question
 		vendorsdir = pn "#{target}/vendors"
 		releasefile = pn "#{target}/#{release}"
 		releasedir = releasefile.split("/").slice(0, -1).join "/"
-		
+
 		log "#{'Created'.green.bold} #{target}" if FsUtil.mkdir_p target
 		log "#{'Created'.green.bold} #{srcdir}" if FsUtil.mkdir_p srcdir
 		log "#{'Created'.green.bold} #{vendorsdir}" if FsUtil.mkdir_p vendorsdir
