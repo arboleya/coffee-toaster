@@ -2,7 +2,7 @@
   "author"         : "Anderson Arboleya <anderson@arboleya.me>",
   "name"           : "coffee-toaster",
   "description"    : "Minimalist manager and build system for CoffeeScript, an alternative for AMD's or CJS's OOP patterns, but with similar results. Made for those who dare to use class definitions in CoffeeScript while being able to easily inherit from external files. Powered with imports directives that use wildcards facilities, exposed scopes and excluded files filter options. The system can even use folders-as-namespaces to help you avoid naming collisions in architecture.",
-  "version"        : "0.6.2",
+  "version"        : "0.6.3",
 
   "repository"     : {
     "type"           : "git",

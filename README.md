@@ -1,6 +1,6 @@
 ![Coffee Toaster](http://github.com/serpentem/coffee-toaster/blob/0.5.0/images/toaster.png?raw=true)
 
-Version 0.6.2
+Version 0.6.3
 
 CoffeeToaster is a dependency manager and build system for CoffeeScript.
 
@@ -484,6 +484,13 @@ be answered sooner than later.<BR>
 https://groups.google.com/group/coffee-toaster
 
 # Changelog
+
+## 0.6.3 - 07/01/2012
+ * Fixing example 'package.' again (the zombie bug)
+ * Fixing line number evaluation [closing issue [#26](http://github.com/serpentem/coffee-toaster/issues/26)]
+ * Fixing 'c' / '--compile' option [closing issue [#27](http://github.com/serpentem/coffee-toaster/issues/27)]
+ * Adding first test (finally)
+
 ## 0.6.2 - 06/25/2012
  * Fixing last upgrade in self-toasting system
  * Adjusting everything for self-toasting at version 0.6.2
