@@ -37,12 +37,12 @@ spawn_toaster = (args, options) ->
 
 # tests
 # ------------------------------------------------------------------------------
-vows.describe('Project')
-.addBatch( 'A new project':
+vows.describe('Scaffolding')
+.addBatch( 'a new project':
 
 	# testing default values
 	# --------------------------------------------------------------------------
-	'created with default values':
+	'with default values':
 		topic: ->
 			# cleaning first
 			if path.existsSync (folder = __dirname + "/tmp/new_default_project")
@@ -71,7 +71,7 @@ vows.describe('Project')
 
 	# testing custom values
 	# --------------------------------------------------------------------------
-	'created with custom values':
+	'with custom values':
 		topic: ->
 
 			# cleaning first
