@@ -1,4 +1,3 @@
 node_modules
 lib/toaster
 lib/toaster-debug.js
-spec/tmp
