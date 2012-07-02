@@ -21,7 +21,8 @@ snapshot = ( folderpath, buffer = {} )->
 			buffer[ alias ] = 'folder'
 			snapshot filepath, buffer
 		else
-			buffer[ alias ] = fs.readFileSync( filepath ).toString()
+			unless /.gitkeep/.test alias
+				buffer[ alias ] = fs.readFileSync( filepath ).toString()
 
 	return buffer
 
