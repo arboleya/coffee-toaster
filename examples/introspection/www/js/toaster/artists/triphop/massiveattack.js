@@ -2,8 +2,6 @@
 
   __t('artists.triphop').MassiveAttack = (function() {
 
-    MassiveAttack.name = 'MassiveAttack';
-
     function MassiveAttack() {
       console.log("\t\tArtist: MassiveAttack created!");
     }

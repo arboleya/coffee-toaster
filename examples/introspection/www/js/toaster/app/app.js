@@ -2,8 +2,6 @@
 
   __t('app').App = (function() {
 
-    App.name = 'App';
-
     function App() {
       console.log("App created!");
       new genres.Progressive;

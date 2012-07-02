@@ -2,8 +2,6 @@
 
   __t('artists.progressive').TheMarsVolta = (function() {
 
-    TheMarsVolta.name = 'TheMarsVolta';
-
     function TheMarsVolta() {
       console.log("\t\tArtist: TheMarsVolta created!");
     }

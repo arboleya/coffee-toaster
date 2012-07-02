@@ -1,4 +1,3 @@
-
 var __t;
 
 __t = function(ns) {
@@ -24,7 +23,6 @@ __t = function(ns) {
 var app = window.app = {};
 var artists = window.artists = {};
 var genres = window.genres = {};
-
 
 document.write('<scri'+'pt src="/toaster/artists/triphop/lovage.js"></scr'+'ipt>')
 document.write('<scri'+'pt src="/toaster/artists/triphop/massiveattack.js"></scr'+'ipt>')

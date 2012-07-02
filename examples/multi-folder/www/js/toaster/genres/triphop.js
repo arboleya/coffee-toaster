@@ -2,8 +2,6 @@
 
   __t('genres').TripHop = (function() {
 
-    TripHop.name = 'TripHop';
-
     function TripHop() {
       console.log("\tGenre: TripHop created!");
       new artists.triphop.MassiveAttack;

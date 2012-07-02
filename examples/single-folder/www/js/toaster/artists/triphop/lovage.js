@@ -2,8 +2,6 @@
 
   __t('artists.triphop').Lovage = (function() {
 
-    Lovage.name = 'Lovage';
-
     function Lovage() {
       console.log("\t\tArtist: Lovage created!");
     }

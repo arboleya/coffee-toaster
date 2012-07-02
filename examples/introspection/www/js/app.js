@@ -1,4 +1,3 @@
-
 var __t;
 
 __t = function(ns) {
@@ -25,12 +24,9 @@ var app = window.app = {};
 var artists = window.artists = {};
 var genres = window.genres = {};
 
-
 (function() {
 
   __t('artists.triphop').Lovage = (function() {
-
-    Lovage.name = 'Lovage';
 
     function Lovage() {
       console.log("\t\tArtist: Lovage created!");
@@ -42,8 +38,6 @@ var genres = window.genres = {};
 
   __t('artists.triphop').MassiveAttack = (function() {
 
-    MassiveAttack.name = 'MassiveAttack';
-
     function MassiveAttack() {
       console.log("\t\tArtist: MassiveAttack created!");
     }
@@ -53,8 +47,6 @@ var genres = window.genres = {};
   })();
 
   __t('artists.triphop').Portishead = (function() {
-
-    Portishead.name = 'Portishead';
 
     function Portishead() {
       console.log("\t\tArtist: Portishead created!");
@@ -66,8 +58,6 @@ var genres = window.genres = {};
 
   __t('artists.progressive').KingCrimson = (function() {
 
-    KingCrimson.name = 'KingCrimson';
-
     function KingCrimson() {
       console.log("\t\tArtist: KingCrimson created!");
     }
@@ -77,8 +67,6 @@ var genres = window.genres = {};
   })();
 
   __t('genres').TripHop = (function() {
-
-    TripHop.name = 'TripHop';
 
     function TripHop() {
       console.log("\tGenre: TripHop created!");
@@ -93,8 +81,6 @@ var genres = window.genres = {};
 
   __t('artists.progressive').TheMarsVolta = (function() {
 
-    TheMarsVolta.name = 'TheMarsVolta';
-
     function TheMarsVolta() {
       console.log("\t\tArtist: TheMarsVolta created!");
     }
@@ -105,8 +91,6 @@ var genres = window.genres = {};
 
   __t('artists.progressive').Tool = (function() {
 
-    Tool.name = 'Tool';
-
     function Tool() {
       console.log("\t\tArtist: Tool created!");
     }
@@ -116,8 +100,6 @@ var genres = window.genres = {};
   })();
 
   __t('genres').Progressive = (function() {
-
-    Progressive.name = 'Progressive';
 
     function Progressive() {
       console.log("\tGenre: Progressive created!");
@@ -132,8 +114,6 @@ var genres = window.genres = {};
 
   __t('app').App = (function() {
 
-    App.name = 'App';
-
     function App() {
       console.log("App created!");
       new genres.Progressive;
@@ -147,4 +127,3 @@ var genres = window.genres = {};
   new app.App;
 
 }).call(this);
-
