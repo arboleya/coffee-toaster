@@ -2,6 +2,8 @@
 
 Version 0.6.3
 
+[![Build Status](https://secure.travis-ci.org/serpentem/coffee-toaster.png)](http://travis-ci.org/serpentem/coffee-toaster)
+
 CoffeeToaster is a dependency manager and build system for CoffeeScript.
 
 The main purpose is to provide a very comfortable environment to code large<BR>
