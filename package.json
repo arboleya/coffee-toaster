@@ -20,11 +20,12 @@
   },
 
   "scripts"        : {
-    "test"           : "vows spec/*.coffee --spec"
+    "test"           : "vows spec/*.coffee --spec",
+    "start"          : "node ./build/coffee-toaster/bin/toaster -wd"
   },
 
   "engines"        : {
-    "node"           : ">= 0.4.9"
+    "node"           : ">= 0.6"
   },
   
   "dependencies"   : {
