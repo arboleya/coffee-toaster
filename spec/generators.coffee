@@ -35,10 +35,10 @@ spawn_toaster = (args, options) ->
 
 
 
-# tests
+# testing new project creation
 # ------------------------------------------------------------------------------
-vows.describe('Scaffolding')
-.addBatch( 'a new project':
+vows.describe('Generators (-n, -i)')
+.addBatch( 'A new project created':
 
 	# testing default values
 	# --------------------------------------------------------------------------
@@ -109,10 +109,11 @@ vows.describe('Scaffolding')
 				a = created[ alias ]
 				b = contents
 				assert.equal a, b
-).export module
 
-vows.describe( "Initializing" )
-.addBatch( 'an existing project with the proper params':
+# testing existent projects initialization
+# ------------------------------------------------------------------------------
+# vows.describe( "Initializing" )
+).addBatch( 'A config file created for an existent project':
 	topic: ->
 		template = (__dirname + "/templates/existing_project/toaster.coffee")
 		folder = (__dirname + "/tmp/existing_project/")
@@ -146,7 +147,7 @@ vows.describe( "Initializing" )
 
 		undefined
 
-	'should match the initialized template':( model, created )->
+	'should match the \'toaster.coffe\' template':( model, created )->
 		assert.equal model, created
 
 ).export module
