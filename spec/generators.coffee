@@ -89,7 +89,7 @@ vows.describe('Scaffolding')
 					toaster.stdin.write 'custom_www/custom_js/custom_app.js'
 
 				else if question.indexOf( "" ) >= 0
-					toaster.stdin.write 'custom_js'				
+					toaster.stdin.write 'custom_js'
 
 			toaster.stderr.on 'data', (data)->
 				console.log data.toString()
@@ -109,4 +109,44 @@ vows.describe('Scaffolding')
 				a = created[ alias ]
 				b = contents
 				assert.equal a, b
+).export module
+
+vows.describe( "Initializing" )
+.addBatch( 'an existing project with the proper params':
+	topic: ->
+		template = (__dirname + "/templates/existing_project/toaster.coffee")
+		folder = (__dirname + "/tmp/existing_project/")
+		created = "#{folder}/toaster.coffee"
+
+		# cleaning first
+		FsUtil.rmdir_rf folder if path.existsSync folder
+		fs.mkdirSync folder, "0777"
+
+		toaster = spawn_toaster ['-i', 'tmp/existing_project']
+		toaster.stdout.on 'data', (data)->
+
+				question = data.toString()
+				if question.indexOf( "Path to your src folder" ) >= 0
+					toaster.stdin.write 'src'
+
+				else if question.indexOf( "Path to your release file" ) >= 0
+					toaster.stdin.write 'www/js/app.js'
+
+				else if question.indexOf( "" ) >= 0
+					toaster.stdin.write 'js'
+
+		toaster.stderr.on 'data', (data)=>
+			console.log data.toString()
+			@callback null, null
+
+		toaster.on 'exit', (code)=>
+			model = fs.readFileSync template, "utf-8"
+			created = fs.readFileSync created, "utf-8"
+			@callback model, created
+
+		undefined
+
+	'should match the initialized template':( model, created )->
+		assert.equal model, created
+
 ).export module
