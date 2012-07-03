@@ -38,13 +38,9 @@ toast '%src%'
 		if folderpath? and folderpath != true
 			@basepath = "#{@basepath}/#{folderpath}" 
 		
-		log "#{'Let\'s toast this sly little project! :)'.grey.bold}"
-		log ". With this as your basepath: #{@basepath.cyan}"
-		log ". Please, tell me:"
-
-		q1 = "\tWhere's your src folder? (i.e. src): "
-		q2 = "\tWhere do you want your release file? (i.e. www/js/app.js) : "
-		q3 = "\tStarting from your webroot '/', what's the folderpath to "+
+		q1 = "Path to your src folder? [src] : "
+		q2 = "Path to your release file? [www/js/app.js] : "
+		q3 = "Starting from your webroot '/', what's the folderpath to "+
 			 "reach your release file? (i.e. js) (optional) : "
 
 		@ask q1.magenta, /.+/, (src)=>
