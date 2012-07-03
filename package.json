@@ -21,7 +21,7 @@
 
   "scripts"        : {
     "test"           : "vows spec/*.coffee --spec",
-    "start"          : "node ./build/coffee-toaster/bin/toaster -wd"
+    "start"          : "node ./build/coffee-toaster/bin/toaster . -wd"
   },
 
   "engines"        : {
