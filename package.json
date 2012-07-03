@@ -20,8 +20,8 @@
   },
 
   "scripts"        : {
-    "test"           : "vows spec/*.coffee --spec",
-    "start"          : "node ./build/coffee-toaster/bin/toaster . -wd"
+    "test"           : "node ./build/coffee-toaster/bin/toaster . -c; vows --spec",
+    "start"          : "node ./build/coffee-toaster/bin/toaster . -w"
   },
 
   "engines"        : {

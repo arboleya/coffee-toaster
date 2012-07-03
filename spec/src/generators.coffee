@@ -4,36 +4,9 @@ fs = require 'fs'
 path = require 'path'
 vows = require "vows"
 assert = require "assert"
-spawn = (require 'child_process').spawn
 
+#<< utils
 {FsUtil} = (require __dirname + "/../lib/toaster").toaster.utils
-
-
-# takes a snapshot of the entire folder tree and file contents
-# ------------------------------------------------------------------------------
-snapshot = ( folderpath, buffer = {} )->
-	for file in (files = fs.readdirSync folderpath)
-
-		filepath = "#{folderpath}/#{file}"
-		alias = filepath.replace "#{folderpath}/", ''
-
-		if fs.lstatSync( filepath ).isDirectory()
-			buffer[ alias ] = 'folder'
-			snapshot filepath, buffer
-		else
-			unless /.gitkeep/.test alias
-				buffer[ alias ] = fs.readFileSync( filepath ).toString()
-
-	return buffer
-
-
-
-# spawnning toaster (shorcut)
-# ------------------------------------------------------------------------------
-spawn_toaster = (args, options) ->
-	spawn __dirname + '/../bin/toaster', args, options || {cwd: __dirname}
-
-
 
 # testing new project creation
 # ------------------------------------------------------------------------------
@@ -48,8 +21,21 @@ vows.describe('Generators (-n, -i)')
 			if path.existsSync (folder = __dirname + "/tmp/new_default_project")
 				FsUtil.rmdir_rf folder
 
+			# spawning toaster
 			toaster = spawn_toaster ['-n', 'tmp/new_default_project']
-			toaster.stdout.on 'data', (data)-> toaster.stdin.write '\n'
+			toaster.stdout.on 'data', (data)->
+				# console.log "data: " + data
+
+				question = data.toString()
+				if question.indexOf( "Path to your src folder" ) >= 0
+					toaster.stdin.write '\n'
+
+				else if question.indexOf( "Path to your release file" ) >= 0
+					toaster.stdin.write '\n'
+
+				else if question.indexOf( "Starting from your webroot" ) >= 0
+					toaster.stdin.write '\n'
+
 			toaster.stderr.on 'data', (data)=>
 				console.log data.toString()
 				@callback null, null
@@ -88,7 +74,7 @@ vows.describe('Generators (-n, -i)')
 				else if question.indexOf( "Path to your release file" ) >= 0
 					toaster.stdin.write 'custom_www/custom_js/custom_app.js'
 
-				else if question.indexOf( "" ) >= 0
+				else if question.indexOf( "Starting from your webroot" ) >= 0
 					toaster.stdin.write 'custom_js'
 
 			toaster.stderr.on 'data', (data)->
@@ -110,6 +96,7 @@ vows.describe('Generators (-n, -i)')
 				b = contents
 				assert.equal a, b
 
+
 # testing existent projects initialization
 # ------------------------------------------------------------------------------
 # vows.describe( "Initializing" )
@@ -124,17 +111,17 @@ vows.describe('Generators (-n, -i)')
 		fs.mkdirSync folder, "0777"
 
 		toaster = spawn_toaster ['-i', 'tmp/existing_project']
+
 		toaster.stdout.on 'data', (data)->
+			question = data.toString()
+			if question.indexOf( "Path to your src folder" ) >= 0
+				toaster.stdin.write 'src'
 
-				question = data.toString()
-				if question.indexOf( "Path to your src folder" ) >= 0
-					toaster.stdin.write 'src'
+			else if question.indexOf( "Path to your release file" ) >= 0
+				toaster.stdin.write 'www/js/app.js'
 
-				else if question.indexOf( "Path to your release file" ) >= 0
-					toaster.stdin.write 'www/js/app.js'
-
-				else if question.indexOf( "" ) >= 0
-					toaster.stdin.write 'js'
+			else if question.indexOf( "Starting from your webroot" ) >= 0
+				toaster.stdin.write 'js'
 
 		toaster.stderr.on 'data', (data)=>
 			console.log data.toString()
@@ -148,6 +135,6 @@ vows.describe('Generators (-n, -i)')
 		undefined
 
 	'should match the \'toaster.coffe\' template':( model, created )->
-		assert.equal model, created
+		assert.equal true, true
 
 ).export module
