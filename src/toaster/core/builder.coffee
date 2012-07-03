@@ -308,10 +308,12 @@ class Builder
 			try
 				fs.writeFileSync absolute_path, cs.compile file.raw, {bare:@bare}
 			catch err
-				msg = err.message.replace '"', '\\"'
-				console.log "MSG:::: " + msg
-				msg = "#{msg.white} at file: " + "#{file.filepath}".bold.red
-				error msg
+				## dont show nothing because the error was alreary shown
+				## in the compile rotine above
+				# 
+				# msg = err.message.replace '"', '\\"'
+				# msg = "#{msg.white} at file: " + "#{file.filepath}".bold.red
+				# error msg
 				continue
 
 			# adds to the files buffer
