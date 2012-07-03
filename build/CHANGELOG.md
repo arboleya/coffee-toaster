@@ -1,7 +1,8 @@
 # Changelog
 
 ## 0.6.4
- * Adding initialize test
+ * Adding test for initializing existent projects
+ * Fixing GROWL icons path
 
 ## 0.6.3 - 07/01/2012
  * Fixing example 'package.' again (the zombie bug)
