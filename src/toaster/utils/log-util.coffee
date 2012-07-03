@@ -2,8 +2,8 @@
 growl = require 'growl'
 
 # ICONS 
-icon_warn = '/Users/nybras/Dropbox/Workspace/serpentem/coffee-toaster/images/warning.png'
-icon_error = '/Users/nybras/Dropbox/Workspace/serpentem/coffee-toaster/images/error.png'
+icon_warn = __dirname + '/../images/warning.png'
+icon_error = __dirname + '/../images/error.png'
 
 
 
