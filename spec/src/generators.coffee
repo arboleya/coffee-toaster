@@ -134,7 +134,7 @@ vows.describe('Generators (-n, -i)')
 
 		undefined
 
-	'should match the \'toaster.coffe\' template':( model, created )->
+	'should match the \'toaster.coffee\' template':( model, created )->
 		assert.equal true, true
 
 ).export module
