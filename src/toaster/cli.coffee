@@ -23,10 +23,11 @@ class Cli
 			.describe('i', "Create a config (toaster.coffee) file")
 			
 			.alias('w', 'watch')
+			.string( 'w' )
 			.describe('w', "Start watching/compiling your project")
 			
 			.alias('c', 'compile')
-			.boolean( 'c' )
+			.string( 'c' )
 			.describe('c', "Compile the entire project, without watching it.")
 
 			.alias('d', 'debug')

@@ -38,7 +38,10 @@ exports.Toaster = class Toaster
 			new toaster.generators.Config( @basepath ).create @cli.argv.i
 
 		# start watching'n'compiling project
-		else if @cli.argv.w || @cli.argv.c
+		else if (base = @cli.argv.w || @cli.argv.c)
+			# overwrite basepath if some path argument is given
+			@basepath = base if base isnt true
+
 			config = if options and options.config then options.config else null
 			@toast = new toaster.Toast @
 			@build() unless skip_initial_build
