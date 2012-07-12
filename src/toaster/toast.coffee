@@ -75,6 +75,10 @@ class Toast
 				release: pn "#{@basepath}/#{params.release}"
 				debug: debug
 
+		# compute vendors full path
+		config.vendors[i] = pn "#{@basepath}/#{v}" for v, i in config.vendors
+		console.log config.vendors
+
 		unless srcpath instanceof Object
 			config.src_folders.push {
 				path: srcpath,

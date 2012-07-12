@@ -40,6 +40,19 @@ class FsUtil
 		return true
 
 
+	@cp_dir:(from, to)->
+
+		from = (from.slice 0, -1)  if (from.slice -1) == "/"
+		to = (to.slice 0, -1)  if (to.slice -1) == "/"
+
+		for file_from in (files = @find from, /.*/, false)
+
+			file_to = file_from.replace from, to
+			dir = ((file_to.split '/').slice 0, -1).join '/'
+
+			@mkdir_p dir unless path.existsSync dir
+			fs.writeFileSync file_to, (fs.readFileSync file_from, "utf-8")
+
 
 	@find:( folderpath, pattern, include_dirs = false )->
 

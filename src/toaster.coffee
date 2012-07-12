@@ -39,8 +39,13 @@ exports.Toaster = class Toaster
 
 		# start watching'n'compiling project
 		else if (base = @cli.argv.w || @cli.argv.c)
+
 			# overwrite basepath if some path argument is given
-			@basepath = base if base isnt true
+			if base isnt true
+				if base[0] == "/"
+					@basepath = base
+				else
+					@basepath = pn "#{@basepath}/#{base}"
 
 			config = if options and options.config then options.config else null
 			@toast = new toaster.Toast @
