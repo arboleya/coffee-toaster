@@ -12,22 +12,22 @@ class Config extends toaster.generators.Question
 # => SRC FOLDER
 toast '%src%'
 
-	# EXCLUDED FOLDERS (optional)
-	# exclude: ['folder/to/exclude', 'another/folder/to/exclude', ... ]
+  # EXCLUDED FOLDERS (optional)
+  # exclude: ['folder/to/exclude', 'another/folder/to/exclude', ... ]
 
-	# => VENDORS (optional)
-	# vendors: ['vendors/x.js', 'vendors/y.js', ... ]
+  # => VENDORS (optional)
+  # vendors: ['vendors/x.js', 'vendors/y.js', ... ]
 
-	# => OPTIONS (optional, default values listed)
-	# bare: false
-	# packaging: true
-	# expose: ''
-	# minify: true
+  # => OPTIONS (optional, default values listed)
+  # bare: false
+  # packaging: true
+  # expose: ''
+  # minify: true
 
-	# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
-	httpfolder: '%httpfolder%'
-	release: '%release%'
-	debug: '%debug%'
+  # => HTTPFOLDER (optional), RELEASE / DEBUG (required)
+  httpfolder: '%httpfolder%'
+  release: '%release%'
+  debug: '%debug%'
 """
 	
 	constructor:(@basepath)->
