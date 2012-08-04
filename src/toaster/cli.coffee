@@ -14,6 +14,7 @@ class Cli
 		usage += "  toaster -n myawsomeapp   (#{'required'.red})\n"
 		usage += "  toaster -i [myawsomeapp] (#{'optional'.green})\n"
 		usage += "  toaster -w [myawsomeapp] (#{'optional'.green})"
+		usage += "  toaster -wd [myawsomeapp] (#{'optional'.green})"
 		
 		@argv = (@opts = optimist.usage( usage )
     		.alias('n', 'new')
@@ -23,16 +24,12 @@ class Cli
 			.describe('i', "Create a config (toaster.coffee) file")
 			
 			.alias('w', 'watch')
-			.string( 'w' )
 			.describe('w', "Start watching/compiling your project")
 			
 			.alias('c', 'compile')
-			.string( 'c' )
 			.describe('c', "Compile the entire project, without watching it.")
 
 			.alias('d', 'debug')
-			.boolean( 'd' )
-			.default('d', false )
 			.describe('d', 'Debug mode (compile js files individually)')
 
 			.alias('j', 'config')
