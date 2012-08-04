@@ -23,7 +23,7 @@ class Toast
 			config_file = @toaster.cli.argv["config-file"]
 			filepath = config_file || pn "#{@basepath}/toaster.coffee"
 
-			if path.existsSync( filepath )
+			if fs.existsSync( filepath )
 
 				contents = fs.readFileSync( filepath, "utf-8" )
 
@@ -77,7 +77,6 @@ class Toast
 
 		# compute vendors full path
 		config.vendors[i] = pn "#{@basepath}/#{v}" for v, i in config.vendors
-		console.log config.vendors
 
 		unless srcpath instanceof Object
 			config.src_folders.push {
@@ -92,7 +91,7 @@ class Toast
 				config.src_folders.push {path: folder, alias: alias}
 
 		for item in config.src_folders
-			unless path.existsSync item.path
+			unless fs.existsSync item.path
 				error	"Source folder doens't exist:\n\t#{item.path.red}\n" + 
 						"Check your #{'toaster.coffee'.yellow} and try again." +
 						"\n\t" + pn( "#{@basepath}/toaster.coffee" ).yellow

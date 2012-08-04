@@ -30,7 +30,7 @@ class FsUtil
 		folders = folderpath.split "/"
 		for folder, index in folders
 			continue if (folder = folders.slice( 0, index + 1 ).join "/") == ""
-			exists = path.existsSync folder
+			exists = fs.existsSync folder
 			if exists and index is folders.length - 1
 				throw new Error error( "Folder exists: #{folder.red}" )
 				return false
@@ -50,7 +50,7 @@ class FsUtil
 			file_to = file_from.replace from, to
 			dir = ((file_to.split '/').slice 0, -1).join '/'
 
-			@mkdir_p dir unless path.existsSync dir
+			@mkdir_p dir unless fs.existsSync dir
 			fs.writeFileSync file_to, (fs.readFileSync file_from, "utf-8")
 
 
@@ -194,7 +194,7 @@ class FsUtil
 
 	@_on_folder_change:( folderpath, curr, prev)=>
 		# abort if the folder doest not exist
-		return unless path.existsSync folderpath
+		return unless fs.existsSync folderpath
 
 		# get previous and current folder snapshot to compare
 		a = FsUtil.snapshots[folderpath]

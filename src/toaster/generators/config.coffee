@@ -67,7 +67,7 @@ toast '%src%'
 		buffer = buffer.replace "%debug%", debug
 		buffer = buffer.replace "%httpfolder%", httpfolder
 
-		if path.existsSync filepath
+		if fs.existsSync filepath
 			question = "\tDo you want to overwrite the file: #{filepath.yellow}"
 			question += " ? [y/N] : ".white
 			@ask question, /.*?/, (overwrite)=>
