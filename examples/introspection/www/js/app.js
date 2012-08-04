@@ -1,32 +1,10 @@
-var __t;
-
-__t = function(ns) {
-  var curr, index, part, parts, _i, _len;
-  curr = null;
-  parts = [].concat = ns.split(".");
-  for (index = _i = 0, _len = parts.length; _i < _len; index = ++_i) {
-    part = parts[index];
-    if (curr === null) {
-      curr = eval(part);
-      continue;
-    } else {
-      if (curr[part] == null) {
-        curr = curr[part] = {};
-      } else {
-        curr = curr[part];
-      }
-    }
-  }
-  return curr;
-};
-
 var app = window.app = {};
-var artists = window.artists = {};
+var artists = window.artists = {progressive:{},triphop:{}};
 var genres = window.genres = {};
 
 (function() {
 
-  __t('artists.triphop').Lovage = (function() {
+  artists.triphop.Lovage = (function() {
 
     function Lovage() {
       console.log("\t\tArtist: Lovage created!");
@@ -36,7 +14,7 @@ var genres = window.genres = {};
 
   })();
 
-  __t('artists.triphop').MassiveAttack = (function() {
+  artists.triphop.MassiveAttack = (function() {
 
     function MassiveAttack() {
       console.log("\t\tArtist: MassiveAttack created!");
@@ -46,7 +24,7 @@ var genres = window.genres = {};
 
   })();
 
-  __t('artists.triphop').Portishead = (function() {
+  artists.triphop.Portishead = (function() {
 
     function Portishead() {
       console.log("\t\tArtist: Portishead created!");
@@ -56,7 +34,7 @@ var genres = window.genres = {};
 
   })();
 
-  __t('artists.progressive').KingCrimson = (function() {
+  artists.progressive.KingCrimson = (function() {
 
     function KingCrimson() {
       console.log("\t\tArtist: KingCrimson created!");
@@ -66,7 +44,7 @@ var genres = window.genres = {};
 
   })();
 
-  __t('genres').TripHop = (function() {
+  genres.TripHop = (function() {
 
     function TripHop() {
       console.log("\tGenre: TripHop created!");
@@ -79,7 +57,7 @@ var genres = window.genres = {};
 
   })();
 
-  __t('artists.progressive').TheMarsVolta = (function() {
+  artists.progressive.TheMarsVolta = (function() {
 
     function TheMarsVolta() {
       console.log("\t\tArtist: TheMarsVolta created!");
@@ -89,7 +67,7 @@ var genres = window.genres = {};
 
   })();
 
-  __t('artists.progressive').Tool = (function() {
+  artists.progressive.Tool = (function() {
 
     function Tool() {
       console.log("\t\tArtist: Tool created!");
@@ -99,7 +77,7 @@ var genres = window.genres = {};
 
   })();
 
-  __t('genres').Progressive = (function() {
+  genres.Progressive = (function() {
 
     function Progressive() {
       console.log("\tGenre: Progressive created!");
@@ -112,7 +90,7 @@ var genres = window.genres = {};
 
   })();
 
-  __t('app').App = (function() {
+  app.App = (function() {
 
     function App() {
       console.log("App created!");

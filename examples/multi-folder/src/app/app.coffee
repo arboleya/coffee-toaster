@@ -1,6 +1,6 @@
 #<< genres/*
 
-class App
+class app.App
 	constructor:->
 		console.log "App created!"
 		new genres.Progressive

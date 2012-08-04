@@ -46,6 +46,6 @@ new Toaster __dirname,
 		minify: false
 
 		# RELEASING
-		httpfolder: ''
+		httpfolder: 'js'
 		release: "www/js/app.js"
 		debug: 'www/js/app-debug.js'

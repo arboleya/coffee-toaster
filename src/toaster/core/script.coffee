@@ -56,8 +56,8 @@ class Script
 				# the parser thing, adding the package headers declarations
 				# as well as the expose thing
 
-				repl = "$1$2 __t('#{@namespace}').$3$4"
-				@raw = @raw.replace rgx, repl
+				# repl = "$1$2 __t('#{@namespace}').$3$4"
+				# @raw = @raw.replace rgx, repl
 				@classpath = "#{@namespace}.#{@classname}"
 
 			# assemble some more infos about the file.

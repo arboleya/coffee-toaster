@@ -1,6 +1,6 @@
 #<< artists/triphop/*
 
-class TripHop
+class genres.TripHop
 	constructor:->
 		console.log "\tGenre: TripHop created!"
 		new artists.triphop.MassiveAttack

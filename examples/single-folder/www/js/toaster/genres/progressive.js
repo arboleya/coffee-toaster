@@ -1,6 +1,6 @@
 (function() {
 
-  __t('genres').Progressive = (function() {
+  genres.Progressive = (function() {
 
     function Progressive() {
       console.log("\tGenre: Progressive created!");

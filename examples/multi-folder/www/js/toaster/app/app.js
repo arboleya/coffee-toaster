@@ -1,6 +1,6 @@
 (function() {
 
-  __t('app').App = (function() {
+  app.App = (function() {
 
     function App() {
       console.log("App created!");

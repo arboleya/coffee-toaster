@@ -1,6 +1,6 @@
 (function() {
 
-  __t('artists.progressive').Tool = (function() {
+  artists.progressive.Tool = (function() {
 
     function Tool() {
       console.log("\t\tArtist: Tool created!");

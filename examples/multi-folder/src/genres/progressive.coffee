@@ -1,6 +1,6 @@
 #<< artists/progressive/*
 
-class Progressive
+class genres.Progressive
 	constructor:->
 		console.log "\tGenre: Progressive created!"
 		new artists.progressive.KingCrimson

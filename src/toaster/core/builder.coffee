@@ -11,28 +11,23 @@ class Builder
 	uglify_parser = require("uglify-js").parser
 
 	Script = toaster.core.Script
-	FnUtil = toaster.utils.FnUtil
-	FsUtil = toaster.utils.FsUtil
-	ArrayUtil = toaster.utils.ArrayUtil
-	StringUtil = toaster.utils.StringUtil
+	{FnUtil, FsUtil, ArrayUtil, StringUtil} = toaster.utils
 
-
-
-	_toaster_helper: """
-		__t = ( ns )->
-			curr = null
-			parts = [].concat = ns.split "."
-			for part, index in parts
-				if curr == null
-					curr = eval part
-					continue
-				else
-					unless curr[ part ]?
-						curr = curr[ part ] = {}
-					else
-						curr = curr[ part ]
-			curr
-	"""
+	# _toaster_helper: """
+	# 	__t = ( ns )->
+	# 		curr = null
+	# 		parts = [].concat = ns.split "."
+	# 		for part, index in parts
+	# 			if curr == null
+	# 				curr = eval part
+	# 				continue
+	# 			else
+	# 				unless curr[ part ]?
+	# 					curr = curr[ part ] = {}
+	# 				else
+	# 					curr = curr[ part ]
+	# 		curr
+	# """
 
 	_include_tmpl: "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
 
@@ -78,16 +73,15 @@ class Builder
 					s = new Script @, fpath, file, falias, @cli
 					@files.push s
 
-
 	build:( header_code = "", footer_code = "" )=>
 		# namespaces
 		namespaces = @build_namespaces()
 
 		# prepare helper
-		if @packaging
-			helper = cs.compile @_toaster_helper, {bare:true}
-		else
-			helper = ""
+		# if @packaging
+		# 	helper = cs.compile @_toaster_helper, {bare:true}
+		# else
+		# 	helper = ""
 
 		# prepare vendors
 		vendors = @merge_vendors()
@@ -95,10 +89,10 @@ class Builder
 		# prepare release contents
 		contents = []
 		contents.push vendors if vendors isnt ""
-		contents.push helper if @packaging
+		# contents.push helper if @packaging
 		contents.push namespaces if @packaging
 		contents.push header_code if header_code isnt ""
-		contents.push @compile()
+		contents.push (c = @compile())
 		contents.push footer_code if header_code isnt ""
 		contents = contents.join '\n'
 
@@ -130,7 +124,7 @@ class Builder
 			# prepare boot loader contents
 			contents = []
 			contents.push vendors if vendors isnt ""
-			contents.push helper if @packaging
+			# contents.push helper if @packaging
 			contents.push namespaces if @packaging
 			contents.push header_code if header_code isnt ""
 			contents.push (files.join "\n")
@@ -145,30 +139,27 @@ class Builder
 			now = "#{now.getHours()}:#{now.getMinutes()}:#{now.getSeconds()}"
 			log "#{'Compiled'.bold} #{@debug} @ #{now}".green
 
-	# get all root namespaces
-	build_namespaces:( after_build_namespaces )->
-		namespaces = ""
-
+	# Creates a NS holder for all folders
+	build_namespaces:()->
+		tree = {}
 		for folder in @config.src_folders
-			if folder.alias?
-				namespaces += @build_namespaces_declaration folder.alias
-			else
-				subfolders = FsUtil.ls_folders folder.path
+			t = (tree[folder.alias] = {}) if folder.alias?
+			@build_ns_tree t || tree, folder.path
 
-				for subfolder in subfolders
-					name = subfolder.match /[^\/]+$/m
-					namespaces += @build_namespaces_declaration name
+		buffer = ""
+		for name, scope of tree
+			buffer += "var #{name} = "
+			buffer += "#{@expose}.#{name} = " if @expose?
+			buffer += (JSON.stringify scope, null, '').replace /\"/g, ''
+			buffer += ";\n"
 
-		return namespaces
+		return buffer
 
-
-	build_namespaces_declaration:( name )=>
-		declaration = ""
-		declaration += "var #{name} = " if @packaging
-		declaration += "#{@expose}.#{name} = " if @expose?
-		declaration += "{};\n" if declaration.length
-
-		return declaration
+	# Walk some folder path and lists all its subfolders
+	build_ns_tree:( tree, folderpath )->
+		folders = FsUtil.ls_folders folderpath
+		for folder in folders
+			@build_ns_tree (tree[folder.match /[^\/]+$/m] = {}), folder
 
 
 	watch:()->
@@ -281,7 +272,7 @@ class Builder
 		release_path += "/toaster"
 
 		# cleaning previous/existent structure
-		FsUtil.rmdir_rf release_path if path.existsSync release_path
+		FsUtil.rmdir_rf release_path if fs.existsSync release_path
 
 		# creating new structre from scratch
 		FsUtil.mkdir_p release_path
@@ -302,7 +293,7 @@ class Builder
 			folder_path = absolute_path.split('/').slice(0,-1).join "/"
 
 			# create container folder if it doesnt exist yet
-			FsUtil.mkdir_p folder_path if !path.existsSync folder_path
+			FsUtil.mkdir_p folder_path if !fs.existsSync folder_path
 
 			# writing file
 			try
@@ -415,7 +406,7 @@ class Builder
 	merge_vendors:()=>
 		buffer = []
 		for vendor in @vendors
-			if path.existsSync vendor
+			if fs.existsSync vendor
 				buffer.push fs.readFileSync vendor, 'utf-8'
 			else
 				warn "Vendor not found at ".white + vendor.yellow.bold

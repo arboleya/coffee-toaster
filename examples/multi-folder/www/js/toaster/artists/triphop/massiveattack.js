@@ -1,6 +1,6 @@
 (function() {
 
-  __t('artists.triphop').MassiveAttack = (function() {
+  artists.triphop.MassiveAttack = (function() {
 
     function MassiveAttack() {
       console.log("\t\tArtist: MassiveAttack created!");

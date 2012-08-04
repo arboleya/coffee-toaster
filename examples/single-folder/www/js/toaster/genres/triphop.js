@@ -1,6 +1,6 @@
 (function() {
 
-  __t('genres').TripHop = (function() {
+  genres.TripHop = (function() {
 
     function TripHop() {
       console.log("\tGenre: TripHop created!");
