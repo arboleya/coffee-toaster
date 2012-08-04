@@ -18,6 +18,15 @@ exports.Toaster = class Toaster
 		@basepath = basedir || path.resolve "."
 		@cli = new toaster.Cli options
 
+		# increments basepath if some path is given
+		for flag in ('nicwd'.split '')
+			continue unless (typeof (base = @cli.argv[flag]) is 'string')
+			if base[0] == "/"
+				@basepath = base
+			else
+				@basepath = pn "#{@basepath}/#{base}"
+
+		# inject options
 		if options?
 			for k, v of options
 				@cli.argv[k] = v
@@ -39,14 +48,6 @@ exports.Toaster = class Toaster
 
 		# start watching'n'compiling project
 		else if (base = @cli.argv.w || @cli.argv.c)
-
-			# overwrite basepath if some path argument is given
-			if base isnt true
-				if base[0] == "/"
-					@basepath = base
-				else
-					@basepath = pn "#{@basepath}/#{base}"
-
 			config = if options and options.config then options.config else null
 			@toast = new toaster.Toast @
 			@build() unless skip_initial_build
