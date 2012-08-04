@@ -72,7 +72,7 @@
           });
           return void 0;
         },
-        'should report the error precisely': function(err, reported_msg) {
+        'should rise the error precisely': function(err, reported_msg) {
           assert.equal(err, null);
           return assert.equal(reported_msg, error_message);
         }

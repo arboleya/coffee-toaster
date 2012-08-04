@@ -31,8 +31,7 @@ vows.describe( 'Compiling' )
 
 			undefined
 
-		'should report the error precisely':( err, reported_msg )->
+		'should rise the error precisely':( err, reported_msg )->
 			assert.equal err, null
 			assert.equal reported_msg, error_message
-
 ).export module
