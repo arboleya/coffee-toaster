@@ -338,19 +338,11 @@ So you will end up with just 'bunch of code':
 
 ### Packaging
 
-If true, use all your folders as namespaces to your class definitions.
+If true, builds a hash with all your folders-as-namespaces.
 
-If you have class 'Lovage' declared inside the "artists/triphop" folder, you<BR>
-can access it through 'artists.triphop.Lovage'.
-
-````javascript
-
-	# usual way
-	new Lovage
-	
-	# with packaging=true
-	new artists.triphop.Lovage
-````
+If you have file 'lovage.coffee' declared inside the "artists/triphop"<BR>
+folder, you can declare it with 'class artists.triphop.Lovage', the <BR>
+namespace 'artists.triphop' will be created automatically for holding it.
 
 ### Expose
 
