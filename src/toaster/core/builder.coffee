@@ -150,7 +150,7 @@ class Builder
 		for name, scope of tree
 			buffer += "var #{name} = "
 			buffer += "#{@expose}.#{name} = " if @expose?
-			buffer += (JSON.stringify scope, null, '').replace /\"/g, ''
+			buffer += (JSON.stringify scope, null, '').replace /\"/g, "'"
 			buffer += ";\n"
 
 		return buffer
