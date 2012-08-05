@@ -15,8 +15,7 @@ class Script
 
 
 
-	getinfo:( declare_ns = false )->
-
+	getinfo:( declare_ns = true )->
 		# read file content and initialize dependencies
 		# and baseclasses array
 		@raw = fs.readFileSync @realpath, "utf-8"
@@ -38,15 +37,13 @@ class Script
 		@namespace = @filefolder.replace(/\//g, ".").slice 0, -1
 		
 		# filter files that have class declarations inside of it
-		rgx = /^(\s*)(class)+\s(\w+)(\s+(extends)\s+([\w.]+))?/gm
+		rgx = /^(class)+\s+([^\s]+)+(\s(extends)\s+([\w.]+))?/mg
 		
 		# filter classes that extends another classes
 		rgx_ext = /(^|=\s*)(class)\s(\w+)\s(extends)\s(\\w+)\s*$/gm
 
 		# if there is a class inside the file
 		if @raw.match( rgx )?
-
-			@classpath = @classname
 
 			# if the file is not in the root src folder (outside any
 			# folder/package ) and packaging is enabled
@@ -56,9 +53,14 @@ class Script
 				# the parser thing, adding the package headers declarations
 				# as well as the expose thing
 
-				if declare_ns
-					repl = "$1$2 #{@namespace}.$3$4"
-					@raw = @raw.replace rgx, repl
+				for decl in [].concat (@raw.match rgx)
+					name = (decl.match /class\s([^\s]+)/)
+					name = (name[1].split '.').pop()
+					# console.log "search: #{decl}"
+					# console.log "name: #{name}"
+					# console.log "replace: " + "class #{@namespace}.#{name}"
+					@raw = @raw.replace decl, "class #{@namespace}.#{name}"
+					fs.writeFileSync @realpath, @raw
 
 				@classpath = "#{@namespace}.#{@classname}"
 
