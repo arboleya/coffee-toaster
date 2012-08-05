@@ -76,8 +76,10 @@ class Toast
 				debug: debug
 
 		# compute vendors full path
-		config.vendors[i] = pn "#{@basepath}/#{v}" for v, i in config.vendors
-
+		for v, i in config.vendors
+			if (v.substr 0, 1) != "/"
+				config.vendors[i] = pn "#{@basepath}/#{v}"
+		
 		unless srcpath instanceof Object
 			config.src_folders.push {
 				path: srcpath,
