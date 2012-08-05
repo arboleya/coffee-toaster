@@ -40,6 +40,9 @@ class Cli
 			.string( 'f' )
 			.describe('f', "Path to a different config file.")
 
+			.alias( 'ns', 'inject-ns' )
+			.describe('ns', "Inject namespace declarations for all project classes.")
+
 			.alias('v', 'version')
 			.describe('v', '')
 

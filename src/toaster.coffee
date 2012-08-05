@@ -2,6 +2,7 @@ exports.run=()-> new Toaster
 
 #<< toaster/toast
 #<< toaster/cli
+#<< toaster/misc/inject-ns
 
 exports.toaster = toaster
 exports.Toaster = class Toaster
@@ -45,6 +46,11 @@ exports.Toaster = class Toaster
 		# initializes a toaster file template into an existent project
 		else if @cli.argv.i
 			new toaster.generators.Config( @basepath ).create @cli.argv.i
+
+		# Inject namespace declarations
+		else if @cli.argv.ns
+			@toast = new toaster.Toast @
+			new toaster.misc.InjectNS @toast.builders
 
 		# start watching'n'compiling project
 		else if (base = @cli.argv.w || @cli.argv.c)
