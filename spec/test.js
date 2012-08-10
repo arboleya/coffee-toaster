@@ -96,7 +96,7 @@
         topic: function() {
           var folder, toaster,
             _this = this;
-          if (path.existsSync((folder = __dirname + "/tmp/new_default_project"))) {
+          if (fs.existsSync((folder = __dirname + "/tmp/new_default_project"))) {
             FsUtil.rmdir_rf(folder);
           }
           toaster = spawn_toaster(['-n', 'tmp/new_default_project']);
@@ -141,7 +141,7 @@
         topic: function() {
           var folder, toaster,
             _this = this;
-          if (path.existsSync((folder = __dirname + "/tmp/new_custom_project"))) {
+          if (fs.existsSync((folder = __dirname + "/tmp/new_custom_project"))) {
             FsUtil.rmdir_rf(folder);
           }
           toaster = spawn_toaster(['-n', 'tmp/new_custom_project']);
@@ -191,7 +191,7 @@
         template = __dirname + "/templates/existing_project/toaster.coffee";
         folder = __dirname + "/tmp/existing_project/";
         created = "" + folder + "/toaster.coffee";
-        if (path.existsSync(folder)) {
+        if (fs.existsSync(folder)) {
           FsUtil.rmdir_rf(folder);
         }
         fs.mkdirSync(folder, "0777");

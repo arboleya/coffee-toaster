@@ -18,7 +18,7 @@ vows.describe('Generators (-n, -i)')
 	'with default values':
 		topic: ->
 			# cleaning first
-			if path.existsSync (folder = __dirname + "/tmp/new_default_project")
+			if fs.existsSync (folder = __dirname + "/tmp/new_default_project")
 				FsUtil.rmdir_rf folder
 
 			# spawning toaster
@@ -61,7 +61,7 @@ vows.describe('Generators (-n, -i)')
 		topic: ->
 
 			# cleaning first
-			if path.existsSync (folder = __dirname + "/tmp/new_custom_project")
+			if fs.existsSync (folder = __dirname + "/tmp/new_custom_project")
 				FsUtil.rmdir_rf folder
 
 			toaster = spawn_toaster ['-n', 'tmp/new_custom_project']
@@ -107,7 +107,7 @@ vows.describe('Generators (-n, -i)')
 		created = "#{folder}/toaster.coffee"
 
 		# cleaning first
-		FsUtil.rmdir_rf folder if path.existsSync folder
+		FsUtil.rmdir_rf folder if fs.existsSync folder
 		fs.mkdirSync folder, "0777"
 
 		toaster = spawn_toaster ['-i', 'tmp/existing_project']
