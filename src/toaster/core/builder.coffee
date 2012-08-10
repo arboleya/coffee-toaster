@@ -13,24 +13,7 @@ class Builder
 	Script = toaster.core.Script
 	{FnUtil, FsUtil, ArrayUtil, StringUtil} = toaster.utils
 
-	# _toaster_helper: """
-	# 	__t = ( ns )->
-	# 		curr = null
-	# 		parts = [].concat = ns.split "."
-	# 		for part, index in parts
-	# 			if curr == null
-	# 				curr = eval part
-	# 				continue
-	# 			else
-	# 				unless curr[ part ]?
-	# 					curr = curr[ part ] = {}
-	# 				else
-	# 					curr = curr[ part ]
-	# 		curr
-	# """
-
 	_include_tmpl: "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
-
 
 
 	constructor:(@toaster, @cli, @config)->
@@ -77,19 +60,12 @@ class Builder
 		# namespaces
 		namespaces = @build_namespaces()
 
-		# prepare helper
-		# if @packaging
-		# 	helper = cs.compile @_toaster_helper, {bare:true}
-		# else
-		# 	helper = ""
-
 		# prepare vendors
 		vendors = @merge_vendors()
 
 		# prepare release contents
 		contents = []
 		contents.push vendors if vendors isnt ""
-		# contents.push helper if @packaging
 		contents.push namespaces if @packaging
 		contents.push header_code if header_code isnt ""
 		contents.push (c = @compile())
@@ -124,7 +100,6 @@ class Builder
 			# prepare boot loader contents
 			contents = []
 			contents.push vendors if vendors isnt ""
-			# contents.push helper if @packaging
 			contents.push namespaces if @packaging
 			contents.push header_code if header_code isnt ""
 			contents.push (files.join "\n")

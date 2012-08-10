@@ -54,12 +54,21 @@ class Script
 				# as well as the expose thing
 
 				for decl in [].concat (@raw.match rgx)
+
+					# name
 					name = (decl.match /class\s([^\s]+)/)
 					name = (name[1].split '.').pop()
-					# console.log "search: #{decl}"
-					# console.log "name: #{name}"
-					# console.log "replace: " + "class #{@namespace}.#{name}"
-					@raw = @raw.replace decl, "class #{@namespace}.#{name}"
+
+					# extends
+					extending = (decl.match /(\sextends\s[^\s]+$)/m)
+					extending = extending[0] if extending
+					extending ||= ""
+
+					# file modification (declaring namespaces for classes)
+					repl = "class #{@namespace}.#{name}#{extending}"
+					@raw = @raw.replace decl, repl
+
+					# write definitions to file
 					fs.writeFileSync @realpath, @raw
 
 				@classpath = "#{@namespace}.#{@classname}"
