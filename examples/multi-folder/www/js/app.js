@@ -1,5 +1,5 @@
 var app = window.app = {};
-var artists = window.artists = {progressive:{},triphop:{}};
+var artists = window.artists = {'progressive':{},'triphop':{}};
 var genres = window.genres = {};
 
 (function() {
