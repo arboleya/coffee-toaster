@@ -189,7 +189,7 @@
         var created, folder, template, toaster,
           _this = this;
         template = __dirname + "/templates/existing_project/toaster.coffee";
-        folder = __dirname + "/tmp/existing_project/";
+        folder = __dirname + "/tmp/existing_project";
         created = "" + folder + "/toaster.coffee";
         if (fs.existsSync(folder)) {
           FsUtil.rmdir_rf(folder);

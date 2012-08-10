@@ -103,7 +103,7 @@ vows.describe('Generators (-n, -i)')
 ).addBatch( 'A config file created for an existent project':
 	topic: ->
 		template = (__dirname + "/templates/existing_project/toaster.coffee")
-		folder = (__dirname + "/tmp/existing_project/")
+		folder = (__dirname + "/tmp/existing_project")
 		created = "#{folder}/toaster.coffee"
 
 		# cleaning first
