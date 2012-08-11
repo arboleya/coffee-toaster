@@ -53,8 +53,8 @@ class Toast
 			return process.exit()
 		else
 			path = ( (params.release.split '/').slice 0, -1 ).join '/'
-			unless fs.existsSync path
-				error "Release folder doest not exist:\n\t#{path.yellow}"
+			unless fs.existsSync "#{@basepath}/#{path}"
+				error "Release folder does not exist:\n\t#{path.yellow}"
 				return process.exit()
 
 		# configuration object shared between builders
