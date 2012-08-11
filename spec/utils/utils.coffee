@@ -1,7 +1,7 @@
 fs = require "fs"
 spawn = (require 'child_process').spawn
 
-snapshot = ( folderpath, buffer = {} )->
+exports.snapshot = snapshot = ( folderpath, buffer = {} )->
 	for file in (files = fs.readdirSync folderpath)
 
 		filepath = "#{folderpath}/#{file}"
@@ -17,7 +17,7 @@ snapshot = ( folderpath, buffer = {} )->
 		catch error
 		  throw error
 
-	return buffer
+	buffer
 
-spawn_toaster = (args, options) ->
-	spawn __dirname + '/../bin/toaster', args, options || {cwd: __dirname}
+exports.spawn_toaster = (args, options) ->
+	spawn __dirname + '/../../bin/toaster', args, options || {cwd: __dirname}

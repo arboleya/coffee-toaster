@@ -1,12 +1,10 @@
-# requirements
-# ------------------------------------------------------------------------------
 fs = require 'fs'
 path = require 'path'
 vows = require "vows"
 assert = require "assert"
 
-#<< utils
 {FsUtil} = (require __dirname + "/../lib/toaster").toaster.utils
+{spawn_toaster,snapshot} = require "./utils/utils"
 
 # testing new project creation
 # ------------------------------------------------------------------------------
@@ -17,14 +15,19 @@ vows.describe('Generators (-n, -i)')
 	# --------------------------------------------------------------------------
 	'with default values':
 		topic: ->
+			# console.log "topic"
 			# cleaning first
-			if fs.existsSync (folder = __dirname + "/tmp/new_default_project")
+			if fs.existsSync (folder = __dirname + "/_tmp/new_default_project")
+				# console.log "clean"
 				FsUtil.rmdir_rf folder
 
+			# console.log "spawn: " + folder
+
 			# spawning toaster
-			toaster = spawn_toaster ['-n', 'tmp/new_default_project']
+			toaster = spawn_toaster ['-n', folder]
 			toaster.stdout.on 'data', (data)->
-				# console.log "data: " + data
+				# console.log "data: "
+				# console.log data.toString()
 
 				question = data.toString()
 				if question.indexOf( "Path to your src folder" ) >= 0
@@ -37,14 +40,17 @@ vows.describe('Generators (-n, -i)')
 					toaster.stdin.write '\n'
 
 			toaster.stderr.on 'data', (data)=>
+				# console.log "data"
 				console.log data.toString()
 				@callback null, null
 
 			toaster.on 'exit', (code)=>
-				model = snapshot "#{__dirname}/templates/new_default_project"
-				created = snapshot "#{__dirname}/tmp/new_default_project"
+				# console.log "exit"
+				model = snapshot "#{__dirname}/_templates/new_default_project"
+				created = snapshot "#{__dirname}/_tmp/new_default_project"
 				@callback model, created
 
+			# console.log "end"
 			undefined
 
 		'should match the default template':( model, created )->
@@ -61,10 +67,10 @@ vows.describe('Generators (-n, -i)')
 		topic: ->
 
 			# cleaning first
-			if fs.existsSync (folder = __dirname + "/tmp/new_custom_project")
+			if fs.existsSync (folder = __dirname + "/_tmp/new_custom_project")
 				FsUtil.rmdir_rf folder
 
-			toaster = spawn_toaster ['-n', 'tmp/new_custom_project']
+			toaster = spawn_toaster ['-n', folder]
 			toaster.stdout.on 'data', (data)->
 
 				question = data.toString()
@@ -82,8 +88,8 @@ vows.describe('Generators (-n, -i)')
 				@callback null, null
 
 			toaster.on 'exit', (code)=>
-				model = snapshot "#{__dirname}/templates/new_custom_project"
-				created = snapshot "#{__dirname}/tmp/new_custom_project"
+				model = snapshot "#{__dirname}/_templates/new_custom_project"
+				created = snapshot "#{__dirname}/_tmp/new_custom_project"
 				@callback model, created
 
 			undefined
@@ -102,15 +108,15 @@ vows.describe('Generators (-n, -i)')
 # vows.describe( "Initializing" )
 ).addBatch( 'A config file created for an existent project':
 	topic: ->
-		template = (__dirname + "/templates/existing_project/toaster.coffee")
-		folder = (__dirname + "/tmp/existing_project")
+		template = (__dirname + "/_templates/existing_project/toaster.coffee")
+		folder = (__dirname + "/_tmp/existing_project")
 		created = "#{folder}/toaster.coffee"
 
 		# cleaning first
 		FsUtil.rmdir_rf folder if fs.existsSync folder
 		fs.mkdirSync folder, "0777"
 
-		toaster = spawn_toaster ['-i', 'tmp/existing_project']
+		toaster = spawn_toaster ['-i', '_tmp/existing_project']
 
 		toaster.stdout.on 'data', (data)->
 			question = data.toString()
