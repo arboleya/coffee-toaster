@@ -18,20 +18,22 @@ class Toast
 
 		if (config = @toaster.cli.argv["config"])?
 			config = JSON.parse( config ) unless config instanceof Object
-			@toast item for item in [].concat( config )
+			@toast item for item in ( [].concat config )
 		else
 			config_file = @toaster.cli.argv["config-file"]
 			filepath = config_file || pn "#{@basepath}/toaster.coffee"
 
-			if fs.existsSync( filepath )
+			if fs.existsSync filepath
 
-				contents = fs.readFileSync( filepath, "utf-8" )
-
-				fix_scope = /(^[\s\t]?)(toast)+(\()/mg
-				code = cs.compile contents, {bare:1}
-				code = code.replace fix_scope, "$1this.$2$3"
-
-				eval code
+				contents = fs.readFileSync filepath, "utf-8"
+				
+				try
+					code = cs.compile contents, {bare:1}
+					fix_scope = /(^[\s\t]?)(toast)+(\()/mg
+					code = code.replace fix_scope, "$1this.$2$3"
+					eval code
+				catch err
+					error err.message + " at 'toaster.coffee' config file."
 			else
 				error "File not found: ".yellow + " #{filepath.red}\n" +
 				  "Try running:".yellow + " toaster -i".green +
@@ -40,10 +42,20 @@ class Toast
 
 	
 	toast:( srcpath, params = {} )=>
+
 		if srcpath instanceof Object
 			params = srcpath
 		else if srcpath.substr( 0, 1 ) != "/"
 			srcpath = "#{@toaster.basepath}/#{srcpath}"
+
+		if params.release is null
+			error 'Release path not informed in config.'
+			return process.exit()
+		else
+			path = ( (params.release.split '/').slice 0, -1 ).join '/'
+			unless fs.existsSync path
+				error "Release folder doest not exist:\n\t#{path.yellow}"
+				return process.exit()
 
 		# configuration object shared between builders
 		debug = if params.debug then pn "#{@basepath}/#{params.debug}" else null
