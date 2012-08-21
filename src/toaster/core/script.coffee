@@ -66,10 +66,12 @@ class Script
 
 					# file modification (declaring namespaces for classes)
 					repl = "class #{@namespace}.#{name}#{extending}"
-					@raw = @raw.replace decl, repl
 
-					# write definitions to file
-					fs.writeFileSync @realpath, @raw
+					# write full declaration to the file if it's not right yet
+					if decl isnt repl
+						console.log "RE-ESCREVE!"
+						@raw = @raw.replace decl, repl
+						fs.writeFileSync @realpath, @raw
 
 				@classpath = "#{@namespace}.#{@classname}"
 
