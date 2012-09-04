@@ -68,10 +68,10 @@ class Builder
 		contents.push vendors if vendors isnt ""
 		contents.push namespaces if @packaging
 		contents.push header_code if header_code isnt ""
-		contents.push (c = @compile())
+		contents.push @compile()
 		contents.push footer_code if header_code isnt ""
 		contents = contents.join '\n'
-
+		
 		# uglifying
 		if @minify
 			ast = uglify_parser.parse contents
@@ -83,9 +83,8 @@ class Builder
 		fs.writeFileSync @release, contents
 
 		# notify user through cli
-		now = new Date()
-		now = "#{now.getHours()}:#{now.getMinutes()}:#{now.getSeconds()}"
-		log "#{'Compiled'.bold} #{@release} @ #{now}".green
+		now = ("#{new Date}".match /[0-9]{2}\:[0-9]{2}\:[0-9]{2}/)[0]
+		log "[#{now}] #{'Compiled'.bold} #{@release}".green
 
 		# compiling for debug
 		if @cli.argv.d && @debug?
@@ -110,9 +109,7 @@ class Builder
 			fs.writeFileSync @debug, contents
 
 			# notify user through cli
-			now = new Date()
-			now = "#{now.getHours()}:#{now.getMinutes()}:#{now.getSeconds()}"
-			log "#{'Compiled'.bold} #{@debug} @ #{now}".green
+			log "[#{now}] #{'Compiled'.bold} #{@debug}".green
 
 	# Creates a NS holder for all folders
 	build_namespaces:()->
@@ -130,7 +127,7 @@ class Builder
 
 		return buffer
 
-	# Walk some folder path and lists all its subfolders
+	# Walk some folderpath and lists all its subfolders
 	build_ns_tree:( tree, folderpath )->
 		folders = FsUtil.ls_folders folderpath
 		for folder in folders
@@ -163,6 +160,9 @@ class Builder
 				if relative_path.substr( 0, 1 ) == "/"
 					relative_path = relative_path.substr 1
 
+				# date for CLI notifications
+				now = ("#{new Date}".match /[0-9]{2}\:[0-9]{2}\:[0-9]{2}/)[0]
+
 				# switch over created, deleted, updated and watching
 				switch info.action
 
@@ -176,8 +176,8 @@ class Builder
 							@files.push s
 
 						# cli msg
-						msg = "#{('New ' + info.type + ' created').bold.cyan}"
-						log "#{msg} #{info.path.green}"
+						msg = "#{('New ' + info.type + ' created').bold}"
+						log "[#{now}] #{msg} #{info.path}".green
 
 					# when a file is deleted
 					when "deleted"
@@ -189,8 +189,8 @@ class Builder
 						@files.splice file.index, 1
 
 						# cli msg
-						msg = "#{(type + ' deleted, stop watching').bold.red}"
-						log "#{msg} #{info.path.red}"
+						msg = "#{(type + ' deleted, stop watching').bold}"
+						log "[#{now}] #{msg} #{info.path}".red
 
 					# when a file is updated
 					when "updated"
@@ -200,8 +200,8 @@ class Builder
 						file.item.getinfo()
 
 						# cli msg
-						msg = "#{(type + ' changed').bold.cyan}"
-						log "#{msg} #{info.path.cyan}"
+						msg = "#{(type + ' changed').bold}"
+						log "[#{now}] #{msg} #{info.path}".cyan
 
 					# when a file starts being watched
 					# when "watching"
@@ -209,7 +209,8 @@ class Builder
 						# log "#{msg} #{info.path.cyan}"
 
 				# rebuilds modules unless notificiation is 'watching'
-				@build()
+				if @toaster.before_build is null or @toaster.before_build()
+					@build()
 
 				after_watch?()
 			, src

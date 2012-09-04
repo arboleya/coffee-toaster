@@ -14,6 +14,9 @@ exports.Toaster = class Toaster
 	exec = (require "child_process").exec
 	colors = require 'colors'
 
+	# variable - before filter container
+	before_build: null
+
 	constructor:( basedir, options = null, skip_initial_build = false )->
 
 		@basepath = basedir || path.resolve "."
