@@ -152,6 +152,12 @@ class Builder
 				fpath = src.path
 				falias = src.alias || ""
 
+				# check if it's from some excluded folder
+				include = true
+				include &= !(new RegExp( item ).test ipath) for item in @exclude
+				return unless include
+
+
 				# Titleize the type for use in the log messages bellow
 				type = StringUtil.titleize info.type
 

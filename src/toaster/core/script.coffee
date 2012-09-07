@@ -69,7 +69,6 @@ class Script
 
 					# write full declaration to the file if it's not right yet
 					if decl isnt repl
-						console.log "RE-ESCREVE!"
 						@raw = @raw.replace decl, repl
 						fs.writeFileSync @realpath, @raw
 
