@@ -214,8 +214,8 @@ class Builder
 					# 	msg = "#{('Watching ' + info.type + ':').bold.cyan}"
 						# log "#{msg} #{info.path.cyan}"
 
-				# rebuilds modules unless notificiation is 'watching'
 				if @toaster.before_build is null or @toaster.before_build()
+					# rebuilds modules
 					@build()
 
 				after_watch?()
