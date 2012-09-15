@@ -6,45 +6,31 @@ Version 0.6.4
 
 CoffeeToaster is a dependency manager and build system for CoffeeScript.
 
-The main purpose is to provide a very comfortable environment to code large<BR>
-libraries using such things as class definitions and namespaces, in order to<BR>
-to help avoid naming collisions in your architecture.
+The main purpose is to provide a very comfortable environment to code large libraries using such things as class definitions and namespaces, in order to to help avoid naming collisions in your architecture.
 
-A smart 'require' powered by wild-cards is also provided, together with a<BR>
-powerful build system that concatenates everything and outputs a single<BR>
-javascript release file that can be even minified if you like.
+A smart 'require' powered by wild-cards is also provided, together with a powerful build system that concatenates everything and outputs a single javascript release file that can be even minified if you like.
 
-The build system was developed to offer vendors support, with specific<BR>
-ordering options. If you are adept of the extends directive in CoffeeScript,<BR>
-Toaster will even check if you have required base classes for the classes<BR>
-that extends another.
+The build system was developed to offer vendors support, with specific ordering options. If you are adept of the extends directive in CoffeeScript, Toaster will even check if you have required base classes for the classes that extends another.
 
-The CLI program informs you about everything that is happening when a new<BR>
-file is created, deleted or modified. You can even drag'n'drop a folder with<BR>
-lots of CoffeeScript files inside your source folder and everything will be<BR>
-handled gracefully.
+The CLI program informs you about everything that is happening when a new file is created, deleted or modified. You can even drag'n'drop a folder with lots of CoffeeScript files inside your source folder and everything will be handled gracefully.
 
-If you are building for the browser you can use the debug option to compile<BR>
-everything individually -- plus, node targeted support is on the way. In <BR>
-debug mode you'll be gifted with a boot-loader that will load every file in<BR>
-the proper order according your needs.
+If you are building for the browser you can use the debug option to compile everything individually -- plus, node targeted support is on the way. In debug mode you'll be gifted with a boot-loader that will load every file in the proper order according your needs.
 
-I should also mention that it's not some kind of AMD or CJS implementation,<BR>
-as you may be thinking. It's much more like a new point of view based on my<BR>
-specific needs and personal taste, which I didn't come up with a fancy name yet.
+I should also mention that it's not some kind of AMD or CJS implementation, as you may be thinking. It's much more like a new point of view based on my specific needs and personal taste, which I didn't come up with a fancy name yet.
 
-Keep on reading this README, and please do not hesitate to open a feature<BR>
-request or a bug report.<BR>
-https://github.com/serpentem/coffee-toaster/issues
+Keep on reading this README, and please do not hesitate to open a feature request or a bug report.
+> https://github.com/serpentem/coffee-toaster/issues
 
-In case of any doubts, drop an email at the email group and luckily you'll<BR>
-be answered sooner than later.<BR>
-https://groups.google.com/group/coffee-toaster
+In case of any doubts, drop an email at the email group and luckily you'll be answered sooner than later.
+> https://groups.google.com/group/coffee-toaster
+
+This package was created initially as a base for creating the [Theoricus](https://github.com/serpentem/theoricus) framework (which is in a very alpha stage) and will be evolved as needed.
+> https://github.com/serpentem/theoricus
 
 # Features
 
 * Inheritance support across multiples files for the lazy
- * You can require any file whenever your want to
+ * You can require any file whenever your need to
 * Vendors management
 * Packaging System & Namespaces
  * Automagic packaging system that uses folders as namespaces
@@ -52,22 +38,17 @@ https://groups.google.com/group/coffee-toaster
 * Exports aliases
  * Lets you set a top package to list all your modules
 * Broken and circular-loop dependencies validation
- * Helps you prevent some mistakes with circular dependencies loops and<BR>
- alerts you against dependencies not found
+ * Helps you prevent some mistakes with circular dependencies loops and alerts you against dependencies not found
 * Live syntax-check
  * Precise live syntax-check with file path and line number information
 * Growl support
  * Warning/Error messages are shown even in growl
 * Debug Mode
- * In order to provide an easy debugging routine once inside the browser,<BR>
- all files will be compiled individually into its respectives '.js' versions<BR>
- and a smart boot-loader (your-debug-file.js) is provided to load every file<BR>
- orderly. Just include this boot-loader in your html file and voilà
+ * In order to provide an easy debugging routine once inside the browser, all files will be compiled individually into its respectives '.js' versions and a smart boot-loader (your-debug-file.js) is provided to load every file orderly. Just include this boot-loader in your html file and voilà
 * Minify support
  * Aiming to be practical, the output can be even minified (using uglify-js)
 * Scaffolding routines
- * Interactive creation of a very simple skeleton for new projects and<BR>
- config file for existent projects
+ * Interactive creation of a very simple skeleton for new projects and config (toaster.coffee) file for existent projects
 
 
 # Installation
@@ -78,8 +59,7 @@ https://groups.google.com/group/coffee-toaster
 
 ## Creating a new App
 
-CoffeeToaster suggests a very simple structure for initial projects, you can<BR>
-customize it as you like.
+CoffeeToaster suggests a very simple structure for initial projects, you can customize it as you like.
 
 	toaster -n mynewapp
 
@@ -87,11 +67,9 @@ You will be asked for some things:
 
 1. **source folder** - Relative folderpath to your source folder.
   * i.e.: src
-1. **release file** - Path to your release file.
+1. **release file** - Relative filepath to your release file.
   * i.e.: www/js/app.js
-1. **http folder** - The folderpath to reach your debug file through http,<BR>
-in case it is  not inside your root directory. Imagine that the 'www' is<BR>
-your root folder, so you'd just need to inform 'js' as the http folder.
+1. **http folder** - The folderpath to reach your debug file through http, in case it is  not inside your root directory. Imagine that the 'www' is your root folder, so you'd just need to inform 'js' as the http folder.
   * i.e.: js
 
 Your release file will not be affected by the 'http folder' property.
@@ -134,7 +112,7 @@ The toaster.coffee file will have this content:
 
 ## Toasting an existing project
 
-Your can toast an existing project as such:
+You can also toast an existing project as such:
 
 	cd existing-project
 	toaster -i
@@ -143,15 +121,13 @@ Or:
 
 	toaster -i existing-project
 
-Some of the same information (src, release and http folder) will be required,<BR>
-answer everything according to your project's structure.
+Some of the same information (src, release and http folder) will be required, answer everything according to your project's structure.
 
 A 'toaster.coffee' file will be created inside of it.
 
 ## When the magic happens
 
-To see all that CoffeeToaster can do for you, enter the project folder and<BR>
-type 'toaster -w' after creating or toasting a new project:
+To see all that CoffeeToaster can do for you, enter the project folder and type 'toaster -w' after creating or toasting a new project:
 
 	cd existing-project
 	toaster -w
@@ -160,20 +136,16 @@ Or:
 
 	toaster -w existing-project
 
-Your release file will be saved according your configuration.
+Your release file will be saved according your configuration and Toaster will start in watch'n'compile mode. Any changes you make to your src files will trigger the re-compile.
 
 # Debug Mode
 
-In debug mode (option -d) all files will be compiled individually inside a<BR>
-folder called "toaster" in the same directory you've pointed your debug file,<BR>
-	aiming to ease the debugging process.
+In debug mode (option -d) all files will be compiled individually inside a folder called "toaster" in the same directory you've pointed your debug file, aiming to ease the debugging process.
 
 	cd existing-project
 	toaster -wd
 
-For example, if you have "release/app-debug.js", a folder will be created in<BR>
-"release/toaster" and all your CoffeeScript files will be compiled to<BR>
-Javascript within.
+For example, if you have "release/app-debug.js", a folder will be created in "release/toaster" and all your CoffeeScript files will be compiled to Javascript within.
 
 Bellow is a representative directory structure:
 
@@ -216,8 +188,7 @@ Bellow is a representative directory structure:
 	│               └── triphop.js
 	└── toaster.coffee
 
-The debug file you've chosen is the boot-loader responsible to load all your<BR>
-files into the right order.
+The debug file you've chosen is the boot-loader responsible to load all your files into the right order.
 
 So in your .html you'll have two options:
 
@@ -264,7 +235,7 @@ This file contains information of your app, i.e:
 		debug: 'www/js/app-debug.js'
 ````
 
-You can have a multi src folders as well, i.e:
+You can have a multi-source-folders as well, i.e:
 
 ````ruby
 
@@ -294,11 +265,13 @@ You can have a multi src folders as well, i.e:
 
 ### Folders
 
-An array of objects containing setup information about the folders.
+An Object of objects containing setup information about the folders, in the format:
+	
+	'folderpath':'folderalias'
 
-When using multi-folders, you can specify this option to map everything as<BR>
-you need. The hash-key is the path of your folder, and the hash-value is the<BR>
-alias you want to prepend to all files under that.
+When using multi-folders, you can specify this option to map everything as you need. The hash-key is the path of your folder, and the hash-value is the alias you want to prepend to all files under that.
+
+Pay attention to this specially when using Toaster with the '-j' option.
 
 ### Exclude
 
@@ -313,9 +286,7 @@ You can define vendors such as:
 	vendors: ['vendors/x.js', 'vendors/y.js', ... ]
 ````
 
-It's an ordered array of all your vendor's paths. These files must be purely<BR>
-javascript, preferably minified ones -- Toaster will not compile or minify<BR>
-them, only concatenate everything.
+It's an ordered array of all your vendor's paths. These files must be purely javascript, preferably minified ones -- Toaster will not compile or minify them, only concatenate everything.
 
 ### Bare
 
@@ -340,15 +311,11 @@ So you will end up with just 'bunch of code':
 
 If true, builds a hash with all your folders-as-namespaces.
 
-If you have file 'lovage.coffee' declared inside the "artists/triphop"<BR>
-folder, you can declare it with 'class artists.triphop.Lovage', the <BR>
-namespace 'artists.triphop' will be created automatically for holding it.
+If you have file 'lovage.coffee' declared inside the "artists/triphop" folder, you can declare it with 'class artists triphop.Lovage', the namespace 'artists.triphop' will be created automatically for holding it.
 
 ### Expose
 
-If informed, list all you packages of classes in the given scope. If you use<BR>
-'window' as your expose scope, your classes will be available also in the<BR>
-window object -- or whatever scope you inform.
+If informed, list all you packages of classes in the given scope. If you use 'window' as your expose scope, your classes will be available also in the window object -- or whatever scope you inform.
 
 ````javascript
 	
@@ -361,15 +328,11 @@ If true, minify your release file -- debug files are never minified.
 
 ### HTTP Folder
 
-The folder path to reach your debug file through http, in case it is not<BR>
-inside your root directory. Imagine that the 'www' is your root folder, and<BR>
-you have a 'js' folder inside of it with your 'debug.js' file inside of it.
+The folder path to reach your debug file through http, in case it is not inside your root directory. Imagine that the 'www' is your root folder, and you have a 'js' folder inside of it with your 'debug.js' file inside of it.
 
 Following this case you'd just need to inform 'js' as your http folder.
 
-So the declarations inside the debug boot loader will follow this location<BR>
-in order to import your scripts in debug mode, prepending your http folder<BR>
-to all file paths.
+So the declarations inside the debug boot loader will follow this location in order to import your scripts in debug mode, prepending your http folder to all file paths.
 
 Your release file will not be affected by this property.
 
@@ -383,20 +346,14 @@ The file path to your debug file.
 
 ## Conlusion
 
-So when you call 'toaster -w' in this directory, this config is loaded and<BR>
-every file and folder inside 'src' folder will be watched.
+So when you call 'toaster -w' in this directory, this config is loaded and every file and folder inside 'src' folder will be watched.
 
-If debug is enabled (option -d), files will be also compiled individually<BR>
-for a sane debugging routine inside the browser, in the same directory you<BR>
-have your debug file.
+If debug is enabled (option -d), files will be also compiled individually for a sane debugging routine inside the browser, in the same directory you have your debug file.
 
-Every time something changes, CoffeeToaster re-compiles all of your<BR>
-application by:
+Every time something changes, CoffeeToaster re-compiles all of your application by:
 
-* collecting all .coffee files and processing everything, adding package<BR>
-declarations to class definitions based on the folder they are located
-* re-ordering everything, always defining files and classes before<BR>
-they're needed
+* collecting all .coffee files and processing everything, adding package declarations to class definitions based on the folder they are located
+* re-ordering everything, always defining files and classes before they're needed
 * merge all yours vendors in the given order
 * declare root namespaces
 * merge everything
@@ -410,15 +367,13 @@ The import directive is known by:
  * #<< app/views/user_view
  * #<< app/utils/*
 
-By putting '#<< app/views/user_view' in your CoffeeScript file, you're<BR>
-telling CoffeeToaster that there's a dependency.
+By putting '#<< app/views/user_view' in your CoffeeScript file, you're telling CoffeeToaster that there's a dependency.
 
 Wild cards '#<< app/utils/*' are also accepted as a handy option.
 
 # Advanced options
 
-You can pass your own config file for toaster instead of the default one<BR>
-'toaster.coffee', with the '-f' or '--config-file' option:
+You can pass your own config file for toaster instead of the default one 'toaster.coffee', with the '-f' or '--config-file' option:
 
 ````javascript
 
@@ -435,23 +390,21 @@ Or even pass even the whole configuration as a JSON string, with the '-j' or<BR>
 
 # Examples
 
-You'll certainly find some useful resources in the examples provided.<BR>
+You'll certainly find some useful resources in the examples provided.
 Examine it and you'll understand how things works more instinctively.
 
-Install coffee-toaster, clone the usage example and try different config<BR>
-options, always looking for the differences in your javascript release file.
+Install coffee-toaster, clone the usage example and try different config options, always looking for the differences in your javascript release file.
 
- > [Single folder example](https://github.com/serpentem/coffee-toaster/tree/master/examples/single-folder)<BR>
- > [Multi folder example](https://github.com/serpentem/coffee-toaster/tree/master/examples/multi-folder)<BR>
- > [API example](https://github.com/serpentem/coffee-toaster/tree/master/examples/introspection)<BR>
+> [Single folder example](https://github.com/serpentem/coffee-toaster/tree/master/examples/single-folder)<BR>
+> [Multi folder example](https://github.com/serpentem/coffee-toaster/tree/master/examples/multi-folder)<BR>
+> [API example](https://github.com/serpentem/coffee-toaster/tree/master/examples/introspection)<BR>
 
 # API
 
-You can use Toaster through API as well, in case you want to power up your<BR>
-compiling tasks or even buid some framework on top of it.
+You can use Toaster through API as well, in case you want to power up your compiling tasks or even build some framework/lib on top of it.
 
 See the API example for further information.
- > [API example](https://github.com/serpentem/coffee-toaster/tree/master/examples/introspection)<BR>
+ > [API example](https://github.com/serpentem/coffee-toaster/tree/master/examples/introspection)
 
 ````ruby
 
@@ -461,46 +414,36 @@ See the API example for further information.
 	toasting.build header_code_injection, footer_code_injection
 ````
 
-# Note for developers
+# Contributing
 
 ## Setting everything up
 
 ````bash
-	git clone git://github.com/serpentem/coffee-toaster.git coffee-toaster
-	cd coffee-toaster
+	git clone git://github.com/serpentem/coffee-toaster.git && cd coffee-toaster
 	git submodule update --init
 	npm link
 ````
 
-## Testing
+## Watch'n'compile mode
+
+Starts watching/compiling using a previuos version of the CoffeeToaster itself.
 
 ````bash
-	npm test
-````
-
-## Building
-
-````bash
-	npm build
-````
-
-## Watch/build mode
-
-````bash
-	npm watch
+	npm start
 ````
 
 # Issues
 
-Do not hesitate to open a feature request or a bug report.<BR>
-https://github.com/serpentem/coffee-toaster/issues
+Do not hesitate to open a feature request or a bug report.
+> https://github.com/serpentem/coffee-toaster/issues
 
 # Mailing List
 
-A place to talk about it, ask anything, get in touch. Luckily you'll<BR>
-be answered sooner than later.<BR>
-https://groups.google.com/group/coffee-toaster
+A place to talk about it, ask anything, get in touch. Luckily you'll be answered sooner than later.
+> https://groups.google.com/group/coffee-toaster
+
+NOTE: The list is active and maintained, though the low activity.
 
 # Changelog
 
-> [CHANGELOG.md](https://github.com/serpentem/coffee-toaster/tree/master/CHANGELOG.md)<BR>
+> [CHANGELOG.md](https://github.com/serpentem/coffee-toaster/tree/master/CHANGELOG.md)
