@@ -250,7 +250,7 @@ class Builder
 		output = cs.compile output, {bare: @bare}
 
 	compile_for_debug:()->
-		release_path = @release.split("/").slice(0, -1).join "/"
+		release_path = @debug.split("/").slice(0, -1).join "/"
 		release_path += "/toaster"
 
 		# cleaning previous/existent structure
