@@ -16,15 +16,16 @@ class Script
 
 
 	getinfo:( declare_ns = true )->
-		# read file content and initialize dependencies
-		# and baseclasses array
+		# read file content and initialize dependencies and baseclasses array
 		@raw = fs.readFileSync @realpath, "utf-8"
 		@dependencies_collapsed = []
 		@baseclasses = []
 
 		# assemble some information about the file
-		@filepath = @realpath.replace( @folderpath, "" ).substr 1
+		@filepath = @realpath.replace( @folderpath, "" )
 		@filepath = pn "#{@alias}/#{@filepath}" if @alias?
+		@filepath = @filepath.replace /^[\/]+/, ""
+
 		@filename = /[\w-]+\.[\w-]+/.exec( @filepath )[ 0 ]
 		@filefolder = @filepath.replace( "/#{@filename}", "") + "/"
 		@namespace = ""
@@ -34,11 +35,11 @@ class Script
 			@filefolder = ""
 
 		# assemble namespace info about the file
-		@namespace = @filefolder.replace(/\//g, ".").slice 0, -1
-		
+		@namespace = @filefolder.replace(/\//g, ".").replace /^\.?(.*)\.$/g, "$1"
+
 		# filter files that have class declarations inside of it
 		rgx = /^(class)+\s+([^\s]+)+(\s(extends)\s+([\w.]+))?/mg
-		
+
 		# filter classes that extends another classes
 		rgx_ext = /(^|=\s*)(class)\s(\w+)\s(extends)\s(\\w+)\s*$/gm
 
