@@ -114,10 +114,16 @@ class FsUtil
 		
 		onchange?( type:"file", path:filepath, action:"watching" )
 
-		fs.watchFile filepath, {interval : 250}, (curr,prev)=>
+		fs.watchFile filepath, {persistent: true, interval : 30}, (curr,prev)=>
 			mtime = curr.mtime.valueOf() != prev.mtime.valueOf()
 			ctime = curr.ctime.valueOf() != prev.ctime.valueOf()
-			if mtime || ctime
+
+			# file is deleted
+			if curr.nlink is 0
+				onchange?( {type: "file", path:filepath, action: "deleted"} )
+
+			# file is modified
+			else if mtime || ctime
 				onchange?( {type: "file", path:filepath, action: "updated"} )
 
 
@@ -188,7 +194,7 @@ class FsUtil
 			on_folder_change = FnUtil.proxy FsUtil._on_folder_change, folderpath
 
 			fs.unwatchFile folderpath
-			fs.watchFile folderpath, {interval : 250}, on_folder_change
+			fs.watchFile folderpath, {persistent:true, interval : 30}, on_folder_change
 
 
 
@@ -204,7 +210,7 @@ class FsUtil
 		diff = ArrayUtil.diff a, b, "path"
 		
 		# if there's no diff, abort the execution
-		return  unless diff.length
+		return unless diff.length
 
 		# saving watchers reference
 		watchers = FsUtil.watchers[folderpath]
@@ -212,8 +218,6 @@ class FsUtil
 		# loop all diff itens
 		# ----------------------------------------------------------------------
 		for item in diff
-			# console.log ".........."
-			# console.log "ITEM..."
 
 			info = item.item
 			info.action = item.action
@@ -226,13 +230,11 @@ class FsUtil
 				# --------------------------------------------------------------
 				if info.type == "file"
 					
-					# console.log "FILE CREATED!"
 					# looping all watchers (listeners)
 					for watcher in watchers
 
 						# dispatch item if it passes the filter regexp
 						if watcher.filter.test info.path
-							# console.log "ON CHANGE!"
 							watcher.onchange?( info )
 							FsUtil.watch_file info.path, watcher.onchange
 
