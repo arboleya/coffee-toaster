@@ -5,7 +5,6 @@ class Script
 	# requires
 	fs = require "fs"
 	path = require 'path'
-	pn = path.normalize
 	cs = require "coffee-script"
 
 	ArrayUtil = toaster.utils.ArrayUtil
@@ -23,19 +22,22 @@ class Script
 
 		# assemble some information about the file
 		@filepath = @realpath.replace( @folderpath, "" )
-		@filepath = pn "#{@alias}/#{@filepath}" if @alias?
+		@filepath = path.join @alias, @filepath if @alias?
 		@filepath = @filepath.replace /^[\/]+/, ""
 
 		@filename = /[\w-]+\.[\w-]+/.exec( @filepath )[ 0 ]
-		@filefolder = @filepath.replace( "/#{@filename}", "") + "/"
+		@filefolder = path.dirname @filepath
 		@namespace = ""
 
 		# if the file is in the top level
-		if @filepath.indexOf("/") is -1
+		if @filepath.indexOf( path.sep ) is -1
 			@filefolder = ""
 
-		# assemble namespace info about the file
-		@namespace = @filefolder.replace(/\//g, ".").replace /^\.?(.*)\.$/g, "$1"
+		# assemble namespace info about the file by:
+		# 1) replacing "/" or "\" by "."
+		@namespace = @filefolder.replace (new RegExp "\\#{path.sep}", "g"), "."
+		# 2) excluding first and last ".", if there's one
+		@namespace = @namespace.replace /^\.?(.*)\.?$/g, "$1"
 
 		# filter files that have class declarations inside of it
 		rgx = /^(class)+\s+([^\s]+)+(\s(extends)\s+([\w.]+))?/mg
@@ -99,7 +101,19 @@ class Script
 				# 4. concat it with the dependencies array
 				item         = /(#<<\s)(.*)/.exec( item )[ 2 ]
 				item         = item.replace /\s/g, ""
-				item         = [].concat item.split ","
+				# item         = [].concat item.split ","
+
+				# if user is under windows, some tweaks needs to be done to make
+				# path separator works as expected
+				if path.sep == "\\"
+					# scaping "\" to "\\"
+					item = item.replace /(\\)/g, "\\\\"
+
+					# converting "/" to scaped "\\" (fuck my life)
+					item = item.replace /(\/)/g, "\\\\"
+					# converting "\" to "\\" (aham, scaping things again - fml)
+					# item = item.replace /(\\)/g, "\\\\"
+
 				@dependencies_collapsed = @dependencies_collapsed.concat item
 
 	expand_dependencies:()->
@@ -117,7 +131,7 @@ class Script
 			if dependency.substr(-1) != "*"
 
 				# then add file extension to it and continue
-				@dependencies.push "#{dependency}.coffee"
+				@dependencies.push path.resolve "#{dependency}.coffee"
 				continue
 
 			# otherwise find all files under that namespace

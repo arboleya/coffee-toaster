@@ -5,29 +5,20 @@ class Project extends toaster.generators.Question
 
 	# requirements
 	path = require "path"
-	pn = path.normalize
 	fs = require "fs"
 
-
-	FsUtil = toaster.utils.FsUtil
+	{FsUtil} = toaster.utils
 
 
 	constructor:(@basepath)->
 
-
-
 	create:(folderpath, name, src, release)->
 		if !folderpath || folderpath == true
 			return error	"You need to inform a target path!\n" +
-							"\ttoaster -n myawesomeapp".green
-		
-		if folderpath.substr( 0, 1 ) != "/"
-			target = "#{@basepath}/#{folderpath}"
-		else
-			target = folderpath
+							"\ttoaster -n myawesomeapp_folder".green
 		
 		if name? && src? && release?
-			return @scaffold target, name, src, release
+			return @scaffold folderpath, name, src, release
 
 		q1 = "Path to your src folder? [src] : "
 		q2 = "Path to your release file? [www/js/app.js] : "
@@ -43,16 +34,17 @@ class Project extends toaster.generators.Question
 						$httpfolder = 'js'
 					else
 						$httpfolder = httpfolder || ""
-					@scaffold target, $src, $release, $httpfolder
+					@scaffold folderpath, $src, $release, $httpfolder
 					process.exit()
 
 
 
 	scaffold:(target, src, release, httpfolder)=>
-		srcdir = pn "#{target}/#{src}"
-		vendorsdir = pn "#{target}/vendors"
-		releasefile = pn "#{target}/#{release}"
-		releasedir = releasefile.split("/").slice(0, -1).join "/"
+		target = path.resolve target
+		srcdir = path.join target, src
+		vendorsdir = path.join target, "vendors"
+		releasefile = path.join target, release
+		releasedir = path.dirname releasefile
 
 		log "#{'Created'.green.bold} #{target}" if FsUtil.mkdir_p target
 		log "#{'Created'.green.bold} #{srcdir}" if FsUtil.mkdir_p srcdir
@@ -62,6 +54,5 @@ class Project extends toaster.generators.Question
 		srcdir = srcdir.replace( target, "" ).substr 1
 		releasefile = releasefile.replace( target, "" ).substr 1
 
-		new toaster.generators.Config( target ).write	srcdir,
-														releasefile,
-														httpfolder
+		config = new toaster.generators.Config target
+		config.write srcdir, releasefile, httpfolder

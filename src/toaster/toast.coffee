@@ -3,7 +3,6 @@ class Toast
 	# requires
 	fs = require "fs"
 	path = require "path"
-	pn = path.normalize
 	exec = (require "child_process").exec
 	colors = require 'colors'
 	cs = require "coffee-script"
@@ -21,7 +20,7 @@ class Toast
 			@toast item for item in ( [].concat config )
 		else
 			config_file = @toaster.cli.argv["config-file"]
-			filepath = config_file || pn "#{@basepath}/toaster.coffee"
+			filepath = config_file || path.join @basepath, "toaster.coffee"
 
 			if fs.existsSync filepath
 
@@ -29,11 +28,12 @@ class Toast
 				
 				try
 					code = cs.compile contents, {bare:1}
-					fix_scope = /(^[\s\t]?)(toast)+(\()/mg
-					code = code.replace fix_scope, "$1this.$2$3"
-					eval code
 				catch err
 					error err.message + " at 'toaster.coffee' config file."
+
+				fix_scope = /(^[\s\t]?)(toast)+(\()/mg
+				code = code.replace fix_scope, "$1this.$2$3"
+				eval code
 			else
 				error "File not found: ".yellow + " #{filepath.red}\n" +
 				  "Try running:".yellow + " toaster -i".green +
@@ -42,23 +42,26 @@ class Toast
 
 	
 	toast:( srcpath, params = {} )=>
-
 		if srcpath instanceof Object
 			params = srcpath
-		else if srcpath.substr( 0, 1 ) != "/"
-			srcpath = "#{@toaster.basepath}/#{srcpath}"
+		else if path.resolve srcpath != srcpath
+			folder = path.join @basepath, srcpath
 
 		if params.release is null
 			error 'Release path not informed in config.'
 			return process.exit()
 		else
-			path = ( (params.release.split '/').slice 0, -1 ).join '/'
-			unless fs.existsSync "#{@basepath}/#{path}"
-				error "Release folder does not exist:\n\t#{path.yellow}"
+			dir = path.dirname params.release
+			unless fs.existsSync (path.join @basepath, dir)
+				error "Release folder does not exist:\n\t#{dir.yellow}"
 				return process.exit()
 
 		# configuration object shared between builders
-		debug = if params.debug then pn "#{@basepath}/#{params.debug}" else null
+		if params.debug
+			debug = path.join @basepath, params.debug
+		else
+			debug = null
+
 		config =
 				# RUNNING BUILDERS
 				is_building: false
@@ -84,31 +87,34 @@ class Toast
 
 				# HTTP FOLDER / RELEASE / DEBUG
 				httpfolder: params.httpfolder ? ""
-				release: pn "#{@basepath}/#{params.release}"
+				release: path.join @basepath, params.release
 				debug: debug
 
 		# compute vendors full path
 		for v, i in config.vendors
-			if (v.substr 0, 1) != "/"
-				config.vendors[i] = pn "#{@basepath}/#{v}"
-		
+			if (path.resolve v) is not (path.join @basepath, v)
+				config.vendors[i] = path.resolve v
+			else
+				config.vendors[i] = path.join @basepath, v
+
 		unless srcpath instanceof Object
-			config.src_folders.push {
-				path: srcpath,
+			srcpath = path.resolve( path.join @basepath, srcpath )
+			config.src_folders.push
+				path: srcpath
 				alias: params.alias || null
-			}
 
 		if params.folders?
 			for folder, alias of params.folders
-				if folder.substr 0, 1 is not "/"
-					folder = pn "#{@basepath}/#{folder}/"
+				if path.resolve folder != path
+					folder = path.join @basepath, folder
 				config.src_folders.push {path: folder, alias: alias}
 
 		for item in config.src_folders
 			unless fs.existsSync item.path
 				error	"Source folder doens't exist:\n\t#{item.path.red}\n" + 
 						"Check your #{'toaster.coffee'.yellow} and try again." +
-						"\n\t" + pn( "#{@basepath}/toaster.coffee" ).yellow
+						"\n\t" + (path.join @basepath, "toaster.coffee" ).yellow
 				return process.exit()
 
-		@builders.push new toaster.core.Builder @toaster, @toaster.cli, config
+		builder = new toaster.core.Builder @toaster, @toaster.cli, config
+		@builders.push builder

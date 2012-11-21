@@ -92,7 +92,8 @@ class Builder
 
 			# saving boot loader
 			for f, i in files
-				include = "#{@httpfolder}/toaster/#{f}"
+				include = path.normalize "#{@httpfolder}/toaster/#{f}"
+				include = include.replace /\\/g, "\/" if path.sep == "\\"
 				tmpl = @_include_tmpl.replace "%SRC%", include
 				files[i] = tmpl
 
@@ -250,8 +251,8 @@ class Builder
 		output = cs.compile output, {bare: @bare}
 
 	compile_for_debug:()->
-		release_path = @debug.split("/").slice(0, -1).join "/"
-		release_path += "/toaster"
+		release_path = path.dirname @debug
+		release_path = path.join release_path, "toaster"
 
 		# cleaning previous/existent structure
 		FsUtil.rmdir_rf release_path if fs.existsSync release_path
@@ -266,13 +267,15 @@ class Builder
 		for file, index in @files
 
 			# computing releative filepath (replacing .coffee by .js)
-			relative_path = file.filepath.replace ".coffee", ".js"
+			find = "#{@toaster.basepath}#{path.sep}"
+			relative_path = file.filepath.replace find, ""
+			relative_path = relative_path.replace ".coffee", ".js"
 
 			# computing absolute filepath
-			absolute_path = "#{release_path}/#{relative_path}"
+			absolute_path = path.resolve (path.join release_path, relative_path)
 
 			# extracts its folder path
-			folder_path = absolute_path.split('/').slice(0,-1).join "/"
+			folder_path = path.dirname absolute_path
 
 			# create container folder if it doesnt exist yet
 			FsUtil.mkdir_p folder_path if !fs.existsSync folder_path

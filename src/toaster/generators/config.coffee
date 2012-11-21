@@ -4,7 +4,6 @@ class Config extends toaster.generators.Question
 
 	# requirements
 	path = require "path"
-	pn = path.normalize
 	fs = require "fs"
 
 	# variables
@@ -33,11 +32,9 @@ toast '%src%'
 	constructor:(@basepath)->
 
 
-
 	create:(folderpath)=>
-		if folderpath? and folderpath != true
-			@basepath = "#{@basepath}/#{folderpath}" 
-		
+		@basepath = path.resolve folderpath
+
 		q1 = "Path to your src folder? [src] : "
 		q2 = "Path to your release file? [www/js/app.js] : "
 		q3 = "Starting from your webroot '/', what's the folderpath to "+
@@ -51,10 +48,11 @@ toast '%src%'
 
 
 	write:(src, release, httpfolder)=>
-		filepath = pn "#{@basepath}/toaster.coffee"
+
+		filepath = path.join @basepath, "toaster.coffee"
 
 		rgx = /(\/)?((\w+)(\.*)(\w+$))/
-		parts = rgx.exec( release )
+		parts = rgx.exec release 
 		filename = parts[2]
 
 		if filename.indexOf(".") > 0
@@ -62,10 +60,12 @@ toast '%src%'
 		else
 			debug = "#{release}-debug"
 
-		buffer = @tpl.replace "%src%", src
-		buffer = buffer.replace "%release%", release
-		buffer = buffer.replace "%debug%", debug
-		buffer = buffer.replace "%httpfolder%", httpfolder
+		# NOTE: All paths (src, release, debug, httpfolder) in 'toaster.coffee'
+		# are FORDED to be always '/' even when in win32 which wants to use '\'.
+		buffer = @tpl.replace "%src%", src.replace /\\/g, "\/"
+		buffer = buffer.replace "%release%", release.replace /\\/g, "\/"
+		buffer = buffer.replace "%debug%", debug.replace /\\/g, "\/"
+		buffer = buffer.replace "%httpfolder%", httpfolder.replace /\\/g, "\/"
 
 		if fs.existsSync filepath
 			question = "\tDo you want to overwrite the file: #{filepath.yellow}"
