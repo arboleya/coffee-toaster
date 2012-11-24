@@ -1,21 +1,25 @@
 fs = require 'fs'
+os = require 'os'
 path = require 'path'
 events = require "events"
 
 vows = require "vows"
 assert = require "assert"
 
-{FsUtil} = (require __dirname + "/../lib/toaster").toaster.utils
-{spawn_toaster,snapshot} = require "./utils/utils"
+{FsUtil} = (require "#{__dirname}/../lib/toaster").toaster.utils
+{spawn_toaster,snapshot} = require "#{__dirname}/utils/utils"
 
-error_message = "ERROR Parse error on line 12: Unexpected 'UNARY' at file: app.coffee"
+error_message = "ERROR Parse error on line 12: Unexpected 'UNARY' at file: "
+# win32 adds a backslash to the message, so we get it too.
+error_message += "\\" if os.platform() is "win32"
+error_message += "app.coffee"
 
 vows.describe( 'Error with line number' )
 .addBatch( 'Compiling a project': 
 	'that has syntax error on file "app.js" at line 12':
 		topic:->
 			report_msg = null
-			folder = __dirname + '/_templates/error_with_line_number'
+			folder = path.resolve "#{__dirname}/_templates/error_with_line_number"
 			toaster = spawn_toaster ['-c', folder]
 
 			toaster.stdout.on 'data', (data)->

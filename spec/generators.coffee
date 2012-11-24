@@ -3,8 +3,8 @@ path = require 'path'
 vows = require "vows"
 assert = require "assert"
 
-{FsUtil} = (require __dirname + "/../lib/toaster").toaster.utils
-{spawn_toaster,snapshot} = require "./utils/utils"
+{FsUtil} = (require "#{__dirname}/../lib/toaster").toaster.utils
+{spawn_toaster,snapshot} = require "#{__dirname}/utils/utils"
 
 # testing new project creation
 # ------------------------------------------------------------------------------
@@ -15,19 +15,14 @@ vows.describe('Generators (-n, -i)')
 	# --------------------------------------------------------------------------
 	'with default values':
 		topic: ->
-			# console.log "topic"
-			# cleaning first
-			if fs.existsSync (folder = __dirname + "/_tmp/new_default_project")
-				# console.log "clean"
-				FsUtil.rmdir_rf folder
+			folder = path.resolve "#{__dirname}/_tmp/new_default_project"
 
-			# console.log "spawn: " + folder
+			# cleaning first
+			FsUtil.rmdir_rf folder if fs.existsSync folder
 
 			# spawning toaster
 			toaster = spawn_toaster ['-n', folder]
 			toaster.stdout.on 'data', (data)->
-				# console.log "data: "
-				# console.log data.toString()
 
 				question = data.toString()
 				if question.indexOf( "Path to your src folder" ) >= 0
@@ -40,17 +35,13 @@ vows.describe('Generators (-n, -i)')
 					toaster.stdin.write '\n'
 
 			toaster.stderr.on 'data', (data)=>
-				# console.log "data"
-				console.log data.toString()
 				@callback null, null
 
 			toaster.on 'exit', (code)=>
-				# console.log "exit"
 				model = snapshot "#{__dirname}/_templates/new_default_project"
 				created = snapshot "#{__dirname}/_tmp/new_default_project"
 				@callback model, created
 
-			# console.log "end"
 			undefined
 
 		'should match the default template':( model, created )->
@@ -84,7 +75,6 @@ vows.describe('Generators (-n, -i)')
 					toaster.stdin.write 'custom_js'
 
 			toaster.stderr.on 'data', (data)->
-				console.log data.toString()
 				@callback null, null
 
 			toaster.on 'exit', (code)=>
@@ -130,7 +120,6 @@ vows.describe('Generators (-n, -i)')
 				toaster.stdin.write 'js'
 
 		toaster.stderr.on 'data', (data)=>
-			console.log data.toString()
 			@callback null, null
 
 		toaster.on 'exit', (code)=>
