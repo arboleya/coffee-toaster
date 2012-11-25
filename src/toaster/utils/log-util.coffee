@@ -1,5 +1,8 @@
 # requirements
-growl = require 'growl'
+os = require 'os'
+
+# ignoring growl if user is under win32 (otherwise it'd break toaster)
+growl = if os.platform() == 'win32' then null else require 'growl'
 
 # ICONS 
 icon_warn = __dirname + '/../images/warning.png'
@@ -20,7 +23,7 @@ debug = ( msg, send_to_growl = false ) ->
 error = ( msg, send_to_growl = true, file = null ) ->
 	msg = log "ERROR ".bold.red + msg
 
-	if send_to_growl
+	if send_to_growl && growl?
 
 		# remove all colors
 		msg = msg.replace /\[\d{2}m/g, ""
@@ -40,7 +43,7 @@ error = ( msg, send_to_growl = true, file = null ) ->
 warn = ( msg, send_to_growl = true ) ->
 	msg = log "WARNING ".bold.yellow + msg
 
-	if send_to_growl
+	if send_to_growl && growl?
 
 		# remove all colors
 		msg = msg.replace /\[\d{2}m/g, ""
