@@ -1,6 +1,6 @@
 #<< toaster/generators/question
 
-class Config extends toaster.generators.Question
+class toaster.generators.Config extends toaster.generators.Question
 
 	# requirements
 	path = require "path"

@@ -103,7 +103,6 @@ The toaster.coffee file will have this content:
 		# packaging: true
 		# expose: ''
 		# minify: false
-		# autorun: false
 
 		# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
 		httpfolder: 'js'

@@ -29,7 +29,6 @@ class Builder
 		@httpfolder = @config.httpfolder
 		@release = @config.release
 		@debug = @config.debug
-		@autorun = @config.autorun
 
 		@init()
 		@watch() if @cli.argv.w
@@ -113,9 +112,8 @@ class Builder
 			# notify user through cli
 			log "[#{now}] #{'Compiled'.bold} #{@debug}".green
 
-		if @cli.argv.a && @autorun?
-			log "Your App log:"
-			log ""
+		if @cli.argv.a
+			log "Application log:".blue
 			if @child?
 				@child.kill('SIGHUP')
 			@child = cp.fork @release
