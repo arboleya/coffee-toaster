@@ -158,14 +158,11 @@ class Builder
 				include &= !(new RegExp( item ).test ipath) for item in @exclude
 				return unless include
 
-
 				# Titleize the type for use in the log messages bellow
 				type = StringUtil.titleize info.type
 
-				# relative filepath
-				relative_path = info.path.replace "#{fpath}/", "#{falias}/"
-				if relative_path.substr( 0, 1 ) == "/"
-					relative_path = relative_path.substr 1
+				# relative filepath (with alias, if informed)
+				relative_path = info.path.replace fpath, falias
 
 				# date for CLI notifications
 				now = ("#{new Date}".match /[0-9]{2}\:[0-9]{2}\:[0-9]{2}/)[0]
@@ -204,11 +201,18 @@ class Builder
 
 						# updates file information
 						file = ArrayUtil.find @files, relative_path, "filepath"
-						file.item.getinfo()
 
-						# cli msg
-						msg = "#{(type + ' changed').bold}"
-						log "[#{now}] #{msg} #{info.path}".cyan
+						if file is null
+							warn "CHANGED FILE IS APPARENTLY NULL..."
+							console.log file
+							console.log "...."
+							console.log file.filepath for file in @files
+						else
+							file.item.getinfo()
+
+							# cli msg
+							msg = "#{(type + ' changed').bold}"
+							log "[#{now}] #{msg} #{info.path}".cyan
 
 					# when a file starts being watched
 					# when "watching"

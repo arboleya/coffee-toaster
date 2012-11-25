@@ -22,7 +22,7 @@ class Script
 
 		# assemble some information about the file
 		@filepath = @realpath.replace( @folderpath, "" )
-		@filepath = path.join @alias, @filepath if @alias?
+		@filepath = path.join @alias, @filepath if @alias isnt null
 		@filepath = @filepath.replace /^[\/]+/, ""
 
 		@filename = /[\w-]+\.[\w-]+/.exec( @filepath )[ 0 ]
@@ -103,16 +103,9 @@ class Script
 				item         = item.replace /\s/g, ""
 				# item         = [].concat item.split ","
 
-				# if user is under windows, some tweaks needs to be done to make
-				# path separator works as expected
-				if path.sep == "\\"
-					# scaping "\" to "\\"
-					item = item.replace /(\\)/g, "\\\\"
-
-					# converting "/" to scaped "\\" (fuck my life)
-					item = item.replace /(\/)/g, "\\\\"
-					# converting "\" to "\\" (aham, scaping things again - fml)
-					# item = item.replace /(\\)/g, "\\\\"
+				# if user is under windows, checks and replace any "/" by "\" in
+				# file dependencies
+				item = item.replace /(\/)/g, "\\" if path.sep == "\\"
 
 				@dependencies_collapsed = @dependencies_collapsed.concat item
 
@@ -127,15 +120,17 @@ class Script
 		# looping through file dependencies
 		for dependency, index in @dependencies_collapsed
 			
+			dependency = "#{path.sep}#{dependency}"
+
 			# if dependency is not a wild-card (namespace.*)
 			if dependency.substr(-1) != "*"
 
 				# then add file extension to it and continue
-				@dependencies.push path.resolve "#{dependency}.coffee"
+				@dependencies.push "#{dependency}.coffee"
 				continue
 
 			# otherwise find all files under that namespace
-			reg = new RegExp dependency.replace /(\/)/g, "\\$1"
+			reg = new RegExp dependency.replace /(\/|\\)/g, "\\$1"
 			found = ArrayUtil.find_all files, reg, "filepath", true, true
 
 			# if nothing is found under the given namespace
