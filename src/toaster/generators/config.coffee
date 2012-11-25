@@ -23,7 +23,6 @@ toast '%src%'
 	# packaging: true
 	# expose: ''
 	# minify: true
-	# autorun: false
 
 	# => HTTPFOLDER (optional), RELEASE / DEBUG (required)
 	httpfolder: '%httpfolder%'
