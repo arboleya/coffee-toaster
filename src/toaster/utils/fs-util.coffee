@@ -248,35 +248,15 @@ class FsUtil
 											watcher.onchange,
 											true
 
-			# item deleted
+			# folder deleted
 			# ------------------------------------------------------------------
-			else if info.action == "deleted"
+			else if info.action == "deleted" and info.type == "folder"
 
-				# item is file
-				# --------------------------------------------------------------
-				if info.type == "file"
+				# notifies all watchers about the folder removal
+				for watcher in watchers
+					watcher.onchange?( info )
 
-					# looping all watchers (listeners)
-					for watcher in watchers
-
-						# dispatch item if it passes the filter regexp
-						if watcher.filter.test info.path
-							watcher.onchange?( info )
-
-					# unwatch file
-					# FsUtil.unwatch_file( path )
-					fs.unwatchFile info.path
-					FsUtil.watched[info.path] = false
-
-				# item is folder
-				# --------------------------------------------------------------
-				else if info.type == "folder"
-
-					# notifies all watchers about the folder removal
-					for watcher in watchers
-						watcher.onchange?( info )
-
-					FsUtil.unwatch_folder info.path
+				FsUtil.unwatch_folder info.path
 
 
 
