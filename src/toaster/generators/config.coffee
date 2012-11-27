@@ -34,10 +34,8 @@ toast '%src%'
 
 
 
-	create:(folderpath)=>
-		if folderpath? and folderpath != true
-			@basepath = "#{@basepath}/#{folderpath}" 
-		
+	create:()=>
+
 		q1 = "Path to your src folder? [src] : "
 		q2 = "Path to your release file? [www/js/app.js] : "
 		q3 = "Starting from your webroot '/', what's the folderpath to "+

@@ -17,17 +17,13 @@ class Project extends toaster.generators.Question
 
 
 	create:(folderpath, name, src, release)->
-		if !folderpath || folderpath == true
-			return error	"You need to inform a target path!\n" +
-							"\ttoaster -n myawesomeapp".green
-		
-		if folderpath.substr( 0, 1 ) != "/"
-			target = "#{@basepath}/#{folderpath}"
-		else
-			target = folderpath
-		
+		if (typeof folderpath) isnt 'string'
+			error_msg = "You need to inform a target path!\n"
+			error_msg += "\ttoaster -n myawesomeapp".green
+			return error error_msg
+
 		if name? && src? && release?
-			return @scaffold target, name, src, release
+			return @scaffold folderpath, name, src, release
 
 		q1 = "Path to your src folder? [src] : "
 		q2 = "Path to your release file? [www/js/app.js] : "
@@ -43,7 +39,7 @@ class Project extends toaster.generators.Question
 						$httpfolder = 'js'
 					else
 						$httpfolder = httpfolder || ""
-					@scaffold target, $src, $release, $httpfolder
+					@scaffold folderpath, $src, $release, $httpfolder
 					process.exit()
 
 
