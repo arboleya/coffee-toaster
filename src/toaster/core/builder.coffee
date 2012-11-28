@@ -7,6 +7,7 @@ class Builder
 	fs = require 'fs'
 	path = require 'path'
 	cs = require "coffee-script"
+	cp = require "child_process"
 	uglify = require("uglify-js").uglify
 	uglify_parser = require("uglify-js").parser
 
@@ -87,7 +88,7 @@ class Builder
 		log "[#{now}] #{'Compiled'.bold} #{@release}".green
 
 		# compiling for debug
-		if @cli.argv.d && @debug?
+		if @cli.argv.d && @debug? and not @cli.argv.a
 			files = @compile_for_debug()
 
 			# saving boot loader
@@ -110,6 +111,15 @@ class Builder
 
 			# notify user through cli
 			log "[#{now}] #{'Compiled'.bold} #{@debug}".green
+
+		if @cli.argv.a
+			log "Application log:".blue
+			if @child?
+				@child.kill('SIGHUP')
+			if @cli.argv.d
+				@child = cp.fork @release, { execArgv: ['--debug-brk'] }
+			else
+				@child = cp.fork @release
 
 	# Creates a NS holder for all folders
 	build_namespaces:()->

@@ -147,6 +147,15 @@ In debug mode (option -d) all files will be compiled individually inside a folde
 
 For example, if you have "release/app-debug.js", a folder will be created in "release/toaster" and all your CoffeeScript files will be compiled to Javascript within.
 
+# Autorun Mode
+
+If you are working on a node.js app you cna use autorun mode (option -a) to execute the compiled file in a child node process
+
+	cd existing-project
+	toaster -wa
+
+Fatal erros in your code are reported without crashes: you don't need to manually re run your node app, just fix your code! :)
+
 Bellow is a representative directory structure:
 
 	usage/
