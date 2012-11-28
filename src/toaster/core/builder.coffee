@@ -88,7 +88,7 @@ class Builder
 		log "[#{now}] #{'Compiled'.bold} #{@release}".green
 
 		# compiling for debug
-		if @cli.argv.d && @debug?
+		if @cli.argv.d && @debug? and not @cli.argv.a
 			files = @compile_for_debug()
 
 			# saving boot loader
@@ -116,7 +116,10 @@ class Builder
 			log "Application log:".blue
 			if @child?
 				@child.kill('SIGHUP')
-			@child = cp.fork @release
+			if @cli.argv.d
+				@child = cp.fork @release, { execArgv: ['--debug-brk'] }
+			else
+				@child = cp.fork @release
 
 	# Creates a NS holder for all folders
 	build_namespaces:()->
