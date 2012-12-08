@@ -1,13 +1,12 @@
+.PHONY: build
+
 watch:
 	build/coffee-toaster/bin/toaster . -w
 
-compile:
+build:
 	build/coffee-toaster/bin/toaster . -c
 
-# test.clean:
-# 	# do nothing
-
-test:
+test: build
 	node_modules/vows/bin/vows spec/*.coffee --spec
 
 publish:
