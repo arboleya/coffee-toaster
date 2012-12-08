@@ -25,8 +25,8 @@ vows.describe( 'Error with line number' )
 				unless report_msg?
 					report_msg = data.toString().stripColors.replace /\n/g, ""
 
-			toaster.stderr.on 'data', ( error )->
-				@callback error
+			toaster.stderr.on 'data', ( error )=>
+				@callback error.toString()
 
 			toaster.on 'exit', (data)=>
 				@callback null, report_msg
