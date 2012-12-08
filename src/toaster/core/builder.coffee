@@ -133,7 +133,7 @@ class Builder
 	build_ns_tree:( tree, folderpath )->
 		folders = fsu.ls folderpath
 		for folder in folders
-			@build_ns_tree (tree[folder.match /[^\/]+$/m] = {}), folder
+			@build_ns_tree (tree[folder.match /[^\/\\]+$/m] = {}), folder
 
 
 	watch:()->
