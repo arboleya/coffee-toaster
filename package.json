@@ -9,10 +9,7 @@
 
   "directories": {"lib": "./lib/"},
 
-  "scripts": {
-    "test": "node ./build/coffee-toaster/bin/toaster . -c; vows spec/*.coffee --spec",
-    "start": "node ./build/coffee-toaster/bin/toaster . -w"
-  },
+  "scripts": { "test": "make test" },
 
   "repository": {
     "type": "git",
