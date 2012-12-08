@@ -1,6 +1,12 @@
 # Changelog
 
-## 0.6.4
+## 0.6.6 - 12/08/2012
+ * Making toaster cross-platform (Osx, Linux, Windows)
+
+## 0.6.5 - 11/27/2012
+ * Fixing generators [closing issue [#46](https://github.com/serpentem/coffee-toaster/issues/46)]
+
+## 0.6.4 - 11/18/2012
  * Adding test for initializing existent projects
  * Fixing GROWL icons path
 
