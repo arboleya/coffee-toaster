@@ -21,11 +21,9 @@ class Script
 		@baseclasses = []
 
 		# assemble some information about the file
-		@filepath = @realpath.replace( @folderpath, "" )
+		@filepath = @realpath.replace @folderpath, ''
 		@filepath = path.join @alias, @filepath if @alias isnt null
-		@filepath = @filepath.replace /^[\/]+/, ""
-
-		@filename = /[\w-]+\.[\w-]+/.exec( @filepath )[ 0 ]
+		@filename = path.basename @filepath
 		@filefolder = path.dirname @filepath
 		@namespace = ""
 
