@@ -10,8 +10,7 @@ assert = require "assert"
 {spawn_toaster,snapshot} = require "#{__dirname}/utils/utils"
 
 error_message = "ERROR Parse error on line 12: Unexpected 'UNARY' at file: "
-# win32 adds a backslash to the message, so we get it too.
-error_message += "\\" if os.platform() is "win32"
+error_message += if os.platform() is "win32" then "\\" else "/"
 error_message += "app.coffee"
 
 vows.describe( 'Error with line number' )
