@@ -46,7 +46,7 @@ exports.Toaster = class Toaster
 
 		# initializing a toaster file template into an existent project
 		else if @cli.argv.i
-			new toaster.generators.Config( @basepath ).create @cli.argv.i
+			new toaster.generators.Config( @basepath ).create()
 
 		# injecting namespace declarations
 		else if @cli.argv.ns

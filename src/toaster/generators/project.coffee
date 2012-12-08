@@ -14,10 +14,11 @@ class Project extends toaster.generators.Question
 	constructor:(@basepath)->
 
 	create:(folderpath, name, src, release)->
-		if !folderpath || folderpath == true
-			return error	"You need to inform a target path!\n" +
-							"\ttoaster -n myawesomeapp_folder".green
-		
+		if (typeof folderpath) isnt 'string'
+			error_msg = "You need to inform a target path!\n"
+			error_msg += "\ttoaster -n myawesomeapp".green
+			return error error_msg
+
 		if name? && src? && release?
 			return @scaffold folderpath, name, src, release
 

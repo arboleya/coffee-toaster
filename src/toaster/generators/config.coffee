@@ -32,8 +32,7 @@ toast '%src%'
 	constructor:(@basepath)->
 
 
-	create:(folderpath)=>
-		@basepath = path.resolve folderpath
+	create: =>
 
 		q1 = "Path to your src folder? [src] : "
 		q2 = "Path to your release file? [www/js/app.js] : "
