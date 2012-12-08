@@ -6,6 +6,7 @@ class Project extends toaster.generators.Question
 	# requirements
 	path = require "path"
 	fs = require "fs"
+	fsu = require 'fs-util'
 
 	{FsUtil} = toaster.utils
 
@@ -46,10 +47,10 @@ class Project extends toaster.generators.Question
 		releasefile = path.join target, release
 		releasedir = path.dirname releasefile
 
-		log "#{'Created'.green.bold} #{target}" if FsUtil.mkdir_p target
-		log "#{'Created'.green.bold} #{srcdir}" if FsUtil.mkdir_p srcdir
-		log "#{'Created'.green.bold} #{vendorsdir}" if FsUtil.mkdir_p vendorsdir
-		log "#{'Created'.green.bold} #{releasedir}" if FsUtil.mkdir_p releasedir
+		log "#{'Created'.green.bold} #{target}" if fsu.mkdir_p target
+		log "#{'Created'.green.bold} #{srcdir}" if fsu.mkdir_p srcdir
+		log "#{'Created'.green.bold} #{vendorsdir}" if fsu.mkdir_p vendorsdir
+		log "#{'Created'.green.bold} #{releasedir}" if fsu.mkdir_p releasedir
 
 		srcdir = srcdir.replace( target, "" ).substr 1
 		releasefile = releasefile.replace( target, "" ).substr 1

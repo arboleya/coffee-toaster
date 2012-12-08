@@ -24,7 +24,7 @@ snapshot = exports.snapshot = ( folderpath, buffer = {} )->
 	buffer
 
 exports.spawn_toaster = (args, options) ->
-	toaster_path = path.join __dirname, '..', '..', 'bin', 'toaster'
+	toaster_path = path.join __dirname, '../../bin/toaster'
 
 	# Win32 urges some MAGIC in order to do basic things such as spawn a node
 	# program or any other program that isn't a .exe. Gorgeous.

@@ -5,13 +5,14 @@ class Builder
 
 	# requirements
 	fs = require 'fs'
+	fsu = require 'fs-util'
 	path = require 'path'
 	cs = require "coffee-script"
 	uglify = require("uglify-js").uglify
 	uglify_parser = require("uglify-js").parser
 
 	Script = toaster.core.Script
-	{FnUtil, FsUtil, ArrayUtil, StringUtil} = toaster.utils
+	{FnUtil, ArrayUtil, StringUtil} = toaster.utils
 
 	_include_tmpl: "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
 
@@ -38,7 +39,7 @@ class Builder
 		for folder in @config.src_folders
 
 			# search for all *.coffee files inside src folder
-			result = FsUtil.find folder.path, /.coffee/
+			result = fsu.find folder.path, /.coffee/
 
 			# folder path and alias
 			fpath = folder.path
@@ -130,103 +131,93 @@ class Builder
 
 	# Walk some folderpath and lists all its subfolders
 	build_ns_tree:( tree, folderpath )->
-		folders = FsUtil.ls_folders folderpath
+		folders = fsu.ls folderpath
 		for folder in folders
 			@build_ns_tree (tree[folder.match /[^\/]+$/m] = {}), folder
 
 
 	watch:()->
+		@watchers = []
+
 		# loops through all source folders
 		for src in @config.src_folders
 
 			# and watch them entirely
-			FsUtil.watch_folder src.path, /.coffee$/, FnUtil.proxy (src, info)=>
+			@watchers.push watcher = fsu.watch src.path, /.coffee$/m
+			watcher.on 'created', FnUtil.proxy @os_fs_change, src, 'created'
+			watcher.on 'updated', FnUtil.proxy @os_fs_change, src, 'updated'
+			watcher.on 'deleted', FnUtil.proxy @os_fs_change, src, 'deleted'
 
-				# skip all watching notifications
-				return if info.action == "watching" 
+	os_fs_change:(src, ev, f)=>
+		# skipe all folder creation
+		return if f.type == "dir" and ev == "created"
 
-				# skipe all folder creation
-				return if info.type == "folder" and info.action == "created"
+		# folder path and alias
+		fpath = f.location
+		spath = src.path
+		falias = src.alias || ""
 
-				# folder path and alias
-				ipath = info.path
-				fpath = src.path
-				falias = src.alias || ""
+		# check if it's from some excluded folder
+		include = true
+		include &= !(new RegExp( item ).test fpath) for item in @exclude
+		return unless include
 
-				# check if it's from some excluded folder
-				include = true
-				include &= !(new RegExp( item ).test ipath) for item in @exclude
-				return unless include
+		# Titleize the type for use in the log messages bellow
+		type = StringUtil.titleize f.type
 
-				# Titleize the type for use in the log messages bellow
-				type = StringUtil.titleize info.type
+		# relative filepath (with alias, if informed)
+		relative_path = f.location.replace fpath, falias
 
-				# relative filepath (with alias, if informed)
-				relative_path = info.path.replace fpath, falias
+		# date for CLI notifications
+		now = ("#{new Date}".match /[0-9]{2}\:[0-9]{2}\:[0-9]{2}/)[0]
 
-				# date for CLI notifications
-				now = ("#{new Date}".match /[0-9]{2}\:[0-9]{2}\:[0-9]{2}/)[0]
+		# switch over created, deleted, updated and watching
+		switch ev
 
-				# switch over created, deleted, updated and watching
-				switch info.action
+			# when a new file is created
+			when "created"
 
-					# when a new file is created
-					when "created"
+				# initiate file and adds it to the array
+				if f.type == "file"
+					# toaster/core/script
+					s = new Script @, fpath, f.location, falias, @cli
+					@files.push s
 
-						# initiate file and adds it to the array
-						if info.type == "file"
-							# toaster/core/script
-							s = new Script @, fpath, ipath, falias, @cli
-							@files.push s
+				# cli msg
+				msg = "#{('New ' + f.type + ' created').bold}"
+				log "[#{now}] #{msg} #{f.path}".green
 
-						# cli msg
-						msg = "#{('New ' + info.type + ' created').bold}"
-						log "[#{now}] #{msg} #{info.path}".green
+			# when a file is deleted
+			when "deleted"
 
-					# when a file is deleted
-					when "deleted"
+				# removes files from array
+				file = ArrayUtil.find @files, relative_path, "filepath"
+				return if file is null
 
-						# removes files from array
-						file = ArrayUtil.find @files, relative_path, "filepath"
-						return if file is null
+				@files.splice file.index, 1
 
-						@files.splice file.index, 1
+				# cli msg
+				msg = "#{(type + ' deleted, stop watching').bold}"
+				log "[#{now}] #{msg} #{f.location}".red
 
-						# cli msg
-						msg = "#{(type + ' deleted, stop watching').bold}"
-						log "[#{now}] #{msg} #{info.path}".red
+			# when a file is updated
+			when "updated"
 
-					# when a file is updated
-					when "updated"
+				# updates file information
+				file = ArrayUtil.find @files, relative_path, "filepath"
 
-						# updates file information
-						file = ArrayUtil.find @files, relative_path, "filepath"
+				if file is null
+					warn "CHANGED FILE IS APPARENTLY NULL..."
+				else
+					file.item.getinfo()
 
-						if file is null
-							warn "CHANGED FILE IS APPARENTLY NULL..."
-							console.log file
-							console.log "...."
-							console.log file.filepath for file in @files
-						else
-							file.item.getinfo()
+					# cli msg
+					msg = "#{(type + ' changed').bold}"
+					log "[#{now}] #{msg} #{f.location}".cyan
 
-							# cli msg
-							msg = "#{(type + ' changed').bold}"
-							log "[#{now}] #{msg} #{info.path}".cyan
-
-					# when a file starts being watched
-					# when "watching"
-					# 	msg = "#{('Watching ' + info.type + ':').bold.cyan}"
-						# log "#{msg} #{info.path.cyan}"
-
-				if @toaster.before_build is null or @toaster.before_build()
-					# rebuilds modules
-					@build()
-
-				after_watch?()
-			, src
-
-
+		if @toaster.before_build is null or @toaster.before_build()
+			# rebuilds modules
+			@build()
 
 	compile:()->
 		# validating syntax
@@ -259,10 +250,10 @@ class Builder
 		release_path = path.join release_path, "toaster"
 
 		# cleaning previous/existent structure
-		FsUtil.rmdir_rf release_path if fs.existsSync release_path
+		fsu.rm_rf release_path if fs.existsSync release_path
 
 		# creating new structre from scratch
-		FsUtil.mkdir_p release_path
+		fsu.mkdir_p release_path
 
 		# initializing empty array of filepaths
 		files = []
@@ -282,7 +273,7 @@ class Builder
 			folder_path = path.dirname absolute_path
 
 			# create container folder if it doesnt exist yet
-			FsUtil.mkdir_p folder_path if !fs.existsSync folder_path
+			fsu.mkdir_p folder_path if !fs.existsSync folder_path
 
 			# writing file
 			try

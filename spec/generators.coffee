@@ -1,9 +1,9 @@
 fs = require 'fs'
+fsu = require 'fs-util'
 path = require 'path'
 vows = require "vows"
 assert = require "assert"
 
-{FsUtil} = (require "#{__dirname}/../lib/toaster").toaster.utils
 {spawn_toaster,snapshot} = require "#{__dirname}/utils/utils"
 
 # testing new project creation
@@ -18,7 +18,7 @@ vows.describe('Generators (-n, -i)')
 			folder = path.resolve "#{__dirname}/_tmp/new_default_project"
 
 			# cleaning first
-			FsUtil.rmdir_rf folder if fs.existsSync folder
+			fsu.rm_rf folder if fs.existsSync folder
 
 			# spawning toaster
 			toaster = spawn_toaster ['-n', folder]
@@ -59,7 +59,7 @@ vows.describe('Generators (-n, -i)')
 
 			# cleaning first
 			if fs.existsSync (folder = __dirname + "/_tmp/new_custom_project")
-				FsUtil.rmdir_rf folder
+				fsu.rm_rf folder
 
 			toaster = spawn_toaster ['-n', folder]
 			toaster.stdout.on 'data', (data)->
@@ -103,7 +103,7 @@ vows.describe('Generators (-n, -i)')
 		created = "#{folder}/toaster.coffee"
 
 		# cleaning first
-		FsUtil.rmdir_rf folder if fs.existsSync folder
+		fsu.rm_rf folder if fs.existsSync folder
 		fs.mkdirSync folder, "0777"
 
 		toaster = spawn_toaster ['-i', '_tmp/existing_project']

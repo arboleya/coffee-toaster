@@ -119,8 +119,6 @@ class Script
 
 		# looping through file dependencies
 		for dependency, index in @dependencies_collapsed
-			
-			dependency = "#{path.sep}#{dependency}"
 
 			# if dependency is not a wild-card (namespace.*)
 			if dependency.substr(-1) != "*"
