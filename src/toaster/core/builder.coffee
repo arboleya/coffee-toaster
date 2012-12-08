@@ -14,6 +14,7 @@ class Builder
 	Script = toaster.core.Script
 	{FnUtil, ArrayUtil, StringUtil} = toaster.utils
 
+	watchers: null
 	_include_tmpl: "document.write('<scri'+'pt src=\"%SRC%\"></scr'+'ipt>')"
 
 
@@ -39,7 +40,7 @@ class Builder
 		for folder in @config.src_folders
 
 			# search for all *.coffee files inside src folder
-			result = fsu.find folder.path, /.coffee/
+			result = fsu.find folder.path, /.coffee$/m
 
 			# folder path and alias
 			fpath = folder.path
@@ -143,14 +144,15 @@ class Builder
 		for src in @config.src_folders
 
 			# and watch them entirely
-			@watchers.push watcher = fsu.watch src.path, /.coffee$/m
-			watcher.on 'created', FnUtil.proxy @os_fs_change, src, 'created'
-			watcher.on 'updated', FnUtil.proxy @os_fs_change, src, 'updated'
-			watcher.on 'deleted', FnUtil.proxy @os_fs_change, src, 'deleted'
+			@watchers.push (watcher = fsu.watch src.path, /.coffee$/m)
+			watcher.on 'create', (FnUtil.proxy @on_fs_change, src, 'create')
+			watcher.on 'change', (FnUtil.proxy @on_fs_change, src, 'change')
+			watcher.on 'delete', (FnUtil.proxy @on_fs_change, src, 'delete')
 
-	os_fs_change:(src, ev, f)=>
-		# skipe all folder creation
-		return if f.type == "dir" and ev == "created"
+	on_fs_change:(src, ev, f)=>
+
+		# skip all folder creation
+		return if f.type == "dir" and ev == "create"
 
 		# folder path and alias
 		fpath = f.location
@@ -166,7 +168,7 @@ class Builder
 		type = StringUtil.titleize f.type
 
 		# relative filepath (with alias, if informed)
-		relative_path = f.location.replace fpath, falias
+		relative_path = f.location.replace spath, falias
 
 		# date for CLI notifications
 		now = ("#{new Date}".match /[0-9]{2}\:[0-9]{2}\:[0-9]{2}/)[0]
@@ -175,20 +177,20 @@ class Builder
 		switch ev
 
 			# when a new file is created
-			when "created"
+			when "create"
 
 				# initiate file and adds it to the array
 				if f.type == "file"
 					# toaster/core/script
-					s = new Script @, fpath, f.location, falias, @cli
+					s = new Script @, spath, fpath, falias, @cli
 					@files.push s
 
-				# cli msg
+				# cli filepath
 				msg = "#{('New ' + f.type + ' created').bold}"
-				log "[#{now}] #{msg} #{f.path}".green
+				log "[#{now}] #{msg} #{f.location}".green
 
 			# when a file is deleted
-			when "deleted"
+			when "delete"
 
 				# removes files from array
 				file = ArrayUtil.find @files, relative_path, "filepath"
@@ -201,7 +203,7 @@ class Builder
 				log "[#{now}] #{msg} #{f.location}".red
 
 			# when a file is updated
-			when "updated"
+			when "change"
 
 				# updates file information
 				file = ArrayUtil.find @files, relative_path, "filepath"
