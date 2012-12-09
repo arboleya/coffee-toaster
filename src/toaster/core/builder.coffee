@@ -57,6 +57,10 @@ class Builder
 					s = new Script @, fpath, file, falias, @cli
 					@files.push s
 
+	reset:()->
+		for watcher in @watchers
+			watcher.close()
+
 	build:( header_code = "", footer_code = "" )=>
 		# namespaces
 		namespaces = @build_namespaces()

@@ -2,18 +2,20 @@ class Toast
 
 	# requires
 	fs = require "fs"
+	fsu = require "fs-util"
 	path = require "path"
 	exec = (require "child_process").exec
 	colors = require 'colors'
 	cs = require "coffee-script"
 
 	# variables
-	builders: []
+	builders: null
 
 	constructor: (@toaster) ->
 
 		# basepath
 		@basepath = @toaster.basepath
+		@builders = []
 
 		if (config = @toaster.cli.argv["config"])?
 			config = JSON.parse( config ) unless config instanceof Object
@@ -21,6 +23,13 @@ class Toast
 		else
 			config_file = @toaster.cli.argv["config-file"]
 			filepath = config_file || path.join @basepath, "toaster.coffee"
+
+			watcher = fsu.watch filepath
+			watcher.on 'change', (f)=>
+				now = ("#{new Date}".match /[0-9]{2}\:[0-9]{2}\:[0-9]{2}/)[0]
+				log "[#{now}] #{'Changed'.bold} #{filepath}".cyan
+				watcher.close()
+				@toaster.reset()
 
 			if fs.existsSync filepath
 

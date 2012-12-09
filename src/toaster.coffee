@@ -9,6 +9,7 @@ exports.Toaster = class Toaster
 
 	# requirements
 	fs = require "fs"
+	fsu = require "fs-util"
 	path = require "path"
 	exec = (require "child_process").exec
 	colors = require 'colors'
@@ -69,3 +70,9 @@ exports.Toaster = class Toaster
 	build:( header_code = "", footer_code = "" )->
 		for builder in @toast.builders
 			builder.build header_code, footer_code
+
+	# resets the toaster completely - specially used when the `toaster.coffee`
+	# config file is edited :)
+	reset:()->
+		builder.reset() for builder in @toast.builders
+		exports.run()
