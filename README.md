@@ -33,39 +33,39 @@ sooner than later.
 
 # Docs
 
-- [Installation](#installation)
-- [Scaffolding](#scaffolding)
-  - [Initializing new app](#initializing-new-app)
-  - [Initializing config file](#initializing-config-file)
-- [Usage](#usage)
-  - [Import directive](#import-directive)
-  - [Compile](#compile) `-c`
-  - [Watch](#watch) `-w`
-  - [Debug](#debug) `-cd`, `-wd`
-    - [Representative structure](#representative-structure)
-  - [HTML inclusion](#html-inclusion)
-  - [Advanced options](#advanced-options)
-  - [Conclusion](#conclusion)
-- [Config file](#config-file)
-  - [Config options](#config-options)
-    - [`folders`](#config-options-folders)
-    - [`exclude`](#config-options-exclude)
-    - [`vendors`](#config-options-vendors)
-    - [`bare`](#config-options-bare)
-    - [`packaging`](#config-options-packaging)
-    - [`expose`](#config-options-expose)
-    - [`minify`](#config-options-minify)
-    - [`httpfolder`](#config-options-httpfolder)
-    - [`release`](#config-options-release)
-    - [`debug`](#config-options-debug)
-- [Examples](#examples)
-- [API](#api)
-- [Contributing](#contributing)
-  - [Setup](#setup)
-  - [Building](#building)
-  - [Watching](#watching)
-  - [Testing](#testing)
-- [CHANGELOG](#changelog)
+ - [Installation](#installation)
+ - [Scaffolding](#scaffolding)
+   - [Initializing new app](#initializing-new-app)
+   - [Initializing config file](#initializing-config-file)
+ - [Usage](#usage)
+   - [Import directive](#import-directive)
+   - [Compile](#compile) `-c`
+   - [Watch](#watch) `-w`
+   - [Debug](#debug) `-cd`, `-wd`
+     - [Representative structure](#representative-structure)
+   - [HTML inclusion](#html-inclusion)
+   - [Advanced options](#advanced-options)
+   - [Conclusion](#conclusion)
+ - [Config file](#config-file)
+   - [Config options](#config-options)
+     - [`folders`](#config-options-folders)
+     - [`exclude`](#config-options-exclude)
+     - [`vendors`](#config-options-vendors)
+     - [`bare`](#config-options-bare)
+     - [`packaging`](#config-options-packaging)
+     - [`expose`](#config-options-expose)
+     - [`minify`](#config-options-minify)
+     - [`httpfolder`](#config-options-httpfolder)
+     - [`release`](#config-options-release)
+     - [`debug`](#config-options-debug)
+ - [Examples](#examples)
+ - [API](#api)
+ - [Contributing](#contributing)
+   - [Setup](#setup)
+   - [Building](#building)
+   - [Watching](#watching)
+   - [Testing](#testing)
+ - [CHANGELOG](#changelog)
 
 # Installation
 
@@ -391,8 +391,8 @@ file and what each one of these is responsible of.
 ### `folders`
 
 > Mandatory: `no` <BR/>
-> Type: `Array` <BR/>
-> Default: `[]` <BR/>
+> Type: `Object` <BR/>
+> Default: `null` <BR/>
 
 In case you have more than one `src` folder, you can set an `object` of `objects`
 containing setup information about all your source folders, in the format
@@ -519,7 +519,7 @@ files, because Toaster will handle all the dirty for you.
 
 > Mandatory: `no` <BR/>
 > Type: `String` <BR/>
-> Default: `''` <BR/>
+> Default: `null` <BR/>
 
 If informed, list all you packages of classes in the given scope. If you use
 `window` as your expose scope, your classes will be available also in the window
