@@ -51,7 +51,6 @@ class Builder
 
 				include = true
 				for item in @exclude
-
 					include &= !(new RegExp( item ).test file)
 
 				if include
@@ -134,7 +133,11 @@ class Builder
 	build_ns_tree:( tree, folderpath )->
 		folders = fsu.ls folderpath
 		for folder in folders
-			@build_ns_tree (tree[folder.match /[^\/\\]+$/m] = {}), folder
+			include = true
+			for item in @exclude
+				include &= !(new RegExp( item ).test folder)
+			if include
+				@build_ns_tree (tree[folder.match /[^\/\\]+$/m] = {}), folder
 
 
 	watch:()->
