@@ -13,7 +13,7 @@ class Cli
 		usage += "#{'Examples:'}\n"
 		usage += "  toaster -n myawsomeapp   (#{'required'.red})\n"
 		usage += "  toaster -i [myawsomeapp] (#{'optional'.green})\n"
-		usage += "  toaster -w [myawsomeapp] (#{'optional'.green})"
+		usage += "  toaster -w [myawsomeapp] (#{'optional'.green})\n"
 		usage += "  toaster -wd [myawsomeapp] (#{'optional'.green})"
 		
 		@argv = (@opts = optimist.usage( usage )
