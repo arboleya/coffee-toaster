@@ -31,6 +31,12 @@ sooner than later.
 
 *NOTE: The list is `active` and `maintained`, though the low activity. So don't be shy.*
 
+# Little history
+
+CoffeeToaster was created initially as a base for creating the
+[Theoricus Framework](https://github.com/serpentem/theoricus) (which is in a
+very alpha stage), and so will be evolved as needed.
+
 # Docs
 
  - [Installation](#installation)
