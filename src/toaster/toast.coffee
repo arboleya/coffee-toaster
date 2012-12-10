@@ -24,12 +24,13 @@ class Toast
 			config_file = @toaster.cli.argv["config-file"]
 			filepath = config_file || path.join @basepath, "toaster.coffee"
 
-			watcher = fsu.watch filepath
-			watcher.on 'change', (f)=>
-				now = ("#{new Date}".match /[0-9]{2}\:[0-9]{2}\:[0-9]{2}/)[0]
-				log "[#{now}] #{'Changed'.bold} #{filepath}".cyan
-				watcher.close()
-				@toaster.reset()
+			if @toaster.cli.argv.w
+				watcher = fsu.watch filepath
+				watcher.on 'change', (f)=>
+					now = ("#{new Date}".match /[0-9]{2}\:[0-9]{2}\:[0-9]{2}/)[0]
+					log "[#{now}] #{'Changed'.bold} #{filepath}".cyan
+					watcher.close()
+					@toaster.reset()
 
 			if fs.existsSync filepath
 
