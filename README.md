@@ -29,17 +29,25 @@ sooner than later.
 
 > https://groups.google.com/group/coffee-toaster
 
-*NOTE: The list is `active` and `maintained`, though the low activity. So don't be shy.*
+*NOTE: The list is `active` and `maintained`, though the low activity. So don't
+be shy.*
 
-# Little history
+# About
+
+Minimalist build system for CoffeeScript, made for those who dare to use class
+definitions in CoffeeScript while being able to easily inherit from external
+files. The system is powered with import directives that uses wildcards
+facilities, exposed scopes, excluded files filter options and a packaging system
+that can inject your folders-as-namespaces to all your classes based on where
+they are under your src folder.
 
 CoffeeToaster was created initially as a base for creating the
-[Theoricus Framework](https://github.com/serpentem/theoricus) (which is in a
-very alpha stage), and so will be evolved as needed.
+[Theoricus Framework](https://github.com/serpentem/theoricus).
+
 
 # Docs
 
- - [Installation](#installation)
+ - [Installing](#installing)
  - [Scaffolding](#scaffolding)
    - [Initializing new app](#initializing-new-app)
    - [Initializing config file](#initializing-config-file)
@@ -52,6 +60,7 @@ very alpha stage), and so will be evolved as needed.
    - [HTML inclusion](#html-inclusion)
    - [Advanced options](#advanced-options)
    - [Conclusion](#conclusion)
+     - [Note for VIM Users](#vim-users)
  - [Config file](#config-file)
    - [Config options](#config-options)
      - [`folders`](#config-options-folders)
@@ -73,12 +82,15 @@ very alpha stage), and so will be evolved as needed.
    - [Testing](#testing)
  - [CHANGELOG](#changelog)
 
-# Installation
+<a name="installing" />
+# Installing
+----
 
 `npm install -g coffee-toaster`
 
 <a name="scaffolding" />
 # Scaffolding
+----
 
 There are two simple `scaffolding` routines bundled with CoffeeToaster for
 creating new projects structure from the scratch and also for creating the
@@ -138,11 +150,13 @@ cd existing-project
 toaster -i
 ````
 
-Some of the same information (`src`, `release` and `httpfolder`) will be required, answer everything according to your project's structure and a config
+Some of the same information (`src`, `release` and `httpfolder`) will be
+required, answer everything according to your project's structure and a config
 `toaster.coffee` file will be created inside of it.
 
 <a name="usage" />
 # Usage
+----
 
 Toaster help screen.
 
@@ -181,7 +195,8 @@ The import directive is known by:
 #<< app/utils/*
 ````
 
-By putting `#<< app/views/user_view` in your CoffeeScript file, you're telling CoffeeToaster that there's a dependency. It's like a `require`, except that you
+By putting `#<< app/views/user_view` in your CoffeeScript file, you're telling
+CoffeeToaster that there's a dependency. It's like a `require`, except that you
 can't save a reference of the imported file to a variable. Instead, this
 directives shoud be put in the first lines of your files.
 
@@ -315,9 +330,10 @@ You can pass your own config file for toaster instead of the default one
 toaster -wdf config/mycustomconfig.coffee
 ````
 
-*NOTE: It's important that you always call this from your projeto base folder, otherwise
-the paths of your config can get messy. Remembers also that the paths in your
-config file shoud ideally be always relative to your project base folder.*
+*NOTE: It's important that you always call this from your project base folder,
+otherwise the paths of your config can get messy. Remembers also that the paths
+in your config file shoud ideally be always relative to your project base
+folder.*
 
 Alternativelly, you can even pass the whole configuration as a JSON string, with
 the `-j` or `--config` option:
@@ -334,14 +350,35 @@ toaster -wdj '{"folders":{"src":""},"expose":"window","release":"app.js","debug"
 Every time something changes, CoffeeToaster recompiles all of your application
 by:
 
-* collecting all .coffee files and processing everything, adding namespace's declarations to class definitions based on the folder they are located
+* collecting all .coffee files and processing everything, adding namespace's
+declarations to class definitions based on the folder they are located
 * reordering everything, always defining files and classes before they're needed
 * merge all yours vendors in the given order
 * declare root namespaces
 * merge everything
 
+<a name="vim-users"/>
+### VIM Users
+
+Due to the way VIM handles files, you'll need to disable the creation of `swap`
+and `backup` files.
+
+To do it, just put these three lines in your `.vimrc`:
+
+``` vim
+" for coffee-toaster
+set nobackup       " no backup files
+set nowritebackup  " only in case you don't want a backup file while editing
+set noswapfile     " no swap files
+```
+
+This will guarantee the expected behavior of Toaster and make it play nicely
+with VIM without any conflicts. For more info about why it's really needed,
+please check this [thread](https://github.com/serpentem/coffee-toaster/issues/47).
+
 <a name="config-file" />
 # Config file
+----
 
 The `toaster.coffee` is the config file from where Toaster seek all information
 about your app, vendores, build options and so on. There are two main usages
@@ -400,9 +437,9 @@ file and what each one of these is responsible of.
 > Type: `Object` <BR/>
 > Default: `null` <BR/>
 
-In case you have more than one `src` folder, you can set an `object` of `objects`
-containing setup information about all your source folders, in the format
-`'folderpath':'folderalias'`.
+In case you have more than one `src` folder, you can set an `object` of
+`objects` containing setup information about all your source folders, in the
+format `'folderpath':'folderalias'`.
 
 The **hash-key** is the `path` of your folder, and the **hash-value** is the
 `alias` you want to prepend to all files under that.
@@ -466,7 +503,8 @@ You can define vendors such as:
   vendors: ['vendors/x.js', 'vendors/y.js', ... ]
 ````
 
-It's an ordered array of all your vendor's paths. These files must be purely javascript, preferably minified ones -- Toaster will not compile or minify them,
+It's an ordered array of all your vendor's paths. These files must be purely
+javascript, preferably minified ones -- Toaster will not compile or minify them,
 only concatenate everything.
 
 <a name="config-options-bare" />
@@ -498,7 +536,8 @@ So you will end up with just `your peace of code`:
 > Type: `Boolean` <BR/>
 > Default: `false` <BR/>
 
-When packaging is `true`, Toaster will rewrite **all** your `class` declarations.
+When packaging is `true`, Toaster will rewrite **all** your `class`
+declarations.
 
 If you have a file in `src/app/models/user.coffee` with this contents:
 
@@ -608,11 +647,13 @@ The file path to your **debug** file.
 
 <a name="examples"/>
 # Examples
+----
 
 You'll certainly find some useful resources in the examples provided.
 Examine it and you'll understand how things works more instinctively.
 
-Install coffee-toaster, clone the usage example and try different config options, always looking for the differences in your javascript release file.
+Install coffee-toaster, clone the usage example and try different config
+options, always looking for the differences in your javascript release file.
 
 > [Single folder example](https://github.com/serpentem/coffee-toaster/tree/master/examples/single-folder)<BR>
 > [Multi folder example](https://github.com/serpentem/coffee-toaster/tree/master/examples/multi-folder)<BR>
@@ -620,6 +661,7 @@ Install coffee-toaster, clone the usage example and try different config options
 
 <a name="api"/>
 # API
+----
 
 You can use Toaster through API as well, in case you want to power up your
 compiling tasks or even build some framework/lib on top of it.
@@ -635,6 +677,7 @@ See the API example for further information.
 
 <a name="contributing"/>
 # Contributing
+----
 
 <a name="setup"/>
 ## Setting everything up
@@ -676,5 +719,6 @@ Run all tests.
 
 <a name="changelog"/>
 # Changelog
+----
 
 > [CHANGELOG.md](https://github.com/serpentem/coffee-toaster/tree/master/CHANGELOG.md)
