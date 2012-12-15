@@ -2,7 +2,7 @@
   "name": "coffee-toaster",
   "version": "0.6.6",
   "author": "Anderson Arboleya <anderson@arboleya.me>",
-  "description": "Minimalist manager and build system for CoffeeScript, an alternative for AMD's or CJS's OOP patterns, but with similar results. Made for those who dare to use class definitions in CoffeeScript while being able to easily inherit from external files. Powered with imports directives that use wildcards facilities, exposed scopes and excluded files filter options. The system can even use folders-as-namespaces to help you avoid naming collisions in architecture.",
+  "description": "Minimalist build system for CoffeeScript.",
   "keywords": ["coffeescript", "build", "namespace", "tool"],
 
   "main" : "./lib/toaster",
@@ -21,7 +21,7 @@
   "engines": { "node": ">= 0.8.14" },
 
   "dependencies": {
-    "fs-util": "0.3.3",
+    "fs-util": "0.3.4",
     "coffee-script" : "1.3.x",
     "uglify-js": "1.1.x",
     "optimist": "0.2.x",
