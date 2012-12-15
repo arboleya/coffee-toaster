@@ -1,8 +1,9 @@
 # Changelog
 
-## 0.6.6 - 
- * Making toaster cross-platform (Osx, Linux, Win7)
- * Effectively restarting toaster after `toaster.coffee` file is edited. \o/
+## 0.6.6 - 12/15/2012
+ * Desmistifying conflicts betweeen Toaster and VIM [closing issue [#46](https://github.com/serpentem/coffee-toaster/issues/47)]
+ * Making toaster cross-platform (Osx, Linux, Win7) [closing issues [#29](https://github.com/serpentem/coffee-toaster/issues/29) and [#30](https://github.com/serpentem/coffee-toaster/issues/30)]
+ * Effectively restarting toaster after `toaster.coffee` file is edited.
 
 ## 0.6.5 - 11/27/2012
  * Fixing generators [closing issue [#46](https://github.com/serpentem/coffee-toaster/issues/46)]
