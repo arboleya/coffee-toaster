@@ -6,13 +6,13 @@ exec = (require "child_process").exec
 
 class InjectNS
 
-	constructor:( @builders )->
+  constructor:( @builders )->
 
-		console.log "Declaring namespaces for files..."
-		for builder in @builders
-			for f in builder.files
-				f.getinfo true
-				fs.writeFileSync f.realpath, f.raw
-				f.getinfo false
-				console.log f.realpath
-		console.log "...done."
+    console.log "Declaring namespaces for files..."
+    for builder in @builders
+      for f in builder.files
+        f.getinfo true
+        fs.writeFileSync f.realpath, f.raw
+        f.getinfo false
+        console.log f.realpath
+    console.log "...done."
