@@ -721,4 +721,4 @@ Run all tests.
 # Changelog
 ----
 
-> [CHANGELOG.md](https://github.com/serpentem/coffee-toaster/tree/master/CHANGELOG.md)
+> [CHANGELOG.md](https://github.com/serpentem/coffee-toaster/tree/master/build/CHANGELOG.md)
