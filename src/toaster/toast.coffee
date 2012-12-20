@@ -102,9 +102,8 @@ class Toast
 
     # compute vendors full path
     for v, i in config.vendors
-      if (path.resolve v) is not (path.join @basepath, v)
-        config.vendors[i] = path.resolve v
-      else
+      vpath = config.vendors[i] = (path.resolve v)
+      if (path.resolve vpath) isnt vpath
         config.vendors[i] = path.join @basepath, v
 
     unless srcpath instanceof Object
@@ -115,7 +114,7 @@ class Toast
 
     if params.folders?
       for folder, alias of params.folders
-        if path.resolve folder != path
+        if (path.resolve folder) != folder
           folder = path.join @basepath, folder
         config.src_folders.push {path: folder, alias: alias}
 
