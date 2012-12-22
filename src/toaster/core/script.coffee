@@ -118,11 +118,14 @@ class Script
     # looping through file dependencies
     for dependency, index in @dependencies_collapsed
 
+      # normalize first slash / backslash
+      if (dependency.substr 0, 1) is path.sep
+        dependency = dependency.substr 1
+
       # if dependency is not a wild-card (namespace.*)
       if dependency.substr(-1) != "*"
-
         # then add file extension to it and continue
-        @dependencies.push "#{dependency}.coffee"
+        @dependencies.push "#{path.sep}#{dependency}.coffee"
         continue
 
       # otherwise find all files under that namespace
