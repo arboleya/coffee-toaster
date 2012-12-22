@@ -1,6 +1,6 @@
 {
   "name": "coffee-toaster",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "author": "Anderson Arboleya <anderson@arboleya.me>",
   "description": "Minimalist build system for CoffeeScript.",
   "keywords": ["coffeescript", "build", "namespace", "tool"],

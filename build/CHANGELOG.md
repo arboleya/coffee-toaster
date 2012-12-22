@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.9 - 12/22/2012
+ * Fixing path's evaluation also when aliases are in use
+
 ## 0.6.8 - 12/22/2012
  * Fixing path's evaluation for import directives
 
