@@ -22,7 +22,8 @@ class Script
 
     # assemble some information about the file
     @filepath = @realpath.replace @folderpath, ''
-    @filepath = path.join @alias, @filepath if @alias isnt null
+    if @alias?
+      @filepath = path.join path.sep, @alias, @filepath
     @filename = path.basename @filepath
     @filefolder = path.dirname @filepath
     @namespace = ""
