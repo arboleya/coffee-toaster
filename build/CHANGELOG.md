@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.8 - 12/22/2012
+ * Fixing path's evaluation for import directives
+
+## 0.6.7 - 12/20/2012
+ * Fixing custom config file evaluation
+
 ## 0.6.6 - 12/15/2012
  * Desmistifying conflicts betweeen Toaster and VIM [closing issue [#46](https://github.com/serpentem/coffee-toaster/issues/47)]
  * Making toaster cross-platform (Osx, Linux, Win7) [closing issues [#29](https://github.com/serpentem/coffee-toaster/issues/29) and [#30](https://github.com/serpentem/coffee-toaster/issues/30)]
