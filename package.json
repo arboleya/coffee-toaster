@@ -6,9 +6,7 @@
   "keywords": ["coffeescript", "build", "namespace", "tool"],
 
   "main" : "./lib/toaster",
-
   "directories": {"lib": "./lib/"},
-
   "scripts": { "test": "make test" },
 
   "repository": {
@@ -17,7 +15,6 @@
   },
 
   "bin": {"toaster" : "./bin/toaster"},
-
   "engines": { "node": ">= 0.8.14" },
 
   "dependencies": {
