@@ -157,25 +157,28 @@ class Builder
       watcher.on 'delete', (FnUtil.proxy @on_fs_change, src, 'delete')
 
   on_fs_change:(src, ev, f)=>
-
     # skip all folder creation
     return if f.type == "dir" and ev == "create"
 
     # folder path and alias
     fpath = f.location
     spath = src.path
-    falias = src.alias || ""
+    if src.alias?
+      falias = (path.sep + src.alias)
+    else
+      falias = ''
 
     # check if it's from some excluded folder
     include = true
-    include &= !(new RegExp( item ).test fpath) for item in @exclude
+    for item in @exclude
+      include &= !(new RegExp( item ).test fpath)
     return unless include
 
     # Titleize the type for use in the log messages bellow
     type = StringUtil.titleize f.type
 
     # relative filepath (with alias, if informed)
-    relative_path = f.location.replace spath, falias
+    relative_path = fpath.replace spath, falias
 
     # date for CLI notifications
     now = ("#{new Date}".match /[0-9]{2}\:[0-9]{2}\:[0-9]{2}/)[0]

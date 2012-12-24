@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.10 - 12/24/2012
+ * Fixing aliases again, now in Builder class
+
 ## 0.6.9 - 12/22/2012
  * Fixing path's evaluation also when aliases are in use
 
