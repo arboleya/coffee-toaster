@@ -32,6 +32,9 @@ class Cli
       .alias('d', 'debug')
       .describe('d', 'Debug mode (compile js files individually)')
 
+      .alias('a', 'autorun')
+      .describe('a', 'Execute the script in node.js after compilation')
+
       .alias('j', 'config')
       .string( 'j' )
       .describe('j', "Config file formatted as a json-string.")
