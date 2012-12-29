@@ -120,15 +120,24 @@ class Builder
 
     # autorun mode
     if @cli.argv.a
+
+      # getting arguments after the third ( first three are ['node', 'path_to_toaster', '-a'] )
+      args = []
+      if process.argv.length > 3
+        for i in [3...process.argv.length] by 1
+          args.push process.argv[i]
+
       if @child?
         log "Application restarted:".blue
         @child.kill('SIGHUP')
       else
         log "Application started:".blue
+
+      # adding debug arguments
       if @cli.argv.d
-        @child = cp.fork @release, { execArgv: ['--debug-brk'] }
+        @child = cp.fork @release, args, { execArgv: ['--debug-brk'] }
       else
-        @child = cp.fork @release
+        @child = cp.fork @release, args
 
   # Creates a NS holder for all folders
   build_namespaces:()->
