@@ -55,7 +55,7 @@ exports.Toaster = class Toaster
       new toaster.misc.InjectNS @toast.builders
 
     # starting watching'n'compiling process
-    else if (base = @cli.argv.w || @cli.argv.c)
+    else if (base = @cli.argv.w || @cli.argv.c || @cli.argv.a)
       config = if options and options.config then options.config else null
       @toast = new toaster.Toast @
       @build() unless skip_initial_build
