@@ -314,10 +314,28 @@ combination with debug option `-d` to set the script breakpoint on the first lin
 
 ````bash
 toaster -a
-toaster -ad
+toaster -da
 ````
+of if you like the `watch` option
+
+````bash
+toaster -wa
+toaster -wda
+````
+
 to better debug your application via node.js you can use some tools like 
 [node-inspector](https://github.com/dannycoates/node-inspector)
+
+It is also possible to pass arguments to the compiled script
+
+````bash
+toaster -wa argument argument2 argument3
+toaster -wda argument argument2 argument3
+````
+
+Please note that the `-a` arguments has to be the last of the group in order to 
+make it work: `toaster -ad argument` will not behave as expected and
+`toaster -da argument` should be used instead
 
 <a name="html-inclusion"/>
 ## HTML inclusion
