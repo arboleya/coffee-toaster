@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.11 - 12/29/2012
+ * Listening for changes also in vendors
+ * Adding autorun mode (-a) [closing[#56](https://github.com/serpentem/coffee-toaster/pull/56)] • Thanks to [Giacomo Trezzi](https://github.com/G3z)
+
 ## 0.6.10 - 12/24/2012
  * Fixing aliases again, now in Builder class
 
