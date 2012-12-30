@@ -156,6 +156,13 @@ class Builder
       watcher.on 'change', (FnUtil.proxy @on_fs_change, src, 'change')
       watcher.on 'delete', (FnUtil.proxy @on_fs_change, src, 'delete')
 
+    # watching vendors for changes
+    for vendor in @vendors
+      temp = fsu.watch vendor
+      temp.on 'create', (FnUtil.proxy @on_fs_change, src, 'create')
+      temp.on 'change', (FnUtil.proxy @on_fs_change, src, 'change')
+      temp.on 'delete', (FnUtil.proxy @on_fs_change, src, 'delete')
+
   on_fs_change:(src, ev, f)=>
     # skip all folder creation
     return if f.type == "dir" and ev == "create"
