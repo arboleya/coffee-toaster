@@ -56,6 +56,7 @@ CoffeeToaster was created initially as a base for creating the
    - [Compile](#compile) `-c`
    - [Watch](#watch) `-w`
    - [Debug](#debug) `-cd`, `-wd`
+   - [Autorun](#autorun) `-a`, `-ad`
      - [Representative structure](#representative-structure)
    - [HTML inclusion](#html-inclusion)
    - [Advanced options](#advanced-options)
@@ -179,6 +180,7 @@ Options:
   -w, --watch        Start watching/compiling your project           
   -c, --compile      Compile the entire project, without watching it.
   -d, --debug        Debug mode (compile js files individually)      
+  -a, --autorun      Execute the script in node.js after compilation
   -j, --config       Config file formatted as a json-string.           [string]
   -f, --config-file  Path to a different config file.                  [string]
   -v, --version                                                      
@@ -302,6 +304,38 @@ directory, so you can debug it sanely.
 
 The debug file `www/js/app-debug.js` is the boot-loader responsible for loading
 all these individual compiled JS files into the right order.
+
+<a name="autorun"/>
+## Autorun
+
+In autorun mode option `-a` the script is recompiled after each file change and 
+it is executed in a node.js child process. It is possible to use autorun in 
+combination with debug option `-d` to set the script breakpoint on the first line
+
+````bash
+toaster -a
+toaster -da
+````
+of if you like the `watch` option
+
+````bash
+toaster -wa
+toaster -wda
+````
+
+to better debug your application via node.js you can use some tools like 
+[node-inspector](https://github.com/dannycoates/node-inspector)
+
+It is also possible to pass arguments to the compiled script
+
+````bash
+toaster -wa argument argument2 argument3
+toaster -wda argument argument2 argument3
+````
+
+Please note that the `-a` arguments has to be the last of the group in order to 
+make it work: `toaster -ad argument` will not behave as expected and
+`toaster -da argument` should be used instead
 
 <a name="html-inclusion"/>
 ## HTML inclusion
