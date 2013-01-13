@@ -428,7 +428,12 @@ class Builder
     buffer = []
     for vendor in @vendors
       if fs.existsSync vendor
-        buffer.push fs.readFileSync vendor, 'utf-8'
+        stats = fs.lstatSync vendor
+        if stats.isSymbolicLink()
+          realPath = fs.readlinkSync vendor
+          buffer.push fs.readFileSync realPath, 'utf-8'
+        else if stats.isFile()
+          buffer.push fs.readFileSync vendor, 'utf-8'
       else
         warn "Vendor not found at ".white + vendor.yellow.bold
 
