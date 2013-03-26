@@ -1,6 +1,6 @@
 .PHONY: build
 
-VERSION=`coffee build/bumper --version`
+VERSION=`coffee build/bumper.coffee --version`
 
 watch:
 	build/coffee-toaster/bin/toaster . -w
