@@ -54,7 +54,7 @@ class Toast
   toast:( srcpath, params = {} )=>
     if srcpath instanceof Object
       params = srcpath
-    else if path.resolve srcpath != srcpath
+    else if (path.resolve srcpath) != srcpath
       folder = path.join @basepath, srcpath
 
     if params.release is null
