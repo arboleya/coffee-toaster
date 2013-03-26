@@ -15,7 +15,7 @@
   },
 
   "bin": {"toaster" : "./bin/toaster"},
-  "engines": { "node": ">= 0.8.14" },
+  "engines": { "node": "0.10.x" },
 
   "dependencies": {
     "fs-util": "0.3.4",
@@ -23,7 +23,7 @@
     "uglify-js": "1.1.x",
     "optimist": "0.2.x",
     "colors": "0.5.x",
-    "vows" : "0.6.x"
+    "vows" : "0.7.x"
   },
 
   "optionalDependencies": { "growl": "1.2.x" }
