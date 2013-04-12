@@ -1,9 +1,16 @@
+----
+# `PROJECT DISCONTINUED`
+
+ * The development of Coffee-Toaster has been **discontinued**.<br/>
+ * For more info check this **[note](https://github.com/serpentem/coffee-toaster/wiki)**.
+ * Looking for a similar project? *Take a look at [**Polvo**](https://github.com/serpentem/polvo)!*
+
+----
+
 ![Coffee Toaster](http://github.com/serpentem/coffee-toaster/blob/0.5.0/images/toaster.png?raw=true)
 
 Minimalist build system for CoffeeScript.
 > Version 0.6.13
-
-[![Build Status](https://secure.travis-ci.org/serpentem/coffee-toaster.png)](http://travis-ci.org/serpentem/coffee-toaster)
 
 # Features
 
