@@ -428,6 +428,10 @@ class Builder
     buffer = []
     for vendor in @vendors
       if fs.existsSync vendor
+        # is a symbolic link ?
+        if (fs.lstatSync(vendor)).isSymbolicLink()          
+          vendor = fs.readlinkSync vendor
+
         buffer.push fs.readFileSync vendor, 'utf-8'
       else
         warn "Vendor not found at ".white + vendor.yellow.bold
